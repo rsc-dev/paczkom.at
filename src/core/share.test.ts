@@ -7,7 +7,9 @@ import {
   SHARE_URL,
   buildGrid,
   buildShareText,
+  buildWeekShareText,
   formatTime,
+  weekUrl,
 } from './share.js';
 import { buildWall } from './wall.js';
 
@@ -85,6 +87,82 @@ describe('formatTime', () => {
 
   it('clamps a negative time', () => {
     expect(formatTime(-5)).toBe('0:00');
+  });
+});
+
+describe('buildWeekShareText', () => {
+  const day = (label: string, stars: number, score: number) => ({
+    label,
+    stars,
+    score,
+    failed: false,
+  });
+
+  it('matches the Polish week card from the design', () => {
+    expect(
+      buildWeekShareText({
+        modeLabel: 'Tydzień',
+        seed: 'k3j9x',
+        days: [
+          day('Pn', 3, 1240),
+          day('Wt', 3, 1380),
+          day('Śr', 2, 1610),
+          day('Cz', 2, 1720),
+          day('Pt', 1, 1950),
+          { label: 'So', stars: 0, score: 0, failed: true },
+        ],
+      }),
+    ).toBe(
+      [
+        'paczkom.at · Tydzień',
+        'Pn ⭐⭐⭐ 1240',
+        'Wt ⭐⭐⭐ 1380',
+        'Śr ⭐⭐ 1610',
+        'Cz ⭐⭐ 1720',
+        'Pt ⭐ 1950',
+        'So ❌',
+        'https://paczkom.at/?week=k3j9x',
+      ].join('\n'),
+    );
+  });
+
+  it('has one line per day and ends with the link that replays it', () => {
+    const text = buildWeekShareText({
+      modeLabel: 'Week',
+      seed: 'k3j9x',
+      days: Array.from({ length: 6 }, (_unused, i) => day('Mo', 3, 100 * i)),
+    });
+    expect(text.split('\n')).toHaveLength(8);
+    expect(text.endsWith(weekUrl('k3j9x'))).toBe(true);
+    expect(text).toContain('https://paczkom.at/?week=k3j9x');
+  });
+
+  it('stops at the day a failed week ran out on', () => {
+    const text = buildWeekShareText({
+      modeLabel: 'Tydzień',
+      seed: 'abc',
+      days: [
+        day('Pn', 3, 100),
+        day('Wt', 3, 100),
+        day('Śr', 2, 100),
+        day('Cz', 1, 100),
+        { label: 'Pt', stars: 0, score: 100, failed: true },
+      ],
+    });
+    const lines = text.split('\n');
+    // Header, five days, URL — no Saturday.
+    expect(lines).toHaveLength(7);
+    expect(lines[5]).toBe('Pt ❌');
+    expect(text).not.toContain('So');
+  });
+
+  it('leaves the day labels to the caller and the emoji alone', () => {
+    const text = buildWeekShareText({
+      modeLabel: 'Week',
+      seed: 'abc',
+      days: [day('Mon', 3, 10)],
+    });
+    expect(text).toContain('Mon ⭐⭐⭐ 10');
   });
 });
 

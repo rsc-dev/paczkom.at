@@ -68,3 +68,46 @@ export function buildShareText(params: ShareParams): string {
     SHARE_URL,
   ].join('\n');
 }
+
+// ---------------------------------------------------------------------------
+// Week
+// ---------------------------------------------------------------------------
+
+export const STAR = '⭐';
+export const FAILED_DAY = '❌';
+
+export interface WeekShareDay {
+  /** Localised abbreviation: Pn, Wt, Śr … */
+  readonly label: string;
+  readonly score: number;
+  /** Stars left after that day. */
+  readonly stars: number;
+  /** True for the day the run ran out of stars. */
+  readonly failed: boolean;
+}
+
+export interface WeekShareParams {
+  /** Localised mode name, e.g. "Tydzień" / "Week". */
+  readonly modeLabel: string;
+  readonly days: readonly WeekShareDay[];
+  /** The seed, already encoded for a URL. */
+  readonly seed: string;
+}
+
+/** `/?week=<seed>`: the link that replays this exact week. */
+export function weekUrl(seed: string): string {
+  return `${SHARE_URL}/?week=${seed}`;
+}
+
+/**
+ * One line per day played (design D6). A failed week simply stops at the day it
+ * failed on, with ❌ where the stars would be.
+ */
+export function buildWeekShareText(params: WeekShareParams): string {
+  const lines = params.days.map((day) =>
+    day.failed
+      ? `${day.label} ${FAILED_DAY}`
+      : `${day.label} ${STAR.repeat(day.stars)} ${String(day.score)}`,
+  );
+  return [`${SHARE_BRAND} · ${params.modeLabel}`, ...lines, weekUrl(params.seed)].join('\n');
+}

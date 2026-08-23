@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "paczkom.at — a small browser game about a parcel locker",
+  "description": "paczkom.at \u2014 a small browser game about a parcel locker",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "gen:fixtures": "tsx scripts/generate-scripted-days.ts",
+    "gen:fixtures": "tsx scripts/generate-scripted-days.ts && tsx scripts/generate-scripted-weeks.ts",
     "gen:icons": "tsx scripts/generate-icons.ts"
   },
   "engines": {

@@ -20,7 +20,7 @@ import {
 import type { Action, DaySummary, State } from '../src/core/game.js';
 import { DAILY_PROFILE, SATURDAY, THURSDAY } from '../src/core/profiles.js';
 import type { DayProfile } from '../src/core/profiles.js';
-import { fits } from '../src/core/wall.js';
+import { fits, sizeRank } from '../src/core/wall.js';
 
 const TICK_MS = 250;
 const GUARD = 5_000;
@@ -37,8 +37,16 @@ const apply = (take: Take, action: Action): Take => ({
 
 const tick = (take: Take): Take => apply(take, { type: 'tick', dtMs: TICK_MS });
 
+/**
+ * The smallest free door that takes this parcel. Taking the *first* one instead
+ * would spend C doors on A parcels and strand the big ones later.
+ */
 function freeSlotFor(state: State, size: 'A' | 'B' | 'C'): string | null {
-  return state.slots.find((slot) => slot.state === 'empty' && fits(size, slot.size))?.id ?? null;
+  return (
+    [...state.slots]
+      .filter((slot) => slot.state === 'empty' && !slot.jammed && fits(size, slot.size))
+      .sort((a, b) => sizeRank(a.size) - sizeRank(b.size))[0]?.id ?? null
+  );
 }
 
 function targetSlot(state: State): string | null {

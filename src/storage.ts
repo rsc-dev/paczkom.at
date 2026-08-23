@@ -108,11 +108,13 @@ export function createStorage(backend: StorageBackend | null = defaultBackend())
 /** The instance the app uses. */
 export const storage: Storage = createStorage();
 
-/** Keys the game persists (design D12). */
+/** Keys the game persists (design D12, plus the Week change's best run). */
 export const STORAGE_KEYS = {
   lang: 'lang',
   theme: 'theme',
   mute: 'mute',
   daily: 'daily',
   best: 'best',
+  /** Highest total from a *completed* week. */
+  weekBest: 'week:best',
 } as const;

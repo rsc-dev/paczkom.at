@@ -14,10 +14,10 @@
 
 ## 3. Week run and reputation
 
-- [ ] 3.1 `core/week.ts`: run state, day seed derivation `hash(seed, dayIndex)`, advance, star accounting (one per unplaced/refused/walked, floor 0), fail detection, totals; tests for star loss, floor, fail, determinism
-- [ ] 3.2 Seed encoding (base36) and `?week=` parsing/writing with `history.replaceState`
-- [ ] 3.3 `storage.ts`: `week:best` key; best-week update rule; tests
-- [ ] 3.4 Scripted-week fixture: a full six-day action log with expected totals, and a failing-on-Friday log
+- [x] 3.1 `core/week.ts`: run state, day seed derivation `hash(seed, dayIndex)`, advance, star accounting (one per unplaced/refused/walked, floor 0), fail detection, totals; tests for star loss, floor, fail, determinism
+- [x] 3.2 Seed encoding (base36) and `?week=` parsing/writing with `history.replaceState`
+- [x] 3.3 `storage.ts`: `week:best` key; best-week update rule; tests
+- [x] 3.4 Scripted-week fixture: a full six-day action log with expected totals, and a failing-on-Friday log
 
 ## 4. UI
 

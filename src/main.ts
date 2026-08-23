@@ -170,7 +170,7 @@ function startDay(): void {
 function finishDay(): void {
   stopLoop();
   const summary = game.summary;
-  if (summary === null || run === null) {
+  if (summary === null || run === null || run.mode !== 'daily') {
     return;
   }
 

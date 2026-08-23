@@ -23,12 +23,13 @@ import type { DailyRecords } from './core/daily.js';
 import type { DaySummary } from './core/game.js';
 import { DAILY_PROFILE } from './core/profiles.js';
 import type { DayProfile } from './core/profiles.js';
+import { daySeed, recordDay, startWeek, totalScore, weekProfile } from './core/week.js';
+import type { DayResult, WeekState } from './core/week.js';
 import { STORAGE_KEYS } from './storage.js';
 import type { Storage } from './storage.js';
 import type { ResultModel } from './ui/screens.js';
 
-export interface DayRun {
-  /** The Week change adds `'week'` here, with its own finish behaviour. */
+export interface DailyRun {
   readonly mode: 'daily';
   readonly profile: DayProfile;
   readonly seed: number;
@@ -37,6 +38,17 @@ export interface DayRun {
   /** True when that date already had a result before this run began. */
   readonly isPractice: boolean;
 }
+
+export interface WeekRun {
+  readonly mode: 'week';
+  readonly profile: DayProfile;
+  /** The seed of *this day*, derived from the week's. */
+  readonly seed: number;
+  /** The week the day belongs to, carried across days. */
+  readonly week: WeekState;
+}
+
+export type DayRun = DailyRun | WeekRun;
 
 export interface RunEnvironment {
   readonly now: () => Date;
@@ -56,7 +68,7 @@ export function currentStreak(env: RunEnvironment): number {
   return computeStreak(readRecords(env.storage), utcDateString(env.now()));
 }
 
-export function startDailyRun(env: RunEnvironment): DayRun {
+export function startDailyRun(env: RunEnvironment): DailyRun {
   const date = utcDateString(env.now());
   return {
     mode: 'daily',
@@ -74,7 +86,7 @@ export function startDailyRun(env: RunEnvironment): DayRun {
  */
 export function finishDailyRun(
   env: RunEnvironment,
-  run: DayRun,
+  run: DailyRun,
   summary: DaySummary,
   grid: readonly string[],
 ): ResultModel {
@@ -102,4 +114,71 @@ export function finishDailyRun(
     isPractice: run.isPractice,
     officialScore: run.isPractice ? officialScore : null,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Week
+// ---------------------------------------------------------------------------
+
+/** Monday of a fresh week. */
+export function startWeekRun(seed: number): WeekRun {
+  const week = startWeek(seed);
+  return {
+    mode: 'week',
+    week,
+    profile: weekProfile(week.dayIndex),
+    seed: daySeed(week.seed, week.dayIndex),
+  };
+}
+
+/** The next day of a week already under way. */
+export function continueWeekRun(week: WeekState): WeekRun {
+  return {
+    mode: 'week',
+    week,
+    profile: weekProfile(week.dayIndex),
+    seed: daySeed(week.seed, week.dayIndex),
+  };
+}
+
+export function readWeekBest(storage: Storage): number {
+  return storage.get<number>(STORAGE_KEYS.weekBest) ?? 0;
+}
+
+export interface WeekOutcome {
+  readonly week: WeekState;
+  /** The day just played, for the day-summary screen. */
+  readonly day: DayResult;
+  readonly total: number;
+  readonly best: number;
+  /** True when this run beat the stored best; only a completed week can. */
+  readonly isBest: boolean;
+}
+
+/**
+ * Files a finished Week day: spends the stars it cost, and — if that was
+ * Saturday — records the total as the new best if it beats the stored one. A
+ * week that ran out of stars is not a week you finished, so it cannot set a
+ * record.
+ */
+export function finishWeekDay(
+  env: RunEnvironment,
+  run: WeekRun,
+  summary: DaySummary,
+  grid: readonly string[],
+): WeekOutcome {
+  const week = recordDay(run.week, summary, grid);
+  const day = week.days.at(-1);
+  if (day === undefined) {
+    throw new Error('a finished week day produced no result');
+  }
+
+  const total = totalScore(week);
+  const storedBest = readWeekBest(env.storage);
+  const isBest = week.status === 'done' && total > storedBest;
+  if (isBest) {
+    env.storage.set(STORAGE_KEYS.weekBest, total);
+  }
+
+  return { week, day, total, best: Math.max(storedBest, isBest ? total : 0), isBest };
 }
