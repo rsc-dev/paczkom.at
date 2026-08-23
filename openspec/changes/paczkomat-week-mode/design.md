@@ -85,6 +85,7 @@ Four- and five-column walls reuse the existing CSS grid; `--unit` will hit its 2
 - [Rain mask makes look-alike pairs unfair] → the masked digit is never one of the transposed positions of a pair.
 - [Week lost on tab close] → accepted; a week is ~12 minutes. Revisit if users ask.
 - [URL seed manipulation] → harmless; there is no server or leaderboard.
+- [Landscape phones (~740×360) clip the wall] → known limitation inherited from core-daily; the manifest requests portrait for installed use. If playtests surface it, add a rotate-your-phone overlay below 480 px viewport height rather than a landscape layout.
 
 ## Migration Plan
 
