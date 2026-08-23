@@ -37,34 +37,34 @@
 
 ## 5. UI and theme
 
-- [ ] 5.1 `theme/tokens.css`: all tokens on `:root` (colours, door colours per state, parcel colour tokens, radius, font, shadow, `--motion`, `--unit`), `prefers-reduced-motion` override; `theme/signage.css` for `[data-theme="signage"]`; bundle Inter woff2 (latin + latin-ext) under `public/fonts/`
-- [ ] 5.2 Static DOM skeleton in `index.html`: app root, screens (`title`, `howto`, `game`, `result`), `scenery` div, wall grid, screen panel, HUD, customer queue, parcel queue
-- [ ] 5.3 `ui/wall.ts`: build door buttons from `buildWall`, CSS grid placement via `grid-row: span`, `data-*` attributes, accessible labels, enlarged hit areas; responsive rule for screen-panel placement (<640 px above, else central column)
-- [ ] 5.4 `ui/render.ts`: diff previous vs next state and update only changed `data-*` attributes/text for doors, parcel queue, customer queue, screen panel, HUD timers; `ui/input.ts` mapping pointer events on doors/customers/buttons to actions
-- [ ] 5.5 `ui/screen.ts`: active customer display (code, hint line, hint level visuals: swatch + sticker, column highlight), sender request, patience bars
-- [ ] 5.6 `ui/hud.ts`: phase label, clock (SERVE shown as 08:00→20:00), score, remaining parcels, mute + language toggles
-- [ ] 5.7 Screens: title (Daily button, how-to, streak, toggles), how-to (three steps, localised), result (Daily number/date, score, time, grid, streak, best, share, practice-again, practice labelling)
-- [ ] 5.8 `main.ts` game loop: rAF tick dispatch, screen routing, Daily start/finish wiring to `daily.ts` and storage (first-attempt-counts, practice counter)
-- [ ] 5.9 Share button: `navigator.share` → clipboard → textarea chain with localised confirmation
-- [ ] 5.10 Language toggle re-render without state reset; theme attribute set from storage at boot (`signage` only)
-- [ ] 5.11 Manual pass on 360×640, 390×844 and 1280×800 viewports: no scrolling, all doors visible, hit areas verified
+- [x] 5.1 `theme/tokens.css`: all tokens on `:root` (colours, door colours per state, parcel colour tokens, radius, font, shadow, `--motion`, `--unit`), `prefers-reduced-motion` override; `theme/signage.css` for `[data-theme="signage"]`; bundle Inter woff2 (latin + latin-ext) under `public/fonts/`
+- [x] 5.2 Static DOM skeleton in `index.html`: app root, screens (`title`, `howto`, `game`, `result`), `scenery` div, wall grid, screen panel, HUD, customer queue, parcel queue
+- [x] 5.3 `ui/wall.ts`: build door buttons from `buildWall`, CSS grid placement via `grid-row: span`, `data-*` attributes, accessible labels, enlarged hit areas; responsive rule for screen-panel placement (<640 px above, else central column)
+- [x] 5.4 `ui/render.ts`: diff previous vs next state and update only changed `data-*` attributes/text for doors, parcel queue, customer queue, screen panel, HUD timers; `ui/input.ts` mapping pointer events on doors/customers/buttons to actions
+- [x] 5.5 `ui/screen.ts`: active customer display (code, hint line, hint level visuals: swatch + sticker, column highlight), sender request, patience bars
+- [x] 5.6 `ui/hud.ts`: phase label, clock (SERVE shown as 08:00→20:00), score, remaining parcels, mute + language toggles
+- [x] 5.7 Screens: title (Daily button, how-to, streak, toggles), how-to (three steps, localised), result (Daily number/date, score, time, grid, streak, best, share, practice-again, practice labelling)
+- [x] 5.8 `main.ts` game loop: rAF tick dispatch, screen routing, Daily start/finish wiring to `daily.ts` and storage (first-attempt-counts, practice counter)
+- [x] 5.9 Share button: `navigator.share` → clipboard → textarea chain with localised confirmation
+- [x] 5.10 Language toggle re-render without state reset; theme attribute set from storage at boot (`signage` only)
+- [x] 5.11 Manual pass on 360×640, 390×844 and 1280×800 viewports: no scrolling, all doors visible, hit areas verified
 
 ## 6. Audio
 
-- [ ] 6.1 `audio/sfx.ts`: gesture-gated `AudioContext`, synthesised `tap`, `door`, `wrong`, `done`; mute respected before context creation
-- [ ] 6.2 Wire cues to reducer feedback flags in `render.ts`; mute toggle persisted
+- [x] 6.1 `audio/sfx.ts`: gesture-gated `AudioContext`, synthesised `tap`, `door`, `wrong`, `done`; mute respected before context creation
+- [x] 6.2 Wire cues to reducer feedback flags in `render.ts`; mute toggle persisted
 
 ## 7. Quality gates
 
-- [ ] 7.1 Test that scans `src/core` and `src/ui` for colour literals and fails on any match
-- [ ] 7.2 Playwright smoke test against `vite preview` of `dist/`: title → Daily → place one parcel → idle to result → share button visible
-- [ ] 7.3 ESLint clean, `tsc --noEmit` clean, all unit tests green
+- [x] 7.1 Test that scans `src/core` and `src/ui` for colour literals and fails on any match
+- [x] 7.2 Playwright smoke test against `vite preview` of `dist/`: title → Daily → place one parcel → idle to result → share button visible
+- [x] 7.3 ESLint clean, `tsc --noEmit` clean, all unit tests green
 
 ## 8. Deploy and docs
 
-- [ ] 8.1 `public/CNAME` (`paczkom.at`), `public/manifest.webmanifest`, favicon and icons; verify they appear in `dist/`
-- [ ] 8.2 `.github/workflows/ci.yml`: typecheck, lint, unit tests, build, Playwright smoke (Chromium) on push and PR
-- [ ] 8.3 `.github/workflows/deploy.yml`: on push to `main` after CI, `upload-pages-artifact` + `deploy-pages`
-- [ ] 8.4 Set `LAUNCH_EPOCH` to the launch date
-- [ ] 8.5 `README.md`: prerequisites, install, dev, test, build, deploy, GitHub Pages + DNS setup for `paczkom.at`, trademark note on wording
-- [ ] 8.6 Enable GitHub Pages (source: Actions) and custom domain in repo settings; confirm the site loads at `paczkom.at` (owner action, documented in README)
+- [x] 8.1 `public/CNAME` (`paczkom.at`), `public/manifest.webmanifest`, favicon and icons; verify they appear in `dist/`
+- [x] 8.2 `.github/workflows/ci.yml`: typecheck, lint, unit tests, build, Playwright smoke (Chromium) on push and PR
+- [x] 8.3 `.github/workflows/deploy.yml`: on push to `main` after CI, `upload-pages-artifact` + `deploy-pages`
+- [x] 8.4 Set `LAUNCH_EPOCH` to the launch date
+- [x] 8.5 `README.md`: prerequisites, install, dev, test, build, deploy, GitHub Pages + DNS setup for `paczkom.at`, trademark note on wording
+- [x] 8.6 Enable GitHub Pages (source: Actions) and custom domain in repo settings; confirm the site loads at `paczkom.at` (owner action, documented in README)
