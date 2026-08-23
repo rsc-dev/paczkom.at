@@ -56,7 +56,15 @@ For an active pickup customer, `tapSlot` on the slot holding their parcel SHALL 
 - **THEN** the customer's wrong-tap count increments, a `wrong` cue fires and the slot state is unchanged
 
 ### Requirement: Hint ladder
-For an active pickup, hint level SHALL become 1 after the first wrong tap or after 6 s active without a tap, and level 2 after the second wrong tap or after 12 s active. Level 1 SHALL reveal the parcel's colour and sticker on the screen; level 2 SHALL additionally mark the column containing the parcel with `data-hint="column"`. Levels SHALL reset when the active customer changes.
+For an active pickup, hint level SHALL become 1 after the first wrong tap or after 6 s active without a tap, and level 2 after the second wrong tap or after 12 s active. Level 1 SHALL reveal the parcel's colour and sticker on the screen; level 2 SHALL additionally mark the column containing the parcel with `data-hint="column"`. A level once reached SHALL be kept for that customer for the rest of the day (levels never decrease); only the idle timer restarts when the active customer changes or a tap occurs. A customer whose level ever reached 1 or more SHALL yield outcome `hinted` when served.
+
+#### Scenario: Level never decreases
+- **WHEN** a pickup has reached level 2 by idling and the user then makes a wrong tap
+- **THEN** hint level remains 2 and the column stays marked
+
+#### Scenario: Switching customers keeps the level
+- **WHEN** a pickup has reached level 2, the user selects another customer and then re-selects the first
+- **THEN** the first customer's hint level is still 2 and serving them yields outcome `hinted`
 
 #### Scenario: Time-based hint
 - **WHEN** a pickup has been active for 6 s with no taps
@@ -93,11 +101,15 @@ Each visible customer SHALL have patience that drains at 1 s per second from a p
 - **THEN** the customer is removed and the `refused` count increments
 
 ### Requirement: SERVE end
-SERVE SHALL end when the serve timer expires or when no customers remain (visible or pending); any remaining customers at timer expiry SHALL walk.
+SERVE SHALL end when the serve timer expires, or early when every scheduled arrival has been admitted and no customers remain (visible or pending); any remaining customers at timer expiry SHALL walk.
 
 #### Scenario: Timer expiry with customers waiting
 - **WHEN** the serve timer expires with two customers visible
 - **THEN** both walk and the phase becomes SWEEP
+
+#### Scenario: Early end waits for the schedule
+- **WHEN** the first customer is served and no customer is visible but later arrivals are still scheduled
+- **THEN** SERVE continues
 
 ### Requirement: SWEEP
 On entering SWEEP every `outgoing` and `expired` slot SHALL become `marked`. `tapSlot` on a marked slot SHALL make it `empty`; taps elsewhere SHALL be ignored. SWEEP SHALL be untimed but its elapsed time SHALL count toward total time. If no slots are marked, SWEEP SHALL be skipped.

@@ -71,12 +71,18 @@ export function shuffle<T>(state: RngState, items: readonly T[]): [T[], RngState
   return [result, current];
 }
 
-/** One key of a weight map, chosen proportionally to its weight. */
+/**
+ * One key of a weight map, chosen proportionally to its weight. Keys are sorted
+ * before the walk, so the order they happen to be written in a profile literal
+ * cannot change which key a given roll lands on.
+ */
 export function weightedPick<K extends string>(
   state: RngState,
   weights: Readonly<Record<K, number>>,
 ): [K, RngState] {
-  const entries = Object.entries(weights) as [K, number][];
+  const entries = (Object.entries(weights) as [K, number][]).sort(([a], [b]) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  );
   const total = entries.reduce((sum, [, weight]) => sum + Math.max(0, weight), 0);
   if (total <= 0) {
     throw new RangeError('weightedPick requires at least one positive weight');

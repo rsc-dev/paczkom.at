@@ -20,7 +20,11 @@ export interface DayProfile {
   readonly patienceMs: number;
   /** How many customers are visible (and draining patience) at once. */
   readonly visibleCustomers: number;
-  /** Arrivals are spread over this window from the start of SERVE. */
+  /**
+   * Arrivals are spread over this window from the start of SERVE. Invariant for
+   * every profile: `arrivalWindowMs + patienceMs <= serveMs`, so no customer
+   * walks purely because SERVE ended before their patience did.
+   */
   readonly arrivalWindowMs: number;
   /** How long a door stays `open` after a correct pickup. */
   readonly doorMs: number;
@@ -45,7 +49,8 @@ export const DAILY_PROFILE: DayProfile = {
   serveMs: 65_000,
   patienceMs: 20_000,
   visibleCustomers: 3,
-  arrivalWindowMs: 50_000,
+  // 45 + 20 = 65: the last possible arrival still gets their full patience.
+  arrivalWindowMs: 45_000,
   doorMs: 220,
   hintDelay1Ms: 6_000,
   hintDelay2Ms: 12_000,

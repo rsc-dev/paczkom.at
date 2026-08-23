@@ -74,7 +74,12 @@ export function stickerName(sticker: Sticker, lang: Lang = currentLang): string 
   return translate(lang, `sticker.${sticker}`);
 }
 
-/** The hint line shown at hint level 1, built from the parcel's identity. */
+/**
+ * The hint line shown at hint level 1, built from the parcel's identity.
+ *
+ * The sticker half is a whole phrase per sticker rather than a name slotted
+ * into one template: Polish needs a different preposition for each sticker.
+ */
 export function hintLine(colour: Colour, sticker: Sticker, lang: Lang = currentLang): string {
   const colourText = colourName(colour, lang);
   if (sticker === 'none') {
@@ -82,6 +87,6 @@ export function hintLine(colour: Colour, sticker: Sticker, lang: Lang = currentL
   }
   return translate(lang, 'hint.colourSticker', {
     colour: colourText,
-    sticker: stickerName(sticker, lang),
+    sticker: translate(lang, `hint.sticker.${sticker}`),
   });
 }

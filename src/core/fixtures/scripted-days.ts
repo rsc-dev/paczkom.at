@@ -19,7 +19,7 @@ export const SCRIPTED_DAYS: readonly ScriptedDay[] = [
   {
     name: 'perfect day',
     seed: 20260901,
-    actions: ['start', 's:c0r4', 's:c0r6', 's:c0r5', 's:c0r0', 's:c0r1', 's:c1r4', 's:c0r2', 's:c0r3', 's:c1r0', 's:c1r1', 's:c1r2', 's:c1r6', 's:c1r3', 's:c1r5', 's:c2r4', 's:c2r5', 't250*3', 's:c0r4', 't250*12', 's:c1r4', 't250*6', 's:c0r4', 't250*6', 's:c1r6', 't250*10', 's:c0r3', 't250*17', 's:c0r3', 't250*2', 's:c0r6', 't250*10', 's:c1r1', 't250*18', 's:c0r1', 't250*4', 's:c0r6', 't250*9', 's:c2r5', 't250*18', 's:c0r5', 't250*8', 's:c1r0', 't250*5', 's:c0r0', 't250*11', 's:c1r5', 't250*15', 's:c0r0', 't250*3', 's:c2r4', 't250*11', 's:c0r2', 't250*16', 's:c1r2', 't250*8', 's:c1r3', 's:c0r0', 's:c0r3', 's:c0r4', 's:c0r6'],
+    actions: ['start', 's:c0r4', 's:c0r6', 's:c0r5', 's:c0r0', 's:c0r1', 's:c1r4', 's:c0r2', 's:c0r3', 's:c1r0', 's:c1r1', 's:c1r2', 's:c1r6', 's:c1r3', 's:c1r5', 's:c2r4', 's:c2r5', 't250*3', 's:c0r4', 't250*10', 's:c1r4', 't250*6', 's:c0r4', 't250*5', 's:c1r6', 't250*9', 's:c0r3', 't250*16', 's:c0r3', 't250', 's:c0r6', 't250*9', 's:c1r1', 't250*17', 's:c0r1', 't250*3', 's:c0r6', 't250*8', 's:c2r5', 't250*16', 's:c0r5', 't250*8', 's:c1r0', 't250*5', 's:c0r0', 't250*9', 's:c1r5', 't250*13', 's:c0r0', 't250*3', 's:c2r4', 't250*11', 's:c0r2', 't250*14', 's:c1r2', 't250*7', 's:c1r3', 's:c0r0', 's:c0r3', 's:c0r4', 's:c0r6'],
     expected: {
       served: 20,
       hinted: 0,
@@ -28,7 +28,7 @@ export const SCRIPTED_DAYS: readonly ScriptedDay[] = [
       unplaced: 0,
       wrongTaps: 0,
       score: 4000,
-      timeMs: 48000,
+      timeMs: 43250,
       slotOutcomes: {
         c0r0: 'perfect',
         c0r1: 'perfect',
@@ -57,7 +57,7 @@ export const SCRIPTED_DAYS: readonly ScriptedDay[] = [
   {
     name: 'hinted day',
     seed: 20260902,
-    actions: ['start', 's:c0r0', 's:c0r4', 's:c0r5', 's:c0r1', 's:c0r6', 's:c0r2', 's:c0r3', 's:c1r4', 's:c1r5', 's:c1r0', 's:c1r1', 's:c1r2', 's:c1r6', 's:c1r3', 's:c2r0', 's:c2r1', 's:c0r0', 's:c0r2', 't250*11', 's:c0r0', 's:c1r5', 't250*10', 's:c0r0', 's:c1r6', 't250*8', 's:c0r1', 's:c0r0', 't250*10', 's:c0r1', 's:c1r5', 't250*14', 's:c0r1', 's:c1r0', 't250*4', 's:c0r1', 's:c1r4', 't250*10', 's:c0r1', 's:c1r1', 't250*17', 's:c0r1', 's:c0r0', 't250*5', 's:c0r3', 's:c0r1', 't250*13', 's:c0r3', 's:c0r1', 't250*12', 's:c0r3', 's:c0r5', 't250*11', 's:c0r3', 's:c0r4', 't250*4', 's:c0r3', 's:c1r2', 't250*7', 's:c0r3', 's:c1r3', 't250*17', 's:c0r6', 's:c0r3', 't250*12', 's:c0r6', 's:c2r0', 't250*7', 's:c0r6', 's:c2r1', 't250*88', 's:c0r0', 's:c0r1', 's:c0r6', 's:c1r5'],
+    actions: ['start', 's:c0r0', 's:c0r4', 's:c0r5', 's:c0r1', 's:c0r6', 's:c0r2', 's:c0r3', 's:c1r4', 's:c1r5', 's:c1r0', 's:c1r1', 's:c1r2', 's:c1r6', 's:c1r3', 's:c2r0', 's:c2r1', 's:c0r0', 's:c0r2', 't250*10', 's:c0r0', 's:c1r5', 't250*9', 's:c0r0', 's:c1r6', 't250*8', 's:c0r1', 's:c0r0', 't250*8', 's:c0r1', 's:c1r5', 't250*13', 's:c0r1', 's:c1r0', 't250*3', 's:c0r1', 's:c1r4', 't250*9', 's:c0r1', 's:c1r1', 't250*15', 's:c0r1', 's:c0r0', 't250*5', 's:c0r3', 's:c0r1', 't250*12', 's:c0r3', 's:c0r1', 't250*11', 's:c0r3', 's:c0r5', 't250*9', 's:c0r3', 's:c0r4', 't250*4', 's:c0r3', 's:c1r2', 't250*7', 's:c0r3', 's:c1r3', 't250*15', 's:c0r6', 's:c0r3', 't250*10', 's:c0r6', 's:c2r0', 't250*6', 's:c0r6', 's:c2r1', 't250*100', 's:c0r0', 's:c0r1', 's:c0r6', 's:c1r5'],
     expected: {
       served: 18,
       hinted: 15,
@@ -66,7 +66,7 @@ export const SCRIPTED_DAYS: readonly ScriptedDay[] = [
       unplaced: 0,
       wrongTaps: 18,
       score: 3025,
-      timeMs: 65000,
+      timeMs: 63500,
       slotOutcomes: {
         c0r0: 'hinted',
         c0r1: 'hinted',

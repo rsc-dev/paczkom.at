@@ -58,9 +58,9 @@ Parcel = `{ id, size, code, colour, sticker }`. Codes are 4 digits, unique withi
 | SERVE | 65 s (displayed as 08:00→20:00) | Customers arrive from the schedule. Up to 3 are visible; the rest are pending and do not drain patience. Tapping a visible customer makes them active (default: front). Pickup: `tapSlot` on their slot opens the door and frees it; other slots count as a wrong tap. Sender: `tapSlot` on a free slot with `size ≥ needed` places a grey outgoing parcel; otherwise wrong tap. Patience 20 s per visible customer; at 0 they walk (pickup parcel stays, marked expired; sender counts as refused). |
 | SWEEP | untimed (counted in total time) | Doors holding outgoing or expired parcels are marked; `tapSlot` on each clears it. When none remain → summary. |
 
-Hint ladder (pickups only): level 1 after the first wrong tap **or** 6 s without a tap — the screen shows the colour swatch and sticker; level 2 after the second wrong tap **or** 12 s — the column containing the parcel is highlighted. Levels reset per customer. A customer served at level 0 on the first tap yields outcome `perfect`; otherwise `hinted`; walked yields `walked`.
+Hint ladder (pickups only): level 1 after the first wrong tap **or** 6 s without a tap — the screen shows the colour swatch and sticker; level 2 after the second wrong tap **or** 12 s — the column containing the parcel is highlighted. The level is stored per customer and only ever rises; the idle timer restarts on a tap or when the active customer changes, so switching customers cannot be used to farm a free hint. A customer served at level 0 on the first tap yields outcome `perfect`; otherwise `hinted`; walked yields `walked`.
 
-Schedule for the Daily profile: 16 pickup parcels loaded in LOAD; during SERVE 16 pickups + 4 senders arrive at seeded times spread over the first 50 s with slight jitter; 2 look-alike pairs. These numbers live in `core/profiles.ts` as a `DayProfile` so the Week change adds rows, not code paths.
+Schedule for the Daily profile: 16 pickup parcels loaded in LOAD; during SERVE 16 pickups + 4 senders arrive at seeded times spread over the first 45 s with slight jitter; 2 look-alike pairs. Invariant for every profile: `arrivalWindow + patience ≤ serve`, so a customer can never walk purely because SERVE ended before their patience did. These numbers live in `core/profiles.ts` as a `DayProfile` so the Week change adds rows, not code paths.
 
 ### D6. Scoring
 
@@ -73,7 +73,7 @@ Reputation is intentionally absent; the Week change adds it on top of the same s
 
 ### D7. Daily mode rules and storage
 
-`daily:<YYYY-MM-DD>` → `{ result?: { score, timeMs, grid }, practices: number }`. The first completed run on a date is the result; later runs are practice and the result screen labels them so. Streak = count of consecutive UTC dates, ending today or yesterday, that have a result. `best` stores the highest Daily score. Daily number `#N` = days since a launch epoch constant (`2026-09-01` = #1; adjust before launch).
+`daily` → a map keyed by `YYYY-MM-DD` of `{ result?: { score, timeMs, grid }, practices: number }` (one storage key, so a day's records are read and written together). The first completed run on a date is the result; later runs are practice and the result screen labels them so. Streak = count of consecutive UTC dates, ending today or yesterday, that have a result. `best` stores the highest Daily score. Daily number `#N` = days since a launch epoch constant (`2026-09-01` = #1; adjust before launch).
 
 ### D8. Share card
 

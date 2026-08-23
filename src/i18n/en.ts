@@ -14,7 +14,7 @@ export const en: Record<MessageKey, string> = {
   'title.howto': 'How to play',
   'title.streak': 'Streak: {count}',
   'title.best': 'Best: {score}',
-  'title.noStreak': 'You have not played today',
+  'title.noStreak': 'No game today yet',
 
   'howto.title': 'How to play',
   'howto.step1': 'Load: tap a box the parcel fits into.',
@@ -44,7 +44,10 @@ export const en: Record<MessageKey, string> = {
   'screen.idle': 'Nobody here. For now.',
 
   'hint.colour': 'the {colour} one',
-  'hint.colourSticker': 'the {colour} one with the {sticker} sticker',
+  'hint.colourSticker': 'the {colour} one {sticker}',
+  'hint.sticker.fragile': 'with the fragile sticker',
+  'hint.sticker.arrow': 'with the arrow sticker',
+  'hint.sticker.bang': 'with the exclamation mark',
 
   'colour.red': 'red',
   'colour.orange': 'orange',

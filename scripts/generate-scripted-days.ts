@@ -46,7 +46,7 @@ function targetSlot(state: State): string | null {
     return null;
   }
   if (active.kind === 'sender') {
-    return freeSlotFor(state, active.needsSize ?? 'A');
+    return freeSlotFor(state, active.needsSize);
   }
   return state.slots.find((slot) => slot.parcelId === active.parcelId)?.id ?? null;
 }
@@ -56,10 +56,8 @@ function decoySlot(state: State): string | null {
   if (active === null) {
     return null;
   }
-  return (
-    state.slots.find((slot) => slot.state === 'full' && slot.parcelId !== active.parcelId)?.id ??
-    null
-  );
+  const theirs = active.kind === 'pickup' ? active.parcelId : null;
+  return state.slots.find((slot) => slot.state === 'full' && slot.parcelId !== theirs)?.id ?? null;
 }
 
 function load(take: Take, limit: number): Take {

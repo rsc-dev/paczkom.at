@@ -32,11 +32,11 @@
 | Fri | 4 | 20 | 6 | 2 | forgotten ×2, late van | 25 s (×0.6) | 70 s | 20 s |
 | Sat | 5 | 27 | 8 | 3 | jam ×1, forgotten ×2, rain, late van | 25 s (×0.6) | 75 s | 18 s |
 
-Daily = the Thursday row. Numbers are data in `core/profiles.ts`; tuning is a data edit.
+Daily = the Thursday row. Numbers are data in `core/profiles.ts`; tuning is a data edit. Every profile keeps the invariant `arrivalWindow + patience ≤ serve` (e.g. Saturday: 75 − 18 = 57 s arrival window) so no customer walks solely because SERVE ended.
 
 ### D3. Events as schedule entries and reducer cases
 
-The schedule gains entries `{ at, kind: 'jam', slot }` and per-customer flags `forgotten: true`; day-wide modifiers `rain: true` and `lateVan: true` live on the profile. Reducer behaviour:
+The schedule is a discriminated union of entries (`{ kind: 'arrival', … } | { kind: 'jam', at, slot }`; `CustomerKind` stays separate) and gains per-customer flags `forgotten: true`; day-wide modifiers `rain: true` and `lateVan: true` live on the profile. Reducer behaviour:
 
 - **Jammed door** (`slot.jammed = true`, independent of state): at `at` seconds into SERVE a seeded slot (preferring a `full` slot) jams; the door shows a jam marker. Senders cannot use it (tapping it is a wrong tap). For a pickup in a jammed slot the *first* correct tap un-jams (cue `thunk`, no penalty, no outcome change), the *second* opens the door. Jam clears on open or at SWEEP.
 - **Forgotten code**: the customer card shows no code, only the description line (size + colour + sticker). Hint ladder behaves as usual from level 0, so a first-tap success is still `perfect`.

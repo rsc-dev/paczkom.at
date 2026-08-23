@@ -11,10 +11,10 @@ import type { Parcel } from './parcel.js';
 import type { DayProfile } from './profiles.js';
 import type { RngState } from './rng.js';
 import { buildSchedule } from './schedule.js';
-import type { Arrival, CustomerKind } from './schedule.js';
+import type { CustomerRequest, ScheduleEntry } from './schedule.js';
 import { PENALTY, applyPoints, servicePoints } from './score.js';
 import { buildWall, fits } from './wall.js';
-import type { Size, Slot } from './wall.js';
+import type { Slot } from './wall.js';
 
 export const PHASE_ORDER = ['LOAD', 'SERVE', 'SWEEP', 'SUMMARY'] as const;
 
@@ -38,13 +38,9 @@ export interface SlotRuntime extends Slot {
   readonly outcome: SlotOutcome;
 }
 
-export interface Customer {
+/** The half of a customer that does not depend on what they came for. */
+export interface CustomerBase {
   readonly id: string;
-  readonly kind: CustomerKind;
-  /** The parcel being collected; `null` for senders. */
-  readonly parcelId: string | null;
-  /** The slot size a sender needs; `null` for pickups. */
-  readonly needsSize: Size | null;
   /** Visible customers drain patience; pending ones wait out of sight. */
   readonly visible: boolean;
   /** Milliseconds spent visible. */
@@ -52,7 +48,15 @@ export interface Customer {
   /** Milliseconds active since becoming active or since the last tap. */
   readonly activeMs: number;
   readonly wrongTaps: number;
+  /**
+   * The hint ladder, stored per customer and monotonic: once a level is
+   * reached it is kept for the rest of the day, so a wrong tap or a switch of
+   * the active customer can never take a hint away — nor hand one out for free.
+   */
+  readonly hintLevel: HintLevel;
 }
+
+export type Customer = CustomerBase & CustomerRequest;
 
 export interface DayStats {
   readonly served: number;
@@ -86,8 +90,8 @@ export interface State {
   readonly parcels: Readonly<Record<string, Parcel>>;
   /** Parcel ids still on the van, head first. */
   readonly loadQueue: readonly string[];
-  readonly schedule: readonly Arrival[];
-  /** Index of the next arrival still to admit. */
+  readonly schedule: readonly ScheduleEntry[];
+  /** Index of the next schedule entry still to process. */
   readonly nextArrival: number;
   readonly customers: readonly Customer[];
   readonly activeCustomerId: string | null;
@@ -187,28 +191,36 @@ export function activeCustomer(state: State): Customer | null {
 }
 
 /**
- * Hint level is derived, never stored: the greater of the time the customer has
- * been active without a tap and the mistakes they have caused. Switching the
- * active customer resets `activeMs`, which is what resets the timed half.
+ * The stored hint level. Senders never get hints, so they always read 0.
+ *
+ * The level is raised by `tick` (idle time) and by wrong taps, and never
+ * lowered — see `CustomerBase.hintLevel`.
  */
-export function hintLevelOf(state: State, customer: Customer | null): HintLevel {
+export function hintLevelOf(_state: State, customer: Customer | null): HintLevel {
   if (customer === null || customer.kind !== 'pickup') {
     return 0;
   }
-  const timed: HintLevel =
-    customer.activeMs >= state.profile.hintDelay2Ms
-      ? 2
-      : customer.activeMs >= state.profile.hintDelay1Ms
-        ? 1
-        : 0;
-  const mistakes: HintLevel = customer.wrongTaps >= 2 ? 2 : customer.wrongTaps >= 1 ? 1 : 0;
-  return timed >= mistakes ? timed : mistakes;
+  return customer.hintLevel;
 }
+
+/** Idle time alone, before it is folded into the stored level. */
+function timedLevel(profile: DayProfile, activeMs: number): HintLevel {
+  if (activeMs >= profile.hintDelay2Ms) {
+    return 2;
+  }
+  return activeMs >= profile.hintDelay1Ms ? 1 : 0;
+}
+
+const raise = (level: HintLevel, candidate: HintLevel): HintLevel =>
+  candidate > level ? candidate : level;
+
+const mistakeLevel = (wrongTaps: number): HintLevel =>
+  wrongTaps >= 2 ? 2 : wrongTaps >= 1 ? 1 : 0;
 
 /** The column to highlight at hint level 2, or `null`. */
 export function hintColumn(state: State): number | null {
   const active = activeCustomer(state);
-  if (active === null || hintLevelOf(state, active) < 2) {
+  if (active === null || active.kind !== 'pickup' || hintLevelOf(state, active) < 2) {
     return null;
   }
   const slot = state.slots.find((candidate) => candidate.parcelId === active.parcelId);
@@ -234,7 +246,8 @@ function patchSlot(state: State, slotId: string, patch: Partial<SlotRuntime>): S
   };
 }
 
-function patchCustomer(state: State, customerId: string, patch: Partial<Customer>): State {
+/** Only the request-independent half of a customer is ever patched. */
+function patchCustomer(state: State, customerId: string, patch: Partial<CustomerBase>): State {
   return {
     ...state,
     customers: state.customers.map((customer) =>
@@ -270,7 +283,7 @@ function endLoad(state: State): State {
     ...state,
     loadQueue: [],
     schedule: state.schedule.filter(
-      (arrival) => arrival.parcelId === null || !stranded.has(arrival.parcelId),
+      (entry) => entry.request.kind !== 'pickup' || !stranded.has(entry.request.parcelId),
     ),
     elapsed: {
       ...state.elapsed,
@@ -355,19 +368,18 @@ function settleServe(state: State): State {
   const admitted: Customer[] = [];
   let cursor = next.nextArrival;
   while (cursor < next.schedule.length) {
-    const arrival = next.schedule[cursor];
-    if (arrival === undefined || arrival.atMs > next.phaseElapsedMs) {
+    const entry = next.schedule[cursor];
+    if (entry === undefined || entry.atMs > next.phaseElapsedMs) {
       break;
     }
     admitted.push({
-      id: arrival.id,
-      kind: arrival.kind,
-      parcelId: arrival.parcelId,
-      needsSize: arrival.needsSize,
+      id: entry.id,
       visible: false,
       waitedMs: 0,
       activeMs: 0,
       wrongTaps: 0,
+      hintLevel: 0,
+      ...entry.request,
     });
     cursor += 1;
   }
@@ -451,10 +463,17 @@ function tickServe(state: State, dtMs: number): State {
     next = withCue(walkCustomer(next, customer.id), 'wrong');
   }
 
-  // The active customer's hint timer only runs while they are the active one.
-  if (next.activeCustomerId !== null) {
-    next = patchCustomer(next, next.activeCustomerId, {
-      activeMs: (activeCustomer(next)?.activeMs ?? 0) + step,
+  // The idle timer only runs for the active customer, and idling can only ever
+  // raise their hint level.
+  const ticking = activeCustomer(next);
+  if (ticking !== null) {
+    const activeMs = ticking.activeMs + step;
+    next = patchCustomer(next, ticking.id, {
+      activeMs,
+      hintLevel:
+        ticking.kind === 'pickup'
+          ? raise(ticking.hintLevel, timedLevel(next.profile, activeMs))
+          : ticking.hintLevel,
     });
   }
 
@@ -502,9 +521,14 @@ function serveSender(state: State, customer: Customer, slot: SlotRuntime): State
 }
 
 function wrongTap(state: State, customer: Customer): State {
+  const wrongTaps = customer.wrongTaps + 1;
   const marked = patchCustomer(state, customer.id, {
-    wrongTaps: customer.wrongTaps + 1,
+    wrongTaps,
     activeMs: 0,
+    hintLevel:
+      customer.kind === 'pickup'
+        ? raise(customer.hintLevel, mistakeLevel(wrongTaps))
+        : customer.hintLevel,
   });
   const counted = addStats(marked, { wrongTaps: marked.stats.wrongTaps + 1 });
   return withCue(score(counted, -PENALTY.wrongTap), 'wrong');
@@ -517,12 +541,18 @@ function tapSlotServe(state: State, slotId: string): State {
     return state;
   }
 
+  // A door mid-open is about to become empty; a sender aiming at it is early,
+  // not wrong.
+  if (customer.kind === 'sender' && slot.state === 'open') {
+    return state;
+  }
+
   const served =
     customer.kind === 'pickup'
       ? slot.state === 'full' && slot.parcelId === customer.parcelId
         ? servePickup(state, customer, slot)
         : wrongTap(state, customer)
-      : slot.state === 'empty' && fits(customer.needsSize ?? 'C', slot.size)
+      : slot.state === 'empty' && fits(customer.needsSize, slot.size)
         ? serveSender(state, customer, slot)
         : wrongTap(state, customer);
 
@@ -543,14 +573,13 @@ function enterSweep(state: State): State {
     phase: 'SWEEP',
     phaseElapsedMs: 0,
     activeCustomerId: null,
+    // Nothing can still be `full` here: every customer who did not collect
+    // their parcel walked at the end of SERVE, which is what marks their slot
+    // `expired` and charges the penalty. The profile invariant
+    // `arrivalWindowMs + patienceMs <= serveMs` guarantees they all arrived.
     slots: state.slots.map((slot) => {
       if (slot.state === 'outgoing' || slot.state === 'expired') {
         return { ...slot, state: 'marked', openMs: 0 };
-      }
-      // A parcel nobody ever came for: treat it like an expired one so the
-      // player still has to clear it and the share grid tells the truth.
-      if (slot.state === 'full') {
-        return { ...slot, state: 'marked', openMs: 0, outcome: 'walked' };
       }
       if (slot.state === 'open') {
         return { ...slot, state: 'empty', parcelId: null, openMs: 0 };
@@ -607,7 +636,9 @@ export function reduce(state: State, action: Action): State {
 
   switch (action.type) {
     case 'tick': {
-      if (action.dtMs <= 0) {
+      // Written as `!(dtMs > 0)` so NaN is rejected too, rather than poisoning
+      // every elapsed counter for the rest of the day.
+      if (!(action.dtMs > 0)) {
         return fresh;
       }
       switch (fresh.phase) {

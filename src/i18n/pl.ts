@@ -12,7 +12,7 @@ export const pl = {
   'title.howto': 'Jak grać',
   'title.streak': 'Seria: {count}',
   'title.best': 'Rekord: {score}',
-  'title.noStreak': 'Dziś jeszcze nie grałeś',
+  'title.noStreak': 'Dziś jeszcze bez gry',
 
   'howto.title': 'Jak grać',
   'howto.step1': 'Rozładunek: dotknij skrytki, w której zmieści się paczka.',
@@ -41,8 +41,13 @@ export const pl = {
   'screen.sweepPrompt': 'Opróżnij oznaczone skrytki',
   'screen.idle': 'Nikogo nie ma. Na razie.',
 
+  // The sticker half is a whole phrase per sticker, because Polish will not
+  // take one preposition for all of them („z naklejką strzałka” is not Polish).
   'hint.colour': 'ten {colour}',
-  'hint.colourSticker': 'ten {colour} z naklejką {sticker}',
+  'hint.colourSticker': 'ten {colour} {sticker}',
+  'hint.sticker.fragile': 'z napisem „Ostrożnie”',
+  'hint.sticker.arrow': 'ze strzałką',
+  'hint.sticker.bang': 'z wykrzyknikiem',
 
   'colour.red': 'czerwony',
   'colour.orange': 'pomarańczowy',

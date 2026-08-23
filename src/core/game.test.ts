@@ -13,7 +13,7 @@ import {
   upcomingParcels,
   visibleQueue,
 } from './game.js';
-import type { Action, State } from './game.js';
+import type { Action, Customer, SlotRuntime, State } from './game.js';
 import { DAILY_PROFILE } from './profiles.js';
 import type { DayProfile } from './profiles.js';
 import { PENALTY, servicePoints } from './score.js';
@@ -79,6 +79,33 @@ function queueFirst(state: State, size: Size): State {
 const slotOf = (state: State, parcelId: string) =>
   state.slots.find((slot) => slot.parcelId === parcelId);
 
+/** The slot holding a pickup customer's parcel. Throws rather than silently
+ * matching nothing, so a test can never pass vacuously. */
+function customerSlot(state: State, customer: Customer | null | undefined): SlotRuntime {
+  if (customer === null || customer === undefined || customer.kind !== 'pickup') {
+    throw new Error('expected an active pickup customer');
+  }
+  const slot = slotOf(state, customer.parcelId);
+  if (slot === undefined) {
+    throw new Error(`no slot holds parcel ${customer.parcelId}`);
+  }
+  return slot;
+}
+
+function asPickup(customer: Customer | null | undefined): Extract<Customer, { kind: 'pickup' }> {
+  if (customer === null || customer === undefined || customer.kind !== 'pickup') {
+    throw new Error('expected a pickup customer');
+  }
+  return customer;
+}
+
+function asSender(customer: Customer | null | undefined): Extract<Customer, { kind: 'sender' }> {
+  if (customer === null || customer === undefined || customer.kind !== 'sender') {
+    throw new Error('expected a sender customer');
+  }
+  return customer;
+}
+
 describe('initialState', () => {
   it('applies the Daily profile: 21 slots and a 16-parcel load queue', () => {
     const state = initialState(1, DAILY_PROFILE);
@@ -108,6 +135,16 @@ describe('initialState', () => {
     const ticked = reduce(state, { type: 'tick', dtMs: 5_000 });
     expect(ticked.phaseElapsedMs).toBe(0);
     expect(reduce(ticked, { type: 'start' }).started).toBe(true);
+  });
+
+  it('ignores a tick that is not a positive number', () => {
+    const state = started(1, DAILY_PROFILE);
+    for (const dtMs of [0, -100, Number.NaN, Number.POSITIVE_INFINITY * 0]) {
+      const ticked = reduce(state, { type: 'tick', dtMs });
+      expect(ticked.phaseElapsedMs).toBe(0);
+      expect(Number.isNaN(ticked.phaseElapsedMs)).toBe(false);
+      expect(ticked.elapsed).toEqual({ load: 0, serve: 0, sweep: 0 });
+    }
   });
 });
 
@@ -166,10 +203,14 @@ describe('LOAD placement', () => {
     const state = started(3, TINY);
     const kept = placeNext(state).loadQueue;
     const expired = reduce(placeNext(state), { type: 'tick', dtMs: TINY.loadMs });
-    for (const arrival of expired.schedule) {
-      expect(kept).not.toContain(arrival.parcelId);
+    for (const entry of expired.schedule) {
+      if (entry.request.kind === 'pickup') {
+        expect(kept).not.toContain(entry.request.parcelId);
+      }
     }
-    expect(expired.schedule.filter((arrival) => arrival.kind === 'pickup')).toHaveLength(1);
+    expect(
+      expired.schedule.filter((entry) => entry.request.kind === 'pickup'),
+    ).toHaveLength(1);
   });
 
   it('lets the player close the van early with `continue`', () => {
@@ -231,13 +272,8 @@ describe('SERVE customer queue', () => {
 
   it('promotes a pending customer when a visible one leaves', () => {
     const state = atServe();
-    const active = activeCustomer(state);
-    const slot = slotOf(state, active?.parcelId ?? '');
-    const served = run(
-      state,
-      { type: 'tapSlot', slotId: slot?.id ?? '' },
-      { type: 'tick', dtMs: 10 },
-    );
+    const slot = customerSlot(state, activeCustomer(state));
+    const served = run(state, { type: 'tapSlot', slotId: slot.id }, { type: 'tick', dtMs: 10 });
     expect(visibleQueue(served)).toHaveLength(profile.visibleCustomers);
     expect(served.customers).toHaveLength(profile.pickups - 1);
   });
@@ -260,29 +296,29 @@ describe('SERVE pickup service', () => {
 
   it('opens the right door, frees the slot and scores the service', () => {
     const state = atServe();
-    const active = activeCustomer(state);
-    const slot = slotOf(state, active?.parcelId ?? '');
-    const tapped = reduce(state, { type: 'tapSlot', slotId: slot?.id ?? '' });
+    const active = asPickup(activeCustomer(state));
+    const slot = customerSlot(state, active);
+    const tapped = reduce(state, { type: 'tapSlot', slotId: slot.id });
 
-    expect(findSlot(tapped, slot?.id ?? '')?.state).toBe('open');
-    expect(findSlot(tapped, slot?.id ?? '')?.outcome).toBe('perfect');
-    expect(tapped.customers.some((customer) => customer.id === active?.id)).toBe(false);
+    expect(findSlot(tapped, slot.id)?.state).toBe('open');
+    expect(findSlot(tapped, slot.id)?.outcome).toBe('perfect');
+    expect(tapped.customers.some((customer) => customer.id === active.id)).toBe(false);
     expect(tapped.stats.served).toBe(1);
     expect(tapped.stats.hinted).toBe(0);
-    expect(tapped.score).toBe(servicePoints(active?.waitedMs ?? 0, profile.patienceMs));
+    expect(tapped.score).toBe(servicePoints(active.waitedMs, profile.patienceMs));
     expect(tapped.cues).toContain('door');
 
     const settled = reduce(tapped, { type: 'tick', dtMs: profile.doorMs });
-    expect(findSlot(settled, slot?.id ?? '')?.state).toBe('empty');
-    expect(findSlot(settled, slot?.id ?? '')?.parcelId).toBeNull();
-    expect(findSlot(settled, slot?.id ?? '')?.outcome).toBe('perfect');
+    expect(findSlot(settled, slot.id)?.state).toBe('empty');
+    expect(findSlot(settled, slot.id)?.parcelId).toBeNull();
+    expect(findSlot(settled, slot.id)?.outcome).toBe('perfect');
   });
 
   it('counts any other door as a wrong tap', () => {
     const state = atServe();
-    const active = activeCustomer(state);
+    const active = asPickup(activeCustomer(state));
     const wrong = state.slots.find(
-      (slot) => slot.state === 'full' && slot.parcelId !== active?.parcelId,
+      (slot) => slot.state === 'full' && slot.parcelId !== active.parcelId,
     );
     const tapped = reduce(state, { type: 'tapSlot', slotId: wrong?.id ?? '' });
 
@@ -295,12 +331,11 @@ describe('SERVE pickup service', () => {
 
   it('marks a service after a hint as hinted', () => {
     const state = atServe();
-    const active = activeCustomer(state);
     const hinted = reduce(state, { type: 'tick', dtMs: profile.hintDelay1Ms });
     expect(hintLevelOf(hinted, activeCustomer(hinted))).toBe(1);
-    const slot = slotOf(hinted, active?.parcelId ?? '');
-    const tapped = reduce(hinted, { type: 'tapSlot', slotId: slot?.id ?? '' });
-    expect(findSlot(tapped, slot?.id ?? '')?.outcome).toBe('hinted');
+    const slot = customerSlot(hinted, activeCustomer(hinted));
+    const tapped = reduce(hinted, { type: 'tapSlot', slotId: slot.id });
+    expect(findSlot(tapped, slot.id)?.outcome).toBe('hinted');
     expect(tapped.stats.hinted).toBe(1);
     expect(tapped.stats.served).toBe(1);
   });
@@ -331,56 +366,75 @@ describe('hint ladder', () => {
 
   it('reaches level 2 after 12 s and marks the parcel column', () => {
     const state = reduce(atServe(), { type: 'tick', dtMs: profile.hintDelay2Ms });
-    const active = activeCustomer(state);
-    expect(hintLevelOf(state, active)).toBe(2);
-    expect(hintColumn(state)).toBe(slotOf(state, active?.parcelId ?? '')?.col);
+    expect(hintLevelOf(state, activeCustomer(state))).toBe(2);
+    expect(hintColumn(state)).toBe(customerSlot(state, activeCustomer(state)).col);
   });
 
   it('reaches level 1 on the first wrong tap and level 2 on the second', () => {
     const state = atServe();
-    const active = activeCustomer(state);
+    const active = asPickup(activeCustomer(state));
     const others = state.slots.filter(
-      (slot) => slot.state === 'full' && slot.parcelId !== active?.parcelId,
+      (slot) => slot.state === 'full' && slot.parcelId !== active.parcelId,
     );
     const first = reduce(state, { type: 'tapSlot', slotId: others[0]?.id ?? '' });
     expect(hintLevelOf(first, activeCustomer(first))).toBe(1);
     const second = reduce(first, { type: 'tapSlot', slotId: others[1]?.id ?? '' });
     expect(hintLevelOf(second, activeCustomer(second))).toBe(2);
-    expect(hintColumn(second)).toBe(slotOf(second, active?.parcelId ?? '')?.col);
+    expect(hintColumn(second)).toBe(customerSlot(second, activeCustomer(second)).col);
   });
 
-  it('resets the timed part of the ladder when the active customer changes', () => {
-    const state = reduce(atServe(), { type: 'tick', dtMs: profile.hintDelay1Ms });
-    const other = visibleQueue(state).find(
-      (customer) => customer.id !== activeCustomer(state)?.id,
+  it('never decreases the level: a wrong tap after idling to level 2 keeps it', () => {
+    const idled = reduce(atServe(), { type: 'tick', dtMs: profile.hintDelay2Ms });
+    const active = asPickup(activeCustomer(idled));
+    expect(hintLevelOf(idled, active)).toBe(2);
+    const wrong = idled.slots.find(
+      (slot) => slot.state === 'full' && slot.parcelId !== active.parcelId,
     );
-    const switched = reduce(state, { type: 'selectCustomer', customerId: other?.id ?? '' });
+    const tapped = reduce(idled, { type: 'tapSlot', slotId: wrong?.id ?? '' });
+    expect(hintLevelOf(tapped, activeCustomer(tapped))).toBe(2);
+    expect(hintColumn(tapped)).toBe(customerSlot(tapped, activeCustomer(tapped)).col);
+    expect(activeCustomer(tapped)?.activeMs).toBe(0);
+  });
+
+  it('keeps the level when the active customer changes and comes back', () => {
+    const idled = reduce(atServe(), { type: 'tick', dtMs: profile.hintDelay2Ms });
+    const active = asPickup(activeCustomer(idled));
+    const other = visibleQueue(idled).find((customer) => customer.id !== active.id);
+
+    const switched = reduce(idled, { type: 'selectCustomer', customerId: other?.id ?? '' });
+    // The newly active customer has their own (untouched) level and a fresh timer.
     expect(hintLevelOf(switched, activeCustomer(switched))).toBe(0);
-    const back = reduce(switched, {
-      type: 'selectCustomer',
-      customerId: activeCustomer(state)?.id ?? '',
-    });
-    expect(hintLevelOf(back, activeCustomer(back))).toBe(0);
+    expect(activeCustomer(switched)?.activeMs).toBe(0);
+
+    const back = reduce(switched, { type: 'selectCustomer', customerId: active.id });
+    expect(hintLevelOf(back, activeCustomer(back))).toBe(2);
+    expect(activeCustomer(back)?.activeMs).toBe(0);
+
+    // ... and serving them is still a hinted service, not a free `perfect`.
+    const slot = customerSlot(back, activeCustomer(back));
+    const served = reduce(back, { type: 'tapSlot', slotId: slot.id });
+    expect(findSlot(served, slot.id)?.outcome).toBe('hinted');
+    expect(served.stats.hinted).toBe(1);
   });
 
   it('keeps the mistake-based level when the customer becomes active again', () => {
     const state = atServe();
-    const active = activeCustomer(state);
+    const active = asPickup(activeCustomer(state));
     const wrong = state.slots.find(
-      (slot) => slot.state === 'full' && slot.parcelId !== active?.parcelId,
+      (slot) => slot.state === 'full' && slot.parcelId !== active.parcelId,
     );
     const mistaken = reduce(state, { type: 'tapSlot', slotId: wrong?.id ?? '' });
-    const other = visibleQueue(mistaken).find((customer) => customer.id !== active?.id);
+    const other = visibleQueue(mistaken).find((customer) => customer.id !== active.id);
     const away = reduce(mistaken, { type: 'selectCustomer', customerId: other?.id ?? '' });
-    const back = reduce(away, { type: 'selectCustomer', customerId: active?.id ?? '' });
+    const back = reduce(away, { type: 'selectCustomer', customerId: active.id });
     expect(hintLevelOf(back, activeCustomer(back))).toBe(1);
   });
 
-  it('resets the tap timer on every tap', () => {
+  it('resets the idle timer on every tap', () => {
     const state = reduce(atServe(), { type: 'tick', dtMs: profile.hintDelay1Ms - 100 });
-    const active = activeCustomer(state);
+    const active = asPickup(activeCustomer(state));
     const wrong = state.slots.find(
-      (slot) => slot.state === 'full' && slot.parcelId !== active?.parcelId,
+      (slot) => slot.state === 'full' && slot.parcelId !== active.parcelId,
     );
     const tapped = reduce(state, { type: 'tapSlot', slotId: wrong?.id ?? '' });
     expect(activeCustomer(tapped)?.activeMs).toBe(0);
@@ -394,12 +448,18 @@ describe('hint ladder', () => {
       senders: 1,
       lookalikePairs: 0,
       arrivalWindowMs: 200,
+      patienceMs: 60_000,
+      serveMs: 120_000,
     });
     const state = reduce(loadAll(started(41, senderProfile)), { type: 'tick', dtMs: 15_000 });
-    const sender = state.customers.find((customer) => customer.kind === 'sender');
-    if (sender !== undefined) {
-      expect(hintLevelOf(state, sender)).toBe(0);
-    }
+    const sender = asSender(state.customers.find((customer) => customer.kind === 'sender'));
+    expect(sender.hintLevel).toBe(0);
+    expect(hintLevelOf(state, sender)).toBe(0);
+
+    const selected = reduce(state, { type: 'selectCustomer', customerId: sender.id });
+    const idled = reduce(selected, { type: 'tick', dtMs: senderProfile.hintDelay2Ms });
+    expect(hintLevelOf(idled, activeCustomer(idled))).toBe(0);
+    expect(hintColumn(idled)).toBeNull();
   });
 });
 
@@ -427,29 +487,66 @@ describe('SERVE sender service', () => {
 
   it('accepts an empty slot at least as large as the sender needs', () => {
     const state = atServe();
-    const sender = activeCustomer(state);
-    expect(sender?.kind).toBe('sender');
+    const sender = asSender(activeCustomer(state));
     const target = state.slots.find(
-      (slot) => slot.state === 'empty' && fits(sender?.needsSize ?? 'A', slot.size),
+      (slot) => slot.state === 'empty' && fits(sender.needsSize, slot.size),
     );
     const placed = reduce(state, { type: 'tapSlot', slotId: target?.id ?? '' });
     expect(findSlot(placed, target?.id ?? '')?.state).toBe('outgoing');
     expect(findSlot(placed, target?.id ?? '')?.outcome).toBe('none');
-    expect(placed.customers.some((customer) => customer.id === sender?.id)).toBe(false);
+    expect(placed.customers.some((customer) => customer.id === sender.id)).toBe(false);
     expect(placed.stats.served).toBe(1);
   });
 
   it('rejects a slot that is too small', () => {
     const state = atServe();
-    const sender = activeCustomer(state);
+    const sender = asSender(activeCustomer(state));
     const tooSmall = state.slots.find(
-      (slot) => slot.state === 'empty' && !fits(sender?.needsSize ?? 'C', slot.size),
+      (slot) => slot.state === 'empty' && !fits(sender.needsSize, slot.size),
     );
     const tapped = reduce(state, { type: 'tapSlot', slotId: tooSmall?.id ?? '' });
     expect(findSlot(tapped, tooSmall?.id ?? '')?.state).toBe('empty');
-    expect(activeCustomer(tapped)?.id).toBe(sender?.id);
+    expect(activeCustomer(tapped)?.id).toBe(sender.id);
     expect(activeCustomer(tapped)?.wrongTaps).toBe(1);
     expect(tapped.stats.wrongTaps).toBe(1);
+  });
+
+  it('treats a door that is still swinging open as too early, not wrong', () => {
+    // A pickup is served first, so one door is `open`; then a sender taps it.
+    const pickupProfile = profileWith({
+      id: 'test-open-door',
+      columns: 2,
+      pickups: 2,
+      senders: 1,
+      lookalikePairs: 0,
+      loadMs: 10_000,
+      serveMs: 60_000,
+      patienceMs: 40_000,
+      arrivalWindowMs: 300,
+      senderSizeWeights: { A: 1, B: 0, C: 0 },
+    });
+    const state = reduce(loadAll(started(53, pickupProfile)), { type: 'tick', dtMs: 400 });
+    const pickup = asPickup(
+      state.customers.find((customer) => customer.visible && customer.kind === 'pickup'),
+    );
+    const opened = run(
+      state,
+      { type: 'selectCustomer', customerId: pickup.id },
+      { type: 'tapSlot', slotId: customerSlot(state, pickup).id },
+    );
+    const openSlot = opened.slots.find((slot) => slot.state === 'open');
+    expect(openSlot).toBeDefined();
+
+    const sender = asSender(
+      opened.customers.find((customer) => customer.visible && customer.kind === 'sender'),
+    );
+    const selected = reduce(opened, { type: 'selectCustomer', customerId: sender.id });
+    const tapped = reduce(selected, { type: 'tapSlot', slotId: openSlot?.id ?? '' });
+
+    expect(tapped.stats.wrongTaps).toBe(0);
+    expect(activeCustomer(tapped)?.wrongTaps).toBe(0);
+    expect(tapped.cues).toEqual([]);
+    expect(findSlot(tapped, openSlot?.id ?? '')?.state).toBe('open');
   });
 
   it('rejects an occupied slot', () => {
@@ -495,13 +592,13 @@ describe('patience', () => {
     const state = advanceUntil(loadAll(started(61, profile)), (candidate) =>
       firstVisible(candidate, 'pickup') !== undefined,
     );
-    const pickup = firstVisible(state, 'pickup');
-    const slotId = slotOf(state, pickup?.parcelId ?? '')?.id ?? '';
+    const pickup = asPickup(firstVisible(state, 'pickup'));
+    const slotId = customerSlot(state, pickup).id;
     expect(findSlot(state, slotId)?.state).toBe('full');
 
     const walked = reduce(state, { type: 'tick', dtMs: profile.patienceMs });
     expect(walked.phase).toBe('SERVE');
-    expect(walked.customers.some((customer) => customer.id === pickup?.id)).toBe(false);
+    expect(walked.customers.some((customer) => customer.id === pickup.id)).toBe(false);
     expect(findSlot(walked, slotId)?.state).toBe('expired');
     expect(findSlot(walked, slotId)?.outcome).toBe('walked');
     expect(walked.stats.walked).toBeGreaterThanOrEqual(1);
@@ -569,14 +666,61 @@ describe('SERVE end', () => {
       if (active === null) {
         break;
       }
-      const slot = slotOf(state, active.parcelId ?? '');
-      state = reduce(state, { type: 'tapSlot', slotId: slot?.id ?? '' });
+      state = reduce(state, { type: 'tapSlot', slotId: customerSlot(state, active).id });
     }
     expect(state.stats.served).toBe(2);
     expect(state.phase).not.toBe('SERVE');
     expect(state.elapsed.serve).toBeLessThan(profile.serveMs);
   });
+
+  it('waits for the schedule: an empty queue with arrivals to come stays in SERVE', () => {
+    // Two arrivals, far apart: serve the first and the locker stands empty for
+    // a while before the second turns up.
+    const spread = profileWith({
+      id: 'test-early-end',
+      columns: 2,
+      pickups: 2,
+      senders: 0,
+      lookalikePairs: 0,
+      loadMs: 10_000,
+      serveMs: 90_000,
+      patienceMs: 20_000,
+      arrivalWindowMs: 60_000,
+    });
+    let state = loadAll(started(83, spread));
+    state = advanceUntilVisible(state);
+
+    const active = activeCustomer(state);
+    expect(active).not.toBeNull();
+    expect(state.nextArrival).toBeLessThan(state.schedule.length);
+
+    state = reduce(state, { type: 'tapSlot', slotId: customerSlot(state, active).id });
+    expect(state.customers).toHaveLength(0);
+    expect(state.phase).toBe('SERVE');
+
+    // ... and it still does not end on the next tick.
+    state = reduce(state, { type: 'tick', dtMs: 500 });
+    expect(state.phase).toBe('SERVE');
+
+    // Only once the last arrival has been admitted and served does SERVE end.
+    state = advanceUntilVisible(state);
+    state = reduce(state, { type: 'tapSlot', slotId: customerSlot(state, activeCustomer(state)).id });
+    expect(state.phase).not.toBe('SERVE');
+    expect(state.stats.served).toBe(2);
+  });
 });
+
+/** Ticks in small steps until somebody is standing at the locker. */
+function advanceUntilVisible(state: State): State {
+  let current = state;
+  for (let i = 0; i < 2_000 && activeCustomer(current) === null; i += 1) {
+    current = reduce(current, { type: 'tick', dtMs: 100 });
+  }
+  if (activeCustomer(current) === null) {
+    throw new Error('no customer ever became visible');
+  }
+  return current;
+}
 
 describe('SWEEP', () => {
   const profile = profileWith({
@@ -641,8 +785,7 @@ describe('SWEEP', () => {
       arrivalWindowMs: 100,
     });
     let state = reduce(loadAll(started(101, clean)), { type: 'tick', dtMs: 200 });
-    const active = activeCustomer(state);
-    state = reduce(state, { type: 'tapSlot', slotId: slotOf(state, active?.parcelId ?? '')?.id ?? '' });
+    state = reduce(state, { type: 'tapSlot', slotId: customerSlot(state, activeCustomer(state)).id });
     expect(state.phase).toBe('SUMMARY');
     expect(state.elapsed.sweep).toBe(0);
   });

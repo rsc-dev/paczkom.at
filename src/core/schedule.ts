@@ -1,6 +1,10 @@
 /**
- * The SERVE-phase arrival schedule: who turns up at the locker and when.
- * Times are milliseconds from the start of SERVE.
+ * The SERVE-phase schedule: what happens at the locker and when. Times are
+ * milliseconds from the start of SERVE.
+ *
+ * `ScheduleEntry` is a discriminated union on `kind`. Only customer arrivals
+ * exist in this change; the Week change adds `{ kind: 'jam', … }` alongside
+ * them, which is why the union exists at all.
  */
 import type { Parcel } from './parcel.js';
 import type { DayProfile } from './profiles.js';
@@ -8,23 +12,26 @@ import { next, shuffle, weightedPick } from './rng.js';
 import type { RngState } from './rng.js';
 import type { Size } from './wall.js';
 
-export type CustomerKind = 'pickup' | 'sender';
+/** What a customer wants. Separate from the schedule's own `kind`. */
+export type CustomerRequest =
+  | { readonly kind: 'pickup'; readonly parcelId: string }
+  | { readonly kind: 'sender'; readonly needsSize: Size };
 
-export interface Arrival {
+export type CustomerKind = CustomerRequest['kind'];
+
+export interface CustomerArrival {
+  readonly kind: 'arrival';
   readonly id: string;
-  readonly kind: CustomerKind;
   /** Milliseconds from the start of SERVE. */
   readonly atMs: number;
-  /** The parcel being collected; `null` for senders. */
-  readonly parcelId: string | null;
-  /** The smallest slot the sender's parcel needs; `null` for pickups. */
-  readonly needsSize: Size | null;
+  readonly request: CustomerRequest;
 }
 
-interface Pending {
-  readonly kind: CustomerKind;
-  readonly parcelId: string | null;
-  readonly needsSize: Size | null;
+/** The Week change widens this to `CustomerArrival | JamEvent`. */
+export type ScheduleEntry = CustomerArrival;
+
+export function isCustomerArrival(entry: ScheduleEntry): entry is CustomerArrival {
+  return entry.kind === 'arrival';
 }
 
 /**
@@ -35,47 +42,45 @@ export function buildSchedule(
   state: RngState,
   profile: DayProfile,
   parcels: readonly Parcel[],
-): [Arrival[], RngState] {
+): [ScheduleEntry[], RngState] {
   let rng = state;
 
-  const pending: Pending[] = parcels.map((parcel) => ({
+  const requests: CustomerRequest[] = parcels.map((parcel) => ({
     kind: 'pickup',
     parcelId: parcel.id,
-    needsSize: null,
   }));
 
   for (let i = 0; i < profile.senders; i += 1) {
     const [needsSize, afterSize] = weightedPick(rng, profile.senderSizeWeights);
     rng = afterSize;
-    pending.push({ kind: 'sender', parcelId: null, needsSize });
+    requests.push({ kind: 'sender', needsSize });
   }
 
-  const [order, afterShuffle] = shuffle(rng, pending);
+  const [order, afterShuffle] = shuffle(rng, requests);
   rng = afterShuffle;
 
   const spacing = order.length > 0 ? profile.arrivalWindowMs / order.length : 0;
-  const timed: { entry: Pending; atMs: number }[] = [];
+  const timed: { request: CustomerRequest; atMs: number }[] = [];
   for (let i = 0; i < order.length; i += 1) {
-    const entry = order[i];
-    if (entry === undefined) {
+    const request = order[i];
+    if (request === undefined) {
       throw new Error('schedule shuffle lost an entry');
     }
     const [roll, afterRoll] = next(rng);
     rng = afterRoll;
     const jitter = (roll - 0.5) * spacing;
     const atMs = Math.round(Math.min(Math.max(i * spacing + jitter, 0), profile.arrivalWindowMs));
-    timed.push({ entry, atMs });
+    timed.push({ request, atMs });
   }
 
   timed.sort((a, b) => a.atMs - b.atMs);
 
-  const arrivals = timed.map((slotted, index) => ({
+  const schedule: ScheduleEntry[] = timed.map((slotted, index) => ({
+    kind: 'arrival',
     id: `k${String(index)}`,
-    kind: slotted.entry.kind,
     atMs: slotted.atMs,
-    parcelId: slotted.entry.parcelId,
-    needsSize: slotted.entry.needsSize,
+    request: slotted.request,
   }));
 
-  return [arrivals, rng];
+  return [schedule, rng];
 }

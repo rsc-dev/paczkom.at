@@ -148,8 +148,22 @@ describe('hint lines', () => {
   });
 
   it('names the colour and the sticker together', () => {
-    expect(hintLine('blue', 'fragile', 'pl')).toBe('ten niebieski z naklejką ostrożnie');
+    expect(hintLine('blue', 'fragile', 'pl')).toBe('ten niebieski z napisem „Ostrożnie”');
     expect(hintLine('blue', 'fragile', 'en')).toBe('the blue one with the fragile sticker');
+  });
+
+  it('reads naturally for every sticker, in both languages', () => {
+    expect(hintLine('red', 'arrow', 'pl')).toBe('ten czerwony ze strzałką');
+    expect(hintLine('red', 'bang', 'pl')).toBe('ten czerwony z wykrzyknikiem');
+    expect(hintLine('red', 'arrow', 'en')).toBe('the red one with the arrow sticker');
+    expect(hintLine('red', 'bang', 'en')).toBe('the red one with the exclamation mark');
+    for (const sticker of STICKERS) {
+      for (const lang of LANGS) {
+        const line = hintLine('green', sticker, lang);
+        expect(line).not.toContain('{');
+        expect(line).not.toContain('hint.');
+      }
+    }
   });
 
   it('has a name for every colour in both languages', () => {

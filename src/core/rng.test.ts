@@ -22,9 +22,55 @@ describe('fnv1a', () => {
   it('matches the known FNV-1a offset basis for the empty string', () => {
     expect(fnv1a('')).toBe(2166136261);
   });
+
+  // Golden vectors. "abc" is the published FNV-1a 32-bit test vector
+  // (0x1a47e90b); the rest pin our own inputs so a refactor cannot silently
+  // reseed every player's day.
+  it.each([
+    ['abc', 440920331],
+    ['paczkom.at', 2405220199],
+    ['2026-09-01', 130883755],
+  ])('hashes %s to %i', (input, expected) => {
+    expect(fnv1a(input)).toBe(expected);
+  });
 });
 
 describe('next', () => {
+  /** The reference mulberry32, transcribed independently of our version. */
+  function referenceMulberry32(seed: number): () => number {
+    let a = seed;
+    return () => {
+      let t = (a += 0x6d2b79f5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  const firstThree = (seed: number): number[] => {
+    let state = seed;
+    return Array.from({ length: 3 }, () => {
+      const [value, nextState] = next(state);
+      state = nextState;
+      return value;
+    });
+  };
+
+  it('matches the reference mulberry32 stream', () => {
+    for (const seed of [0, 1, 12345, 2405220199]) {
+      const reference = referenceMulberry32(seed);
+      expect(firstThree(seed)).toEqual([reference(), reference(), reference()]);
+    }
+  });
+
+  // Golden vector: hard-coded so a refactor that still "looks like"
+  // mulberry32 cannot quietly change every seeded day.
+  it('produces the recorded stream for seed 12345', () => {
+    expect(firstThree(12345)).toEqual([
+      0.9797282677609473, 0.3067522644996643, 0.484205421525985,
+    ]);
+  });
+
   it('is a pure function of its state', () => {
     expect(next(12345)).toEqual(next(12345));
   });
@@ -164,5 +210,13 @@ describe('weightedPick', () => {
 
   it('throws when all weights are zero', () => {
     expect(() => weightedPick(1, { a: 0, b: 0 })).toThrow();
+  });
+
+  it('does not depend on the order the weights were written in', () => {
+    for (let state = 0; state < 200; state += 7) {
+      expect(weightedPick(state, { a: 1, b: 3, c: 2 })).toEqual(
+        weightedPick(state, { c: 2, a: 1, b: 3 }),
+      );
+    }
   });
 });
