@@ -1,0 +1,854 @@
+/**
+ * Structure. Every value here is either a layout number or a token from
+ * tokens.css — no colour is named twice, and none is named in TypeScript.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  block-size: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* `hidden` has to beat the component `display` rules below. */
+[hidden] {
+  display: none !important;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ screens */
+
+#app {
+  block-size: 100dvh;
+  inline-size: 100%;
+}
+
+.screen {
+  display: none;
+  block-size: 100dvh;
+  inline-size: 100%;
+  max-inline-size: 62rem;
+  margin-inline: auto;
+  padding: var(--space-3);
+  overflow-y: auto;
+}
+
+#app[data-screen='title'] #screen-title,
+#app[data-screen='howto'] #screen-howto,
+#app[data-screen='game'] #screen-game,
+#app[data-screen='result'] #screen-result {
+  display: flex;
+  flex-direction: column;
+}
+
+#app[data-screen='game'] #screen-game {
+  overflow: hidden;
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+
+/* -------------------------------------------------------- shared components */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-block-size: var(--hit-min);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--ink);
+  background: var(--bg);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--step-1);
+  padding-inline: var(--space-4);
+}
+
+.btn--ghost {
+  border-color: var(--hairline);
+  background: transparent;
+  font-weight: 400;
+}
+
+.btn--small {
+  min-block-size: var(--hit-min);
+  min-inline-size: var(--hit-min);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+}
+
+/* The mute button is a glyph; its name lives in `aria-label`. */
+.btn--mute[data-muted='true'] {
+  color: var(--ink-faint);
+  text-decoration: line-through;
+}
+
+.toggles {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.brand {
+  font-size: var(--step-2);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.brand__dot {
+  color: var(--accent);
+}
+
+.rule {
+  border: 0;
+  border-block-start: 1px solid var(--hairline);
+  margin-block: var(--space-3);
+}
+
+/* ---------------------------------------------------------------- title */
+
+#screen-title {
+  gap: var(--space-4);
+  text-align: start;
+}
+
+.title__body {
+  margin-block: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title__mark {
+  font-size: var(--step-4);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  margin: 0;
+}
+
+.title__tagline {
+  font-size: var(--step-1);
+  color: var(--ink-soft);
+  max-inline-size: 26ch;
+  margin: 0;
+}
+
+.title__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.title__stats {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.title__foot {
+  margin-block-start: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--step--1);
+  color: var(--ink-faint);
+}
+
+/* ---------------------------------------------------------------- how to */
+
+#screen-howto {
+  gap: var(--space-3);
+}
+
+.howto__steps {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.howto__step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: start;
+  font-size: var(--step-1);
+}
+
+.howto__step::before {
+  counter-increment: step;
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: var(--step-0);
+}
+
+.howto__note {
+  color: var(--ink-soft);
+  max-inline-size: 48ch;
+}
+
+/* ------------------------------------------------------------------- hud */
+
+.hud {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  flex: 0 0 auto;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 640px) {
+  .hud {
+    gap: var(--space-3);
+  }
+}
+
+.hud__count {
+  font-variant-numeric: tabular-nums;
+}
+
+.hud__phase {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.hud__clock {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.hud__score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ink);
+  font-size: var(--step-0);
+  white-space: nowrap;
+}
+
+.hud__buttons {
+  display: flex;
+  gap: var(--space-1);
+  margin-inline-start: auto;
+}
+
+@media (min-width: 640px) {
+  /* Room to breathe: push the score and the toggles to the far edge. */
+  .hud__score {
+    margin-inline-start: auto;
+  }
+
+  .hud__buttons {
+    margin-inline-start: 0;
+  }
+}
+
+/*
+ * On a phone the meter drops to its own full-width row under the readouts — a
+ * progress line across the top of the screen rather than a squeezed sliver.
+ */
+.hud__meter {
+  order: 9;
+  flex: 1 0 100%;
+  block-size: 3px;
+  border-radius: 999px;
+  background: var(--bg-sunk);
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .hud__meter {
+    order: 0;
+    flex: 1 1 4rem;
+  }
+}
+
+.hud__meter::after {
+  content: '';
+  display: block;
+  block-size: 100%;
+  inline-size: var(--fill, 0%);
+  background: var(--accent);
+  transition: inline-size var(--motion-fast) linear;
+}
+
+/* --------------------------------------------------------------- scenery */
+
+.scenery {
+  display: block;
+  block-size: 0;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+/* ----------------------------------------------------------------- stage */
+
+/*
+ * The cabinet. On phones the screen panel sits above the doors; from 640 px it
+ * becomes a full-height column between them, the way a real locker is built.
+ */
+.stage {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  max-block-size: calc(12 * var(--unit) + 11 * var(--gap) + 2 * var(--space-2) + 6rem);
+  display: grid;
+  grid-template-columns: repeat(var(--wall-columns), minmax(0, 1fr));
+  grid-template-rows: auto repeat(12, minmax(var(--unit-min), 1fr));
+  gap: var(--gap);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--wall-bg);
+  box-shadow: var(--shadow-panel);
+}
+
+@media (min-width: 640px) {
+  .stage {
+    grid-template-columns: var(--stage-columns, repeat(var(--wall-columns), minmax(0, 1fr)));
+    grid-template-rows: repeat(12, minmax(var(--unit-min), 1fr));
+    max-block-size: calc(12 * var(--unit) + 11 * var(--gap) + 2 * var(--space-2));
+    gap: var(--space-2) var(--space-2);
+  }
+}
+
+/* ----------------------------------------------------------------- panel */
+
+.panel {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--panel-edge);
+  background: var(--panel-bg);
+  color: var(--panel-ink);
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .panel {
+    grid-column: var(--panel-column, 1);
+    grid-row: 1 / -1;
+    justify-content: flex-start;
+    padding-block: var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+.panel__kicker {
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--panel-ink-soft);
+}
+
+.panel__code {
+  font-size: var(--step-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  margin: 0;
+}
+
+.panel__code[data-empty='true'] {
+  color: var(--panel-ink-soft);
+  font-size: var(--step-1);
+  letter-spacing: 0;
+}
+
+.panel__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--step-0);
+  color: var(--panel-ink-soft);
+  min-block-size: 1.4em;
+}
+
+.panel__hint[hidden] {
+  display: none;
+}
+
+.panel__wait {
+  block-size: 4px;
+  border-radius: 999px;
+  background: var(--panel-edge);
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  /* Anchored to the bottom of the screen module, like a real status strip. */
+  .panel__wait {
+    margin-block-start: auto;
+  }
+}
+
+.panel__wait::after {
+  content: '';
+  display: block;
+  block-size: 100%;
+  inline-size: var(--fill, 100%);
+  background: var(--accent);
+  transition: inline-size var(--motion-fast) linear;
+}
+
+/* ------------------------------------------------------------- swatches */
+
+.swatch {
+  inline-size: 1.1em;
+  block-size: 1.1em;
+  border-radius: var(--radius-sm);
+  flex: 0 0 auto;
+  background: var(--parcel-tint, var(--panel-ink-soft));
+}
+
+[data-colour='red'] {
+  --parcel-tint: var(--parcel-red);
+}
+[data-colour='orange'] {
+  --parcel-tint: var(--parcel-orange);
+}
+[data-colour='yellow'] {
+  --parcel-tint: var(--parcel-yellow);
+}
+[data-colour='green'] {
+  --parcel-tint: var(--parcel-green);
+}
+[data-colour='blue'] {
+  --parcel-tint: var(--parcel-blue);
+}
+[data-colour='violet'] {
+  --parcel-tint: var(--parcel-violet);
+}
+
+.sticker {
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+.sticker[data-sticker='none'] {
+  display: none;
+}
+
+.sticker[data-sticker='fragile']::after {
+  content: '⌁';
+}
+.sticker[data-sticker='arrow']::after {
+  content: '↑';
+}
+.sticker[data-sticker='bang']::after {
+  content: '!';
+}
+
+/* ------------------------------------------------------------------ doors */
+
+.door {
+  position: relative;
+  min-inline-size: var(--hit-min);
+  z-index: auto;
+  grid-column: var(--col-narrow);
+  grid-row: calc(var(--row) + 1) / span var(--span);
+}
+
+@media (min-width: 640px) {
+  .door {
+    grid-column: var(--col-wide);
+    grid-row: var(--row) / span var(--span);
+  }
+}
+
+/*
+ * The hit extender. It is at least 40 px tall whatever the door looks like, and
+ * it sits in the default positioned layer, so every visible door face (z-index
+ * 1, below) paints and hit-tests above every neighbour's extender. Result: taps
+ * inside a door always belong to that door, and taps in the gaps still land on
+ * a door instead of nothing.
+ */
+.door__hit {
+  position: absolute;
+  inset-inline: calc(-0.5 * var(--gap));
+  inset-block-start: 50%;
+  inline-size: calc(100% + var(--gap));
+  block-size: max(100%, var(--hit-min));
+  transform: translateY(-50%);
+}
+
+.door__cavity,
+.door__face {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: var(--radius-sm);
+}
+
+.door__cavity {
+  background: var(--door-cavity);
+  box-shadow: 0 0 0 1px var(--wall-edge) inset;
+}
+
+/* The handle, on the side away from the hinge the door swings on. */
+.door__face::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 0.42em;
+  inset-block: 28%;
+  inline-size: 2px;
+  border-radius: 999px;
+  background: var(--door-ink);
+  opacity: 0.22;
+}
+
+.door[data-state='marked'] .door__face::after,
+.door[data-state='outgoing'] .door__face::after {
+  opacity: 0.4;
+}
+
+.door__face {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  padding-inline: 0.45em;
+  background: var(--door-face-empty);
+  border: 1px solid var(--door-edge);
+  box-shadow: var(--shadow-door);
+  transform-origin: left center;
+  transition:
+    transform var(--motion) var(--ease),
+    background var(--motion-fast) var(--ease),
+    box-shadow var(--motion-fast) var(--ease);
+}
+
+.door__size {
+  font-size: var(--step--1);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--door-ink);
+  opacity: 0.45;
+  letter-spacing: 0.04em;
+}
+
+.door__mark {
+  position: absolute;
+  inset-inline-end: 1.5em;
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  font-size: var(--step-0);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent);
+}
+
+/* Door states -------------------------------------------------------------- */
+
+.door[data-state='full'] .door__face {
+  background: var(--door-face);
+}
+
+.door[data-state='open'] .door__face {
+  transform: perspective(320px) rotateY(-74deg);
+  box-shadow: none;
+}
+
+.door[data-state='outgoing'] .door__face {
+  background: var(--door-outgoing);
+}
+
+.door[data-state='expired'] .door__face {
+  background: var(--door-face);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+.door[data-state='marked'] .door__face {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--door-face) 0 6px,
+    var(--accent-soft) 6px 12px
+  );
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+/*
+ * Hint level 2 lights the whole column the parcel is in. The ring is drawn
+ * *inside* the face so a neighbouring door can never paint over part of it.
+ */
+.door[data-hint='column'] .door__face {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent) inset;
+}
+
+@media (hover: hover) {
+  .door:hover .door__face {
+    filter: brightness(1.06);
+  }
+}
+
+/* ------------------------------------------------------------------- tray */
+
+.tray {
+  flex: 0 0 auto;
+  display: flex;
+  gap: var(--space-2);
+  align-items: stretch;
+  min-block-size: 4.4rem;
+  overflow: hidden;
+}
+
+.tray__empty {
+  display: flex;
+  align-items: center;
+  color: var(--ink-faint);
+  font-size: var(--step--1);
+}
+
+.card {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--bg);
+  text-align: start;
+  transition: border-color var(--motion-fast) var(--ease);
+}
+
+.card[data-active='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+.card[data-upcoming='true'] {
+  background: var(--bg-sunk);
+  border-style: dashed;
+}
+
+.card__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.card__code {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: var(--step-1);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card__wait {
+  block-size: 3px;
+  border-radius: 999px;
+  background: var(--bg-sunk);
+  overflow: hidden;
+}
+
+.card__wait::after {
+  content: '';
+  display: block;
+  block-size: 100%;
+  inline-size: var(--fill, 100%);
+  background: var(--accent);
+  transition: inline-size var(--motion-fast) linear;
+}
+
+.size-badge {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.5em;
+  padding-inline: 0.3em;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+/* ----------------------------------------------------------------- result */
+
+#screen-result {
+  gap: var(--space-3);
+}
+
+.result__kicker {
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.result__headline {
+  font-size: var(--step-2);
+  font-weight: 700;
+  margin: 0;
+}
+
+.result__score {
+  font-size: var(--step-4);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin: 0;
+}
+
+.result__badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.result__grid {
+  font-size: var(--step-1);
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  margin: 0;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.result__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--space-1) var(--space-4);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: 1px solid var(--hairline);
+  padding-block-start: var(--space-2);
+}
+
+.result__body {
+  margin-block: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.result__note {
+  font-size: var(--step--1);
+  color: var(--ink-faint);
+  min-block-size: 1.4em;
+}
+
+.share-fallback {
+  inline-size: 100%;
+  min-block-size: 7rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--bg-sunk);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--step--1);
+  resize: vertical;
+}
+
+.share-fallback[hidden] {
+  display: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

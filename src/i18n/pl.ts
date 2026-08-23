@@ -13,6 +13,7 @@ export const pl = {
   'title.streak': 'Seria: {count}',
   'title.best': 'Rekord: {score}',
   'title.noStreak': 'Dziś jeszcze bez gry',
+  'title.noStorage': 'Ta przeglądarka nie zapamięta serii',
 
   'howto.title': 'Jak grać',
   'howto.step1': 'Rozładunek: dotknij skrytki, w której zmieści się paczka.',
@@ -32,6 +33,15 @@ export const pl = {
   'hud.unmute': 'Włącz dźwięk',
   'hud.language': 'Język',
 
+  'a11y.wall': 'Ściana skrytek',
+  'door.label': 'Skrytka {id}, rozmiar {size}, {state}',
+  'door.state.empty': 'pusta',
+  'door.state.full': 'zajęta',
+  'door.state.open': 'otwarta',
+  'door.state.outgoing': 'paczka do nadania',
+  'door.state.expired': 'paczka nieodebrana',
+  'door.state.marked': 'do opróżnienia',
+
   'screen.pickup': 'Odbiór',
   'screen.sender': 'Nadanie',
   'screen.code': 'Kod',
@@ -39,7 +49,9 @@ export const pl = {
   'screen.nextUp': 'Następne',
   'screen.loadPrompt': 'Włóż paczkę do skrytki',
   'screen.sweepPrompt': 'Opróżnij oznaczone skrytki',
+  'screen.sweepRemaining': 'Zostało: {count}',
   'screen.idle': 'Nikogo nie ma. Na razie.',
+  'screen.thisParcel': 'Ta paczka',
 
   // The sticker half is a whole phrase per sticker, because Polish will not
   // take one preposition for all of them („z naklejką strzałka” is not Polish).
@@ -89,6 +101,7 @@ export const pl = {
   'share.shared': 'Udostępniono',
   'share.copied': 'Skopiowano do schowka',
   'share.manual': 'Skopiuj tekst poniżej',
+  'share.failed': 'Nie udało się udostępnić',
 
   'lang.pl': 'Polski',
   'lang.en': 'English',

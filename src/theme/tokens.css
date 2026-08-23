@@ -1,0 +1,107 @@
+/**
+ * Every colour, radius, shadow, type step and motion duration in the game is a
+ * custom property declared here. Game code never names a colour: doors carry
+ * `data-state` / `data-size` / `data-hint`, parcels carry `data-colour` /
+ * `data-sticker`, and a theme decides what those look like.
+ *
+ * The values on `:root` are the defaults; `signage.css` restates them under
+ * `[data-theme='signage']` so a second theme is a CSS file and nothing else.
+ */
+
+:root {
+  /* Surfaces and ink */
+  --bg: #f2efe8;
+  --bg-sunk: #e7e2d8;
+  --ink: #111111;
+  --ink-soft: #5c584f;
+  --ink-faint: #8d887c;
+  --hairline: #d5cfc2;
+
+  /* The single accent */
+  --accent: #ff4f1f;
+  --accent-ink: #ffffff;
+  --accent-soft: #ffe4da;
+
+  /* The wall is a dark panel; doors are off-white faces on it */
+  --wall-bg: #171513;
+  --wall-ink: #f2efe8;
+  --wall-edge: #2c2925;
+
+  --door-face: #f2efe8;
+  --door-face-empty: #b9b2a4;
+  --door-ink: #17150f;
+  --door-edge: #00000022;
+  --door-cavity: #0d0c0a;
+  --door-outgoing: #9a9488;
+  --door-marked: #ff4f1f;
+
+  /* Screen panel: the locker's own display */
+  --panel-bg: #17150f;
+  --panel-ink: #f7f4ee;
+  --panel-ink-soft: #a9a396;
+  --panel-edge: #322e26;
+
+  /* Parcel identity tokens */
+  --parcel-red: #d4342a;
+  --parcel-orange: #e2761b;
+  --parcel-yellow: #e8bc2b;
+  --parcel-green: #3f8f4a;
+  --parcel-blue: #2f5fbe;
+  --parcel-violet: #7a4bbd;
+  --parcel-ink: #ffffff;
+
+  /* Shape */
+  --radius-sm: 3px;
+  --radius-md: 7px;
+  --radius-lg: 14px;
+
+  /* Type */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --step--1: clamp(0.69rem, 0.66rem + 0.15vw, 0.78rem);
+  --step-0: clamp(0.84rem, 0.8rem + 0.2vw, 0.95rem);
+  --step-1: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --step-2: clamp(1.4rem, 1.24rem + 0.8vw, 2rem);
+  --step-3: clamp(2rem, 1.6rem + 2vw, 3.2rem);
+  --step-4: clamp(2.6rem, 1.9rem + 3.4vw, 4.4rem);
+  --tracking-wide: 0.14em;
+
+  /* Depth */
+  --shadow-door: 0 1px 0 #ffffff55 inset, 0 1px 2px #00000038;
+  --shadow-panel: 0 2px 14px #00000024;
+  --shadow-lift: 0 6px 20px #0000002e;
+
+  /* Motion. `--motion` is the door swing; nothing animates longer. */
+  --motion: 200ms;
+  --motion-fast: 110ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /*
+   * Layout. Door height is `minmax(--unit-min, 1fr)` inside a stage capped at
+   * `--unit-max`, so the wall always fills the space it is given and never
+   * overflows it: 24–40 px per unit, exactly as the wall spec requires.
+   */
+  --unit-min: 24px;
+  --unit-max: 40px;
+  /* The nominal unit: the stage is capped at 12 of these, so the rendered door
+     height lands between --unit-min and --unit-max whatever the viewport is. */
+  --unit: var(--unit-max);
+  --gap: 3px;
+  --hit-min: 40px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 14px;
+  --space-4: 22px;
+  --wall-columns: 3;
+}
+
+/*
+ * Reduced motion collapses every transition to nothing. Game timing is driven
+ * by the reducer, not by CSS, so nothing about the day changes — the door just
+ * shows its open state at once.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion: 0ms;
+    --motion-fast: 0ms;
+  }
+}

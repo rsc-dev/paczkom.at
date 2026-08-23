@@ -1,12 +1,110 @@
 <!doctype html>
-<html lang="pl">
+<html lang="pl" data-theme="signage">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="paczkom.at — a two-minute game about remembering which box the parcel went into." />
+    <meta name="theme-color" content="#f2efe8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
     <title>paczkom.at</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app" data-screen="title">
+      <!-- ------------------------------------------------------- title -->
+      <section class="screen" id="screen-title" aria-labelledby="title-mark">
+        <div class="title__body">
+          <h1 class="title__mark" id="title-mark">paczkom<span class="brand__dot">.</span>at</h1>
+          <p class="title__tagline" data-t="app.tagline"></p>
+
+          <div class="title__actions">
+            <button class="btn btn--primary" id="btn-play" data-t="title.play"></button>
+            <button class="btn btn--ghost" id="btn-howto" data-t="title.howto"></button>
+          </div>
+
+          <p class="title__stats" id="title-stats"></p>
+        </div>
+
+        <div class="title__foot">
+          <span id="title-note"></span>
+          <span class="toggles">
+            <button class="btn btn--ghost btn--small" id="btn-lang"></button>
+            <button class="btn btn--ghost btn--small btn--mute" id="btn-mute">♪</button>
+          </span>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------- how to -->
+      <section class="screen" id="screen-howto" aria-labelledby="howto-title">
+        <h2 class="brand" id="howto-title" data-t="howto.title"></h2>
+        <ol class="howto__steps">
+          <li class="howto__step"><span data-t="howto.step1"></span></li>
+          <li class="howto__step"><span data-t="howto.step2"></span></li>
+          <li class="howto__step"><span data-t="howto.step3"></span></li>
+        </ol>
+        <p class="howto__note" data-t="howto.hintNote"></p>
+        <hr class="rule" />
+        <div class="title__actions">
+          <button class="btn btn--primary" id="btn-howto-play" data-t="title.play"></button>
+          <button class="btn btn--ghost" id="btn-howto-back" data-t="howto.back"></button>
+        </div>
+      </section>
+
+      <!-- --------------------------------------------------------- game -->
+      <section class="screen" id="screen-game" aria-label="paczkom.at">
+        <header class="hud" id="hud">
+          <span class="hud__phase" id="hud-phase"></span>
+          <span class="hud__clock" id="hud-clock"></span>
+          <span class="hud__meter" id="hud-meter"></span>
+          <span class="hud__count" id="hud-count"></span>
+          <span class="hud__score" id="hud-score"></span>
+          <span class="hud__buttons">
+            <button class="btn btn--ghost btn--small" id="btn-lang-game"></button>
+            <button class="btn btn--ghost btn--small btn--mute" id="btn-mute-game">♪</button>
+          </span>
+        </header>
+
+        <!-- Reserved for themes with a backdrop; empty and zero-height here. -->
+        <div class="scenery" aria-hidden="true"></div>
+
+        <div class="stage" id="stage">
+          <section class="panel" id="panel" aria-live="polite">
+            <span class="panel__kicker" id="panel-kicker"></span>
+            <p class="panel__code" id="panel-code"></p>
+            <span class="panel__hint" id="panel-hint" hidden>
+              <span class="swatch" id="panel-swatch"></span>
+              <span id="panel-hint-text"></span>
+            </span>
+            <span class="panel__wait" id="panel-wait"></span>
+          </section>
+          <!-- Door buttons are built from the wall geometry at boot. -->
+        </div>
+
+        <div class="tray" id="tray"></div>
+      </section>
+
+      <!-- ------------------------------------------------------- result -->
+      <section class="screen" id="screen-result" aria-labelledby="result-headline">
+        <div class="result__body">
+          <span class="result__kicker" id="result-kicker"></span>
+          <h2 class="result__headline" id="result-headline"></h2>
+          <p class="result__score" id="result-score"></p>
+          <p class="result__grid" id="result-grid"></p>
+          <ul class="result__stats" id="result-stats"></ul>
+          <p class="result__note" id="result-note"></p>
+        </div>
+        <div class="result__actions">
+          <button class="btn btn--primary" id="btn-share" data-t="share.button"></button>
+          <button class="btn btn--ghost" id="btn-again" data-t="result.playAgain"></button>
+          <button class="btn btn--ghost" id="btn-home" data-t="result.home"></button>
+        </div>
+        <textarea class="share-fallback" id="share-fallback" readonly hidden></textarea>
+      </section>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -326,7 +326,20 @@ describe('SERVE pickup service', () => {
     expect(activeCustomer(tapped)?.wrongTaps).toBe(1);
     expect(tapped.stats.wrongTaps).toBe(1);
     expect(tapped.score).toBe(0);
-    expect(tapped.cues).toContain('wrong');
+    // Exactly one cue, so the audio layer cannot double-fire the buzz.
+    expect(tapped.cues).toEqual(['wrong']);
+  });
+
+  it('replaces the cue list on every action, ticks included', () => {
+    const state = atServe();
+    const active = asPickup(activeCustomer(state));
+    const wrong = state.slots.find(
+      (slot) => slot.state === 'full' && slot.parcelId !== active.parcelId,
+    );
+    const tapped = reduce(state, { type: 'tapSlot', slotId: wrong?.id ?? '' });
+    expect(tapped.cues).toEqual(['wrong']);
+    expect(reduce(tapped, { type: 'tick', dtMs: 16 }).cues).toEqual([]);
+    expect(reduce(tapped, { type: 'tick', dtMs: 0 }).cues).toEqual([]);
   });
 
   it('marks a service after a hint as hinted', () => {

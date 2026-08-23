@@ -26,6 +26,16 @@ export function isLang(value: unknown): value is Lang {
   return typeof value === 'string' && (LANGS as readonly string[]).includes(value);
 }
 
+/** For `data-t` attributes in the HTML, which are strings until checked. */
+export function isMessageKey(value: string): value is MessageKey {
+  return Object.hasOwn(pl, value);
+}
+
+/** The language a PL/EN toggle switches to. */
+export function otherLang(lang: Lang = currentLang): Lang {
+  return lang === 'pl' ? 'en' : 'pl';
+}
+
 export function getLang(): Lang {
   return currentLang;
 }

@@ -15,6 +15,7 @@ export const en: Record<MessageKey, string> = {
   'title.streak': 'Streak: {count}',
   'title.best': 'Best: {score}',
   'title.noStreak': 'No game today yet',
+  'title.noStorage': 'This browser will not remember your streak',
 
   'howto.title': 'How to play',
   'howto.step1': 'Load: tap a box the parcel fits into.',
@@ -34,6 +35,15 @@ export const en: Record<MessageKey, string> = {
   'hud.unmute': 'Unmute',
   'hud.language': 'Language',
 
+  'a11y.wall': 'Locker wall',
+  'door.label': 'Box {id}, size {size}, {state}',
+  'door.state.empty': 'empty',
+  'door.state.full': 'occupied',
+  'door.state.open': 'open',
+  'door.state.outgoing': 'holds an outgoing parcel',
+  'door.state.expired': 'holds an uncollected parcel',
+  'door.state.marked': 'to be cleared',
+
   'screen.pickup': 'Pickup',
   'screen.sender': 'Drop-off',
   'screen.code': 'Code',
@@ -41,7 +51,9 @@ export const en: Record<MessageKey, string> = {
   'screen.nextUp': 'Next up',
   'screen.loadPrompt': 'Put the parcel in a box',
   'screen.sweepPrompt': 'Clear the marked boxes',
+  'screen.sweepRemaining': 'Left: {count}',
   'screen.idle': 'Nobody here. For now.',
+  'screen.thisParcel': 'This parcel',
 
   'hint.colour': 'the {colour} one',
   'hint.colourSticker': 'the {colour} one {sticker}',
@@ -89,6 +101,7 @@ export const en: Record<MessageKey, string> = {
   'share.shared': 'Shared',
   'share.copied': 'Copied to the clipboard',
   'share.manual': 'Copy the text below',
+  'share.failed': 'Sharing did not work',
 
   'lang.pl': 'Polski',
   'lang.en': 'English',
