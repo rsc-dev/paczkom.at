@@ -1,18 +1,18 @@
 ## 1. Project setup
 
-- [ ] 1.1 Remove `main.py`, `pyproject.toml`, `.python-version`; replace `.gitignore` with a Node/Vite one (keep `.superpowers/`)
-- [ ] 1.2 Initialise `package.json` (private, no `dependencies`), install dev deps: `vite`, `typescript`, `vitest`, `eslint` + `typescript-eslint`, `@playwright/test`; commit lockfile
-- [ ] 1.3 Add `tsconfig.json` (strict, `noUncheckedIndexedAccess`), `vite.config.ts` (`base: '/'`), `vitest.config.ts`, `eslint.config.js` with a `no-restricted-properties` rule banning `Math.random` under `src/core/**`
-- [ ] 1.4 Create `index.html`, `src/main.ts` stub, `src/core/`, `src/ui/`, `src/i18n/`, `src/theme/`, `src/audio/` directories; verify `npm run dev`, `npm run build`, `npm test` all run green on the stub
-- [ ] 1.5 Add npm scripts: `dev`, `build`, `preview`, `typecheck`, `lint`, `test`, `test:e2e`
+- [x] 1.1 Remove `main.py`, `pyproject.toml`, `.python-version`; replace `.gitignore` with a Node/Vite one (keep `.superpowers/`)
+- [x] 1.2 Initialise `package.json` (private, no `dependencies`), install dev deps: `vite`, `typescript`, `vitest`, `eslint` + `typescript-eslint`, `@playwright/test`; commit lockfile
+- [x] 1.3 Add `tsconfig.json` (strict, `noUncheckedIndexedAccess`), `vite.config.ts` (`base: '/'`), `vitest.config.ts`, `eslint.config.js` with a `no-restricted-properties` rule banning `Math.random` under `src/core/**`
+- [x] 1.4 Create `index.html`, `src/main.ts` stub, `src/core/`, `src/ui/`, `src/i18n/`, `src/theme/`, `src/audio/` directories; verify `npm run dev`, `npm run build`, `npm test` all run green on the stub
+- [x] 1.5 Add npm scripts: `dev`, `build`, `preview`, `typecheck`, `lint`, `test`, `test:e2e`
 
 ## 2. Core: wall, RNG, parcels, schedule
 
-- [ ] 2.1 `core/rng.ts`: FNV-1a 32-bit hash of a string, mulberry32 with explicit state, `next(state) → [value, state]`, `pick`, `shuffle`; unit tests for determinism
-- [ ] 2.2 `core/wall.ts`: `Size`, `Slot`, `buildWall(columns)`, `fits(parcelSize, slotSize)`; tests for 2/3/5 columns and fit matrix
-- [ ] 2.3 `core/parcel.ts`: `Parcel` type, colour/sticker enums, `generateParcels(rngState, profile)` with unique codes, look-alike pairs, feasible size mix; tests for uniqueness, determinism, pairs, feasibility
-- [ ] 2.4 `core/profiles.ts`: `DayProfile` type and the `daily` profile (3 cols, 16 pickups, 4 senders, 2 pairs, 25 s / 65 s, patience 20 s)
-- [ ] 2.5 `core/schedule.ts`: `buildSchedule(rngState, profile, parcels)` → sorted arrivals (pickups + senders with `needsSize`) over the first 50 s of SERVE; tests for determinism, counts, ordering
+- [x] 2.1 `core/rng.ts`: FNV-1a 32-bit hash of a string, mulberry32 with explicit state, `next(state) → [value, state]`, `pick`, `shuffle`; unit tests for determinism
+- [x] 2.2 `core/wall.ts`: `Size`, `Slot`, `buildWall(columns)`, `fits(parcelSize, slotSize)`; tests for 2/3/5 columns and fit matrix
+- [x] 2.3 `core/parcel.ts`: `Parcel` type, colour/sticker enums, `generateParcels(rngState, profile)` with unique codes, look-alike pairs, feasible size mix; tests for uniqueness, determinism, pairs, feasibility
+- [x] 2.4 `core/profiles.ts`: `DayProfile` type and the `daily` profile (3 cols, 16 pickups, 4 senders, 2 pairs, 25 s / 65 s, patience 20 s)
+- [x] 2.5 `core/schedule.ts`: `buildSchedule(rngState, profile, parcels)` → sorted arrivals (pickups + senders with `needsSize`) over the first 50 s of SERVE; tests for determinism, counts, ordering
 
 ## 3. Core: reducer and scoring
 
