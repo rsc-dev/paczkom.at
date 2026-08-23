@@ -2,6 +2,7 @@ import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { openGame } from './fixtures.js';
 
 /**
  * The wall has to fit, whole, on the smallest phone we care about and still
@@ -18,8 +19,7 @@ const VIEWPORTS = [
 ];
 
 async function startDay(page: Page): Promise<void> {
-  await page.clock.install();
-  await page.goto('/');
+  await openGame(page);
   await page.locator('#btn-play').click();
   await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
   // Put a few parcels away so the wall is not uniformly empty in the shot.
@@ -98,10 +98,12 @@ test('the screen panel sits between the wall columns on desktop', async ({ page 
   expect(panel?.height ?? 0).toBeGreaterThan((first?.height ?? 0) * 4);
 });
 
-test('every point on the wall belongs to a door', async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 640 });
-  await page.clock.install();
-  await page.goto('/');
+// The gap between doors is 3 px on a phone and 8 px on a desktop, so the hit
+// extenders have to follow it; both widths get probed.
+for (const viewport of [VIEWPORTS[0], VIEWPORTS[2]]) {
+  test(`every point on the wall belongs to a door at ${viewport?.name ?? ''}`, async ({ page }) => {
+  await page.setViewportSize({ width: viewport?.width ?? 360, height: viewport?.height ?? 640 });
+  await openGame(page);
   await page.locator('#btn-play').click();
   await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
 
@@ -120,27 +122,31 @@ test('every point on the wall belongs to a door', async ({ page }) => {
       hit: box === undefined ? null : slotAt(box.left + box.width / 2, box.top + box.height / 2),
     }));
 
-    // ... and the dead space between two stacked doors must still hit one.
-    const first = faces[0]?.box;
-    const second = faces[1]?.box;
-    const gap =
-      first === undefined || second === undefined
-        ? null
-        : slotAt(first.left + first.width / 2, (first.bottom + second.top) / 2);
+    // ... and the dead space between stacked doors must still hit one of them.
+    const gaps: (string | null)[] = [];
+    for (let i = 0; i + 1 < faces.length; i += 1) {
+      const above = faces[i]?.box;
+      const below = faces[i + 1]?.box;
+      if (above === undefined || below === undefined || below.top < above.bottom) {
+        continue;
+      }
+      gaps.push(slotAt(above.left + above.width / 2, (above.bottom + below.top) / 2));
+    }
 
-    return { centres, gap };
+    return { centres, gaps };
   });
 
   for (const centre of probe.centres) {
     expect(centre.hit, `centre of ${centre.slot}`).toBe(centre.slot);
   }
-  expect(probe.gap).not.toBeNull();
-});
+  expect(probe.gaps.length).toBeGreaterThan(10);
+  expect(probe.gaps.filter((slot) => slot === null)).toEqual([]);
+  });
+}
 
 test('serving, with the hint ladder showing', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
-  await page.clock.install();
-  await page.goto('/');
+  await openGame(page);
   await page.locator('#btn-play').click();
 
   // Load largest-door-first until a parcel will not fit, then let LOAD expire.
@@ -189,8 +195,7 @@ test('serving, with the hint ladder showing', async ({ page }) => {
 
 test('title and result screens render', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.clock.install();
-  await page.goto('/');
+  await openGame(page);
   await expect(page.locator('#btn-play')).toBeVisible();
   await page.screenshot({ path: `${SHOTS}title-390x844.png` });
 

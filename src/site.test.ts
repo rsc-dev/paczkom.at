@@ -14,6 +14,7 @@ interface PackageJson {
   readonly dependencies?: Record<string, string>;
   readonly devDependencies?: Record<string, string>;
   readonly scripts?: Record<string, string>;
+  readonly engines?: Record<string, string>;
 }
 
 const pkg = JSON.parse(read('package.json')) as PackageJson;
@@ -30,9 +31,25 @@ describe('zero runtime dependencies', () => {
   });
 
   it('offers the scripts the README documents', () => {
-    for (const script of ['dev', 'build', 'preview', 'typecheck', 'lint', 'test', 'test:e2e']) {
+    for (const script of [
+      'dev',
+      'build',
+      'preview',
+      'typecheck',
+      'lint',
+      'test',
+      'test:e2e',
+      'gen:fixtures',
+      'gen:icons',
+    ]) {
       expect(Object.keys(pkg.scripts ?? {})).toContain(script);
     }
+  });
+
+  it('states the Node range the README states', () => {
+    const engines = pkg.engines?.['node'];
+    expect(engines).toBeDefined();
+    expect(read('README.md')).toContain(engines ?? '');
   });
 });
 

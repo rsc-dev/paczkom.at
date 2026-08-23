@@ -138,6 +138,21 @@ describe('renderResult', () => {
     expect(document.querySelector('#result-note')?.textContent).toContain('1800');
   });
 
+  it('keeps the share confirmation clear of the note about the day&#39;s result', () => {
+    const nodes = resultNodes(document);
+    renderResult(nodes, { ...model, isPractice: true, officialScore: 1800 });
+
+    // What the share did goes on its own line, so confirming it cannot wipe the
+    // line that says which score actually stands.
+    nodes.shareNote.textContent = 'Skopiowano do schowka';
+    expect(nodes.note.textContent).toContain('1800');
+    expect(nodes.shareNote).not.toBe(nodes.note);
+
+    // ... and a fresh result clears the stale confirmation.
+    renderResult(nodes, model);
+    expect(nodes.shareNote.textContent).toBe('');
+  });
+
   it('replaces the stats rather than appending on a re-render', () => {
     const nodes = resultNodes(document);
     renderResult(nodes, model);

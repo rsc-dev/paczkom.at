@@ -1,16 +1,16 @@
 import { expect, test } from '@playwright/test';
+import { openGame } from './fixtures.js';
 
 /**
  * One end-to-end pass over the shipped build: open the title, start the Daily,
  * put a parcel away, let the day run out, and land on a result you can share.
- * The clock is faked so the ninety-second day takes no wall time.
+ * The clock is faked, and pinned to a fixed date so the day is always the same
+ * day, so the ninety-second day takes no wall time.
  */
 test('title to shareable result', async ({ page }) => {
-  await page.clock.install();
-  await page.goto('/');
+  await openGame(page);
 
   const app = page.locator('#app');
-  await expect(app).toHaveAttribute('data-screen', 'title');
   await expect(page.locator('#btn-play')).toBeVisible();
 
   await page.locator('#btn-play').click();

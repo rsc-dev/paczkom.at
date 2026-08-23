@@ -3,7 +3,7 @@
  * image library: a handful of rounded rectangles rasterised into a PNG that is
  * assembled by hand (zlib is in Node; CRC-32 is twenty lines).
  *
- *   npx vite-node scripts/generate-icons.ts
+ *   npm run gen:icons
  */
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

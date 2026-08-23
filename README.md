@@ -13,7 +13,7 @@ thing is a static page of hand-written TypeScript and CSS.
 
 ## Requirements
 
-- Node 20 or newer (CI runs 22)
+- Node `^20.19 || >=22.13` (CI runs 22) — the version Vite 8 needs
 - npm (the lockfile is committed; use `npm ci` for a reproducible install)
 
 ## Install
@@ -45,14 +45,15 @@ npm run test:e2e   # Playwright: smoke test and viewport checks against the buil
 
 The e2e suite builds nothing itself — it starts `vite preview` against `dist/`,
 so run `npm run build` first (or let CI do it). It also writes the viewport
-screenshots it checks into `.superpowers/coordination/screens/`.
+screenshots it checks into `test-results/screens/`, which CI keeps as an
+artefact on every run.
 
 Two generators regenerate committed artefacts. Run them only when you mean to
 change what they produce, and review the diff:
 
 ```sh
-npx vite-node scripts/generate-scripted-days.ts   # src/core/fixtures/scripted-days.ts
-npx vite-node scripts/generate-icons.ts           # public/icon-*.png
+npm run gen:fixtures   # -> src/core/fixtures/scripted-days.ts
+npm run gen:icons      # -> public/icon-*.png, public/apple-touch-icon.png
 ```
 
 The scripted days are the regression net for the whole game loop: a seed, a
@@ -104,8 +105,9 @@ Pages via `upload-pages-artifact` and `deploy-pages`.
    Set it to the real launch date, or the Daily number will be wrong from the
    first day.
 2. **Enable Pages.** Repository → Settings → Pages → Source: **GitHub Actions**.
-3. **Set the custom domain** to `paczkom.at` in the same settings page.
-   `public/CNAME` is published with the build, so the setting survives deploys.
+3. **Set the custom domain** to `paczkom.at` in the same settings page. That
+   repository setting is what Pages actually serves from; `public/CNAME` ships
+   the same value with the build so the two cannot silently disagree.
 4. **Point DNS at GitHub Pages.** At the registrar for `paczkom.at`:
 
    | Record | Name  | Value                                                              |
@@ -128,4 +130,7 @@ machine what it is: an *automat paczkowy* in Polish, a *parcel locker* in
 English. A test scans both string catalogues to keep it that way.
 
 Inter is bundled under the SIL Open Font License 1.1
-(`public/fonts/Inter-LICENSE.txt`).
+(`public/fonts/Inter-LICENSE.txt`). The four `.woff2` files in `public/fonts/`
+were copied out of the `@fontsource/inter` package, which is a devDependency
+only for that reason — nothing imports it, and removing it would not change the
+build.
