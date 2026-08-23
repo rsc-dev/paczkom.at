@@ -13,15 +13,14 @@ const scheduleFor = (seed: number) => {
 type Pickup = Extract<CustomerRequest, { kind: 'pickup' }>;
 type Sender = Extract<CustomerRequest, { kind: 'sender' }>;
 
+const requests = (entries: readonly ScheduleEntry[]): CustomerRequest[] =>
+  entries.filter(isCustomerArrival).map((entry) => entry.request);
+
 const pickups = (entries: readonly ScheduleEntry[]): Pickup[] =>
-  entries
-    .map((entry) => entry.request)
-    .filter((request): request is Pickup => request.kind === 'pickup');
+  requests(entries).filter((request): request is Pickup => request.kind === 'pickup');
 
 const senders = (entries: readonly ScheduleEntry[]): Sender[] =>
-  entries
-    .map((entry) => entry.request)
-    .filter((request): request is Sender => request.kind === 'sender');
+  requests(entries).filter((request): request is Sender => request.kind === 'sender');
 
 describe('buildSchedule', () => {
   it('is deterministic for the same seed', () => {
@@ -32,16 +31,17 @@ describe('buildSchedule', () => {
     expect(scheduleFor(1).arrivals).not.toEqual(scheduleFor(2).arrivals);
   });
 
-  it('is a schedule of customer arrivals', () => {
-    for (const entry of scheduleFor(7).arrivals) {
-      expect(entry.kind).toBe('arrival');
-      expect(isCustomerArrival(entry)).toBe(true);
-    }
+  it('carries the day&#39;s events alongside its arrivals', () => {
+    const { arrivals } = scheduleFor(7);
+    expect(arrivals.filter(isCustomerArrival).length).toBeGreaterThan(0);
+    // Daily is Thursday-grade, which means exactly one jam.
+    expect(arrivals.filter((entry) => entry.kind === 'jam')).toHaveLength(DAILY_PROFILE.jams);
+    expect(new Set(arrivals.map((entry) => entry.id)).size).toBe(arrivals.length);
   });
 
   it('has one arrival per pickup parcel plus the profile senders', () => {
     const { parcels, arrivals } = scheduleFor(7);
-    expect(arrivals).toHaveLength(parcels.length + DAILY_PROFILE.senders);
+    expect(arrivals.filter(isCustomerArrival)).toHaveLength(parcels.length + DAILY_PROFILE.senders);
     expect(pickups(arrivals)).toHaveLength(parcels.length);
     expect(senders(arrivals)).toHaveLength(DAILY_PROFILE.senders);
   });
@@ -55,11 +55,11 @@ describe('buildSchedule', () => {
 
   it('gives pickups a parcel and senders a needed size', () => {
     const { arrivals } = scheduleFor(7);
-    for (const entry of arrivals) {
-      if (entry.request.kind === 'pickup') {
-        expect(entry.request.parcelId).toMatch(/^p\d+$/);
+    for (const request of requests(arrivals)) {
+      if (request.kind === 'pickup') {
+        expect(request.parcelId).toMatch(/^p\d+$/);
       } else {
-        expect(['A', 'B', 'C']).toContain(entry.request.needsSize);
+        expect(['A', 'B', 'C']).toContain(request.needsSize);
       }
     }
   });
@@ -84,9 +84,11 @@ describe('buildSchedule', () => {
   });
 
   it('gives every arrival a unique id in arrival order', () => {
-    const { arrivals } = scheduleFor(7);
-    expect(new Set(arrivals.map((arrival) => arrival.id)).size).toBe(arrivals.length);
-    expect(arrivals.map((arrival) => arrival.id).slice(0, 3)).toEqual(['k0', 'k1', 'k2']);
+    const ids = scheduleFor(7)
+      .arrivals.filter(isCustomerArrival)
+      .map((arrival) => arrival.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids.slice(0, 3)).toEqual(['k0', 'k1', 'k2']);
   });
 
   it('spreads arrivals rather than bunching them at the start', () => {

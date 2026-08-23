@@ -8,10 +8,11 @@
  */
 import { generateParcels } from './parcel.js';
 import type { Parcel } from './parcel.js';
+import { loadDurationMs } from './profiles.js';
 import type { DayProfile } from './profiles.js';
 import type { RngState } from './rng.js';
-import { buildSchedule } from './schedule.js';
-import type { CustomerRequest, ScheduleEntry } from './schedule.js';
+import { buildSchedule, isCustomerArrival, pickRainMask } from './schedule.js';
+import type { CustomerRequest, JamEvent, ScheduleEntry } from './schedule.js';
 import { PENALTY, applyPoints, servicePoints } from './score.js';
 import { buildWall, fits } from './wall.js';
 import type { Slot } from './wall.js';
@@ -26,7 +27,7 @@ export type SlotState = 'empty' | 'full' | 'open' | 'outgoing' | 'expired' | 'ma
 export type SlotOutcome = 'none' | 'perfect' | 'hinted' | 'walked';
 
 /** Feedback for the view layer; the audio layer maps these to synthesised cues. */
-export type Cue = 'tap' | 'door' | 'wrong' | 'done';
+export type Cue = 'tap' | 'door' | 'wrong' | 'done' | 'thunk';
 
 export type HintLevel = 0 | 1 | 2;
 
@@ -36,6 +37,11 @@ export interface SlotRuntime extends Slot {
   /** Milliseconds left of the open-door animation. */
   readonly openMs: number;
   readonly outcome: SlotOutcome;
+  /**
+   * The door is stuck. Independent of `state`: a jammed door can be empty or
+   * full. Senders cannot use it, and its owner has to free it before it opens.
+   */
+  readonly jammed: boolean;
 }
 
 /** The half of a customer that does not depend on what they came for. */
@@ -95,6 +101,11 @@ export interface State {
   readonly nextArrival: number;
   readonly customers: readonly Customer[];
   readonly activeCustomerId: string | null;
+  /**
+   * Rain: the digit position smudged out of every displayed code, or `null` on
+   * a dry day. Chosen from the seed, so a replay reads the same.
+   */
+  readonly maskedDigit: number | null;
   readonly phaseElapsedMs: number;
   readonly elapsed: PhaseElapsed;
   readonly score: number;
@@ -126,7 +137,14 @@ export function phaseRank(phase: Phase): number {
 
 /** A fresh day for a seed. Pure: the same seed always yields the same day. */
 export function initialState(seed: number, profile: DayProfile): State {
-  const [parcels, afterParcels] = generateParcels(seed, profile);
+  // The rain mask is drawn first so parcel generation can keep its look-alike
+  // transpositions clear of the smudged digit.
+  const [maskedDigit, afterMask] = pickRainMask(seed, profile);
+  const [parcels, afterParcels] = generateParcels(
+    afterMask,
+    profile,
+    maskedDigit === null ? {} : { avoidIndex: maskedDigit },
+  );
   const [schedule, afterSchedule] = buildSchedule(afterParcels, profile, parcels);
   const slots: SlotRuntime[] = buildWall(profile.columns).map((slot) => ({
     ...slot,
@@ -134,6 +152,7 @@ export function initialState(seed: number, profile: DayProfile): State {
     parcelId: null,
     openMs: 0,
     outcome: 'none',
+    jammed: false,
   }));
 
   return {
@@ -149,6 +168,7 @@ export function initialState(seed: number, profile: DayProfile): State {
     nextArrival: 0,
     customers: [],
     activeCustomerId: null,
+    maskedDigit,
     phaseElapsedMs: 0,
     elapsed: { load: 0, serve: 0, sweep: 0 },
     score: 0,
@@ -227,6 +247,31 @@ export function hintColumn(state: State): number | null {
   return slot?.col ?? null;
 }
 
+export const MASK_CHARACTER = '•';
+
+/**
+ * A code as the player sees it. On a rain day one seeded digit is smudged out;
+ * the generator has kept every look-alike pair's transposition clear of that
+ * position, so a masked pair is still tellable apart.
+ */
+export function displayCode(state: State, code: string): string {
+  const index = state.maskedDigit;
+  if (index === null || index < 0 || index >= code.length) {
+    return code;
+  }
+  return `${code.slice(0, index)}${MASK_CHARACTER}${code.slice(index + 1)}`;
+}
+
+/** True when this customer turned up without their code. */
+export function hasForgottenCode(customer: Customer | null): boolean {
+  return customer !== null && customer.kind === 'pickup' && customer.forgotten;
+}
+
+/** True while the wall is being loaded from a van that turned up late. */
+export function isLateVan(state: State): boolean {
+  return state.profile.lateVan;
+}
+
 export function totalTimeMs(state: State): number {
   return state.elapsed.load + state.elapsed.serve + state.elapsed.sweep;
 }
@@ -283,11 +328,14 @@ function endLoad(state: State): State {
     ...state,
     loadQueue: [],
     schedule: state.schedule.filter(
-      (entry) => entry.request.kind !== 'pickup' || !stranded.has(entry.request.parcelId),
+      (entry) =>
+        !isCustomerArrival(entry) ||
+        entry.request.kind !== 'pickup' ||
+        !stranded.has(entry.request.parcelId),
     ),
     elapsed: {
       ...state.elapsed,
-      load: Math.min(state.phaseElapsedMs, state.profile.loadMs),
+      load: Math.min(state.phaseElapsedMs, loadDurationMs(state.profile)),
     },
     phase: 'SERVE',
     phaseElapsedMs: 0,
@@ -301,14 +349,14 @@ function endLoad(state: State): State {
 }
 
 function tickLoad(state: State, dtMs: number): State {
-  const step = Math.min(dtMs, Math.max(0, state.profile.loadMs - state.phaseElapsedMs));
+  const step = Math.min(dtMs, Math.max(0, loadDurationMs(state.profile) - state.phaseElapsedMs));
   const phaseElapsedMs = state.phaseElapsedMs + step;
   const advanced: State = {
     ...state,
     phaseElapsedMs,
     elapsed: { ...state.elapsed, load: phaseElapsedMs },
   };
-  return phaseElapsedMs >= state.profile.loadMs ? endLoad(advanced) : advanced;
+  return phaseElapsedMs >= loadDurationMs(state.profile) ? endLoad(advanced) : advanced;
 }
 
 function tapSlotLoad(state: State, slotId: string): State {
@@ -361,6 +409,39 @@ function walkCustomer(state: State, customerId: string): State {
   );
 }
 
+/**
+ * Is anyone else coming? Only customer arrivals count — a jam still queued up
+ * is not a reason to keep the counter open once the last customer has gone.
+ */
+function arrivalsPending(state: State): boolean {
+  for (let i = state.nextArrival; i < state.schedule.length; i += 1) {
+    const entry = state.schedule[i];
+    if (entry !== undefined && isCustomerArrival(entry)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * A door sticks. The jam names a parcel rather than a slot, because which slot
+ * holds what is the player's decision; if that parcel never made it off the van
+ * the seeded fallback door jams instead, so a jam always happens.
+ */
+function jamSlot(state: State, event: JamEvent): State {
+  const holder =
+    event.targetParcelId === null
+      ? undefined
+      : state.slots.find(
+          (slot) => slot.parcelId === event.targetParcelId && slot.state === 'full',
+        );
+  const target = holder ?? state.slots.find((slot) => slot.id === event.fallbackSlotId);
+  if (target === undefined || target.jammed) {
+    return state;
+  }
+  return patchSlot(state, target.id, { jammed: true });
+}
+
 /** Admits due arrivals, fills the visible queue and makes sure someone is active. */
 function settleServe(state: State): State {
   let next = state;
@@ -372,18 +453,22 @@ function settleServe(state: State): State {
     if (entry === undefined || entry.atMs > next.phaseElapsedMs) {
       break;
     }
-    admitted.push({
-      id: entry.id,
-      visible: false,
-      waitedMs: 0,
-      activeMs: 0,
-      wrongTaps: 0,
-      hintLevel: 0,
-      ...entry.request,
-    });
+    if (isCustomerArrival(entry)) {
+      admitted.push({
+        id: entry.id,
+        visible: false,
+        waitedMs: 0,
+        activeMs: 0,
+        wrongTaps: 0,
+        hintLevel: 0,
+        ...entry.request,
+      });
+    } else {
+      next = jamSlot(next, entry);
+    }
     cursor += 1;
   }
-  if (admitted.length > 0) {
+  if (cursor !== next.nextArrival) {
     next = { ...next, customers: [...next.customers, ...admitted], nextArrival: cursor };
   }
 
@@ -482,10 +567,19 @@ function tickServe(state: State, dtMs: number): State {
   if (next.phaseElapsedMs >= next.profile.serveMs) {
     return endServe(next);
   }
-  if (next.customers.length === 0 && next.nextArrival >= next.schedule.length) {
+  if (next.customers.length === 0 && !arrivalsPending(next)) {
     return endServe(next);
   }
   return next;
+}
+
+/**
+ * The right door, but stuck. Freeing it costs a tap and nothing else: no
+ * penalty, no mark against the customer, and the outcome they are heading for
+ * is unchanged.
+ */
+function unjam(state: State, slot: SlotRuntime): State {
+  return withCue(patchSlot(state, slot.id, { jammed: false }), 'thunk');
 }
 
 function servePickup(state: State, customer: Customer, slot: SlotRuntime): State {
@@ -494,6 +588,7 @@ function servePickup(state: State, customer: Customer, slot: SlotRuntime): State
     state: 'open',
     openMs: state.profile.doorMs,
     outcome: level >= 1 ? 'hinted' : 'perfect',
+    jammed: false,
   });
   const removed: State = {
     ...opened,
@@ -549,17 +644,23 @@ function tapSlotServe(state: State, slotId: string): State {
     return state;
   }
 
-  const served =
-    customer.kind === 'pickup'
-      ? slot.state === 'full' && slot.parcelId === customer.parcelId
-        ? servePickup(state, customer, slot)
-        : wrongTap(state, customer)
-      : slot.state === 'empty' && fits(customer.needsSize, slot.size)
-        ? serveSender(state, customer, slot)
-        : wrongTap(state, customer);
+  const theirDoor = customer.kind === 'pickup' && slot.state === 'full' && slot.parcelId === customer.parcelId;
+
+  const served = theirDoor
+    ? // Their door, but stuck: the first tap frees it, the second opens it.
+      slot.jammed
+      ? unjam(state, slot)
+      : servePickup(state, customer, slot)
+    : customer.kind === 'sender' &&
+        !slot.jammed &&
+        slot.state === 'empty' &&
+        fits(customer.needsSize, slot.size)
+      ? // A jammed door will not take an outgoing parcel either.
+        serveSender(state, customer, slot)
+      : wrongTap(state, customer);
 
   const settled = settleServe(served);
-  if (settled.customers.length === 0 && settled.nextArrival >= settled.schedule.length) {
+  if (settled.customers.length === 0 && !arrivalsPending(settled)) {
     return endServe(settled);
   }
   return settled;
@@ -579,14 +680,16 @@ function enterSweep(state: State): State {
     // their parcel walked at the end of SERVE, which is what marks their slot
     // `expired` and charges the penalty. The profile invariant
     // `arrivalWindowMs + patienceMs <= serveMs` guarantees they all arrived.
+    // Jams do not survive the day: whatever stuck, the engineer got to it
+    // before closing, so sweeping is never blocked by one.
     slots: state.slots.map((slot) => {
       if (slot.state === 'outgoing' || slot.state === 'expired') {
-        return { ...slot, state: 'marked', openMs: 0 };
+        return { ...slot, state: 'marked', openMs: 0, jammed: false };
       }
       if (slot.state === 'open') {
-        return { ...slot, state: 'empty', parcelId: null, openMs: 0 };
+        return { ...slot, state: 'empty', parcelId: null, openMs: 0, jammed: false };
       }
-      return slot;
+      return slot.jammed ? { ...slot, jammed: false } : slot;
     }),
   };
   return swept.slots.some((slot) => slot.state === 'marked') ? swept : finish(swept);

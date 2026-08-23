@@ -35,8 +35,12 @@ const MAX_DRAWS = 20_000;
  * Every distinct code reachable from `code` by swapping two neighbouring
  * digits. Swaps that change nothing or that would produce a leading zero are
  * left out, so the result is always a valid, different code.
+ *
+ * `avoidIndex` excludes swaps that touch that digit position: on a rain day the
+ * smudged digit must never be one of the two a pair swaps, or the pair would be
+ * genuinely indistinguishable rather than merely confusable.
  */
-export function adjacentTranspositions(code: string): string[] {
+export function adjacentTranspositions(code: string, avoidIndex?: number): string[] {
   const digits = [...code];
   const result: string[] = [];
   for (let i = 0; i + 1 < digits.length; i += 1) {
@@ -46,6 +50,9 @@ export function adjacentTranspositions(code: string): string[] {
       continue;
     }
     if (i === 0 && b === '0') {
+      continue;
+    }
+    if (avoidIndex !== undefined && (i === avoidIndex || i + 1 === avoidIndex)) {
       continue;
     }
     const swapped = [...digits];
@@ -93,6 +100,7 @@ function generateCodes(
   state: RngState,
   count: number,
   lookalikePairs: number,
+  avoidIndex?: number,
 ): [string[], RngState] {
   if (count < lookalikePairs * 2) {
     throw new RangeError(
@@ -113,7 +121,7 @@ function generateCodes(
       if (taken.has(base) || pairsWithTaken(base)) {
         continue;
       }
-      const variants = adjacentTranspositions(base);
+      const variants = adjacentTranspositions(base, avoidIndex);
       if (variants.length === 0) {
         continue;
       }
@@ -213,8 +221,20 @@ function generateSizes(
   return [sizes, rng];
 }
 
+export interface GenerateOptions {
+  /**
+   * A digit position no look-alike pair may swap — the one the rain smudges
+   * out. Omitted on a dry day.
+   */
+  readonly avoidIndex?: number | undefined;
+}
+
 /** The pickup parcels for a day, in the order the courier unloads them. */
-export function generateParcels(state: RngState, profile: DayProfile): [Parcel[], RngState] {
+export function generateParcels(
+  state: RngState,
+  profile: DayProfile,
+  options: GenerateOptions = {},
+): [Parcel[], RngState] {
   const wall = buildWall(profile.columns);
   const capacity = slotCapacity(wall);
   let rng = state;
@@ -222,7 +242,12 @@ export function generateParcels(state: RngState, profile: DayProfile): [Parcel[]
   const [sizes, afterSizes] = generateSizes(rng, profile, capacity);
   rng = afterSizes;
 
-  const [codes, afterCodes] = generateCodes(rng, profile.pickups, profile.lookalikePairs);
+  const [codes, afterCodes] = generateCodes(
+    rng,
+    profile.pickups,
+    profile.lookalikePairs,
+    options.avoidIndex,
+  );
   rng = afterCodes;
 
   const parcels: Parcel[] = [];

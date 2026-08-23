@@ -17,11 +17,25 @@ import type { Action, Customer, SlotRuntime, State } from './game.js';
 import { DAILY_PROFILE } from './profiles.js';
 import type { DayProfile } from './profiles.js';
 import { PENALTY, servicePoints } from './score.js';
+import { isCustomerArrival } from './schedule.js';
 import { fits } from './wall.js';
 import type { Size } from './wall.js';
 
-const profileWith = (overrides: Partial<DayProfile>): DayProfile => ({
+/**
+ * Daily is Thursday-grade and therefore has a jam in it. The focused tests in
+ * this file are about one rule each, so they build on a Daily with the weather
+ * switched off; the event tests opt back in explicitly.
+ */
+const CALM_DAILY: DayProfile = {
   ...DAILY_PROFILE,
+  jams: 0,
+  forgotten: 0,
+  rain: false,
+  lateVan: false,
+};
+
+const profileWith = (overrides: Partial<DayProfile>): DayProfile => ({
+  ...CALM_DAILY,
   ...overrides,
 });
 
@@ -107,14 +121,18 @@ function asSender(customer: Customer | null | undefined): Extract<Customer, { ki
 }
 
 describe('initialState', () => {
-  it('applies the Daily profile: 21 slots and a 16-parcel load queue', () => {
+  it('applies the Daily profile: 21 slots, 15 parcels and one jam', () => {
     const state = initialState(1, DAILY_PROFILE);
     expect(state.slots).toHaveLength(21);
-    expect(state.loadQueue).toHaveLength(16);
+    expect(state.loadQueue).toHaveLength(15);
+    expect(state.schedule.filter((entry) => entry.kind === 'jam')).toHaveLength(1);
     expect(state.phase).toBe('LOAD');
     expect(state.score).toBe(0);
     expect(state.summary).toBeNull();
     expect(state.slots.every((slot) => slot.state === 'empty')).toBe(true);
+    expect(state.slots.every((slot) => !slot.jammed)).toBe(true);
+    // Thursday is dry.
+    expect(state.maskedDigit).toBeNull();
   });
 
   it('is deterministic for a seed', () => {
@@ -203,14 +221,13 @@ describe('LOAD placement', () => {
     const state = started(3, TINY);
     const kept = placeNext(state).loadQueue;
     const expired = reduce(placeNext(state), { type: 'tick', dtMs: TINY.loadMs });
-    for (const entry of expired.schedule) {
-      if (entry.request.kind === 'pickup') {
-        expect(kept).not.toContain(entry.request.parcelId);
+    const stillComing = expired.schedule.filter(isCustomerArrival).map((entry) => entry.request);
+    for (const request of stillComing) {
+      if (request.kind === 'pickup') {
+        expect(kept).not.toContain(request.parcelId);
       }
     }
-    expect(
-      expired.schedule.filter((entry) => entry.request.kind === 'pickup'),
-    ).toHaveLength(1);
+    expect(stillComing.filter((request) => request.kind === 'pickup')).toHaveLength(1);
   });
 
   it('lets the player close the van early with `continue`', () => {

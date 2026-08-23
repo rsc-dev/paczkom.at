@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { DAILY_PROFILE } from './profiles.js';
+import {
+  DAILY_PROFILE,
+  LATE_VAN_FACTOR,
+  SATURDAY,
+  THURSDAY,
+  WEEK_DAY_KEYS,
+  WEEK_PROFILES,
+  loadDurationMs,
+} from './profiles.js';
 import type { DayProfile } from './profiles.js';
 import { buildWall } from './wall.js';
 
-const PROFILES: DayProfile[] = [DAILY_PROFILE];
+const PROFILES: DayProfile[] = [...WEEK_PROFILES, DAILY_PROFILE];
 
 describe.each(PROFILES)('profile $id', (profile) => {
   /**
@@ -19,6 +27,11 @@ describe.each(PROFILES)('profile $id', (profile) => {
     expect(profile.pickups).toBeLessThanOrEqual(buildWall(profile.columns).length);
   });
 
+  it('leaves room for the senders it invites', () => {
+    // Every sender needs an empty box at some point in the day.
+    expect(profile.pickups).toBeLessThan(buildWall(profile.columns).length);
+  });
+
   it('raises hints in order', () => {
     expect(profile.hintDelay1Ms).toBeLessThan(profile.hintDelay2Ms);
     expect(profile.hintDelay2Ms).toBeLessThan(profile.patienceMs);
@@ -27,14 +40,88 @@ describe.each(PROFILES)('profile $id', (profile) => {
   it('has room for the look-alike pairs it asks for', () => {
     expect(profile.lookalikePairs * 2).toBeLessThanOrEqual(profile.pickups);
   });
+
+  it('asks for no more forgotten codes or jams than it has pickups', () => {
+    expect(profile.forgotten).toBeLessThanOrEqual(profile.pickups);
+    expect(profile.jams).toBeLessThanOrEqual(profile.pickups);
+  });
+});
+
+describe('the week', () => {
+  it('runs Monday to Saturday', () => {
+    expect(WEEK_PROFILES).toHaveLength(6);
+    expect(WEEK_PROFILES.map((profile) => profile.id)).toEqual([...WEEK_DAY_KEYS]);
+  });
+
+  it('escalates: never fewer columns, parcels or customers than the day before', () => {
+    for (let i = 1; i < WEEK_PROFILES.length; i += 1) {
+      const before = WEEK_PROFILES[i - 1];
+      const day = WEEK_PROFILES[i];
+      expect(day?.columns).toBeGreaterThanOrEqual(before?.columns ?? 0);
+      expect(day?.pickups).toBeGreaterThan(before?.pickups ?? 0);
+      expect(day?.patienceMs).toBeLessThanOrEqual(before?.patienceMs ?? 0);
+    }
+  });
+
+  it('matches the numbers design D2 fixes', () => {
+    expect(
+      WEEK_PROFILES.map((profile) => [
+        profile.columns,
+        profile.pickups,
+        profile.senders,
+        profile.lookalikePairs,
+        profile.patienceMs / 1000,
+      ]),
+    ).toEqual([
+      [2, 8, 0, 0, 24],
+      [2, 9, 2, 0, 24],
+      [3, 12, 3, 1, 22],
+      [3, 15, 4, 2, 20],
+      [4, 20, 6, 2, 20],
+      [5, 27, 8, 3, 18],
+    ]);
+  });
+
+  it('turns the weather on in the order the design describes', () => {
+    expect(
+      WEEK_PROFILES.map((profile) => [profile.jams, profile.forgotten, profile.rain, profile.lateVan]),
+    ).toEqual([
+      [0, 0, false, false],
+      [0, 0, false, false],
+      [0, 0, false, false],
+      [1, 0, false, false],
+      [0, 2, false, true],
+      [1, 2, true, true],
+    ]);
+  });
+
+  it('gives Saturday a 35-slot wall', () => {
+    expect(buildWall(SATURDAY.columns)).toHaveLength(35);
+  });
+});
+
+describe('loadDurationMs', () => {
+  it('is the profile value on an ordinary day', () => {
+    expect(loadDurationMs(THURSDAY)).toBe(THURSDAY.loadMs);
+  });
+
+  it('is 60 % of it when the van is late', () => {
+    expect(LATE_VAN_FACTOR).toBe(0.6);
+    expect(loadDurationMs(SATURDAY)).toBe(15_000);
+  });
 });
 
 describe('daily profile', () => {
+  it('is Thursday-grade', () => {
+    expect({ ...DAILY_PROFILE, id: 'thu' }).toEqual(THURSDAY);
+  });
+
   it('matches the numbers the daily-mode spec fixes', () => {
     expect(DAILY_PROFILE.columns).toBe(3);
-    expect(DAILY_PROFILE.pickups).toBe(16);
+    expect(DAILY_PROFILE.pickups).toBe(15);
     expect(DAILY_PROFILE.senders).toBe(4);
     expect(DAILY_PROFILE.lookalikePairs).toBe(2);
+    expect(DAILY_PROFILE.jams).toBe(1);
     expect(DAILY_PROFILE.loadMs).toBe(25_000);
     expect(DAILY_PROFILE.serveMs).toBe(65_000);
     expect(DAILY_PROFILE.patienceMs).toBe(20_000);

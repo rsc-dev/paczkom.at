@@ -50,6 +50,8 @@ const VOICES: Readonly<Record<Cue, readonly Voice[]>> = {
   tap: [{ type: 'triangle', from: 880, to: 660, durationMs: 45, gain: 0.14 }],
   door: [{ type: 'sine', from: 190, to: 70, durationMs: 170, gain: 0.3 }],
   wrong: [{ type: 'sawtooth', from: 150, to: 80, durationMs: 220, gain: 0.16 }],
+  // A jammed door giving: a dull knock, not a buzz — nothing went wrong.
+  thunk: [{ type: 'square', from: 110, to: 55, durationMs: 90, gain: 0.2 }],
   done: [
     { type: 'sine', from: 660, to: 660, durationMs: 160, gain: 0.18 },
     { type: 'sine', from: 880, to: 880, durationMs: 260, gain: 0.18, delayMs: 150 },

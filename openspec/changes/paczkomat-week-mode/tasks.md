@@ -1,16 +1,16 @@
 ## 1. Profiles and schedule
 
-- [ ] 1.1 Extend `DayProfile` with `jams`, `forgotten`, `rain`, `lateVan`, `patienceS`; add the six Monday–Saturday profiles and switch `daily` to the Thursday profile
-- [ ] 1.2 `core/schedule.ts`: emit jam entries (seeded slot preferring `full`, scheduled before that slot's customer), flag seeded pickups as `forgotten`, derive the rain mask index avoiding look-alike transposition positions; determinism tests
-- [ ] 1.3 `core/parcel.ts`: honour per-profile look-alike pair counts including 0 and 3; tests
+- [x] 1.1 Extend `DayProfile` with `jams`, `forgotten`, `rain`, `lateVan`, `patienceS`; add the six Monday–Saturday profiles and switch `daily` to the Thursday profile
+- [x] 1.2 `core/schedule.ts`: emit jam entries (seeded slot preferring `full`, scheduled before that slot's customer), flag seeded pickups as `forgotten`, derive the rain mask index avoiding look-alike transposition positions; determinism tests
+- [x] 1.3 `core/parcel.ts`: honour per-profile look-alike pair counts including 0 and 3; tests
 
 ## 2. Reducer: events
 
-- [ ] 2.1 Jammed door: `slot.jammed` flag, scheduled jam action, sender rejection, two-tap pickup (un-jam then open), clear on open/SWEEP, jam marker in `data-jammed`; tests
-- [ ] 2.2 Forgotten code: customer flag, screen model without code, hint ladder unchanged; tests
-- [ ] 2.3 Rain: `maskedDigit` in state, masked code in the screen model; tests for mask and pair avoidance
-- [ ] 2.4 Late van: LOAD duration ×0.6, HUD note flag; test
-- [ ] 2.5 Scripted-day fixtures for Thursday (jam) and Saturday (all events)
+- [x] 2.1 Jammed door: `slot.jammed` flag, scheduled jam action, sender rejection, two-tap pickup (un-jam then open), clear on open/SWEEP, jam marker in `data-jammed`; tests
+- [x] 2.2 Forgotten code: customer flag, screen model without code, hint ladder unchanged; tests
+- [x] 2.3 Rain: `maskedDigit` in state, masked code in the screen model; tests for mask and pair avoidance
+- [x] 2.4 Late van: LOAD duration ×0.6, HUD note flag; test
+- [x] 2.5 Scripted-day fixtures for Thursday (jam) and Saturday (all events)
 
 ## 3. Week run and reputation
 

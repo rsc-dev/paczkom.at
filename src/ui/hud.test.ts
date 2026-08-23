@@ -63,9 +63,9 @@ describe('countLabel', () => {
   it('counts what is left to do in each phase, in the current language', () => {
     const state = started();
     setLang('pl');
-    expect(countLabel(state)).toBe('Paczki: 16');
+    expect(countLabel(state)).toBe(`Paczki: ${String(DAILY_PROFILE.pickups)}`);
     setLang('en');
-    expect(countLabel(state)).toBe('Parcels: 16');
+    expect(countLabel(state)).toBe(`Parcels: ${String(DAILY_PROFILE.pickups)}`);
     expect(countLabel({ ...state, phase: 'SERVE' })).toBe('Queue: 0');
     expect(countLabel({ ...state, phase: 'SWEEP' })).toBe('Left: 0');
   });

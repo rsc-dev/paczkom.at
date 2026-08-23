@@ -5,6 +5,7 @@
  */
 import { formatTime } from '../core/share.js';
 import type { State } from '../core/game.js';
+import { loadDurationMs } from '../core/profiles.js';
 import { t } from '../i18n/index.js';
 import { percent, setText, setVar } from './dom.js';
 
@@ -37,7 +38,7 @@ export function serveClock(state: State): string {
 /** What the clock reads in each phase. */
 export function clockLabel(state: State): string {
   if (state.phase === 'LOAD') {
-    return formatTime(Math.max(0, state.profile.loadMs - state.phaseElapsedMs));
+    return formatTime(Math.max(0, loadDurationMs(state.profile) - state.phaseElapsedMs));
   }
   if (state.phase === 'SERVE') {
     return serveClock(state);
@@ -48,7 +49,7 @@ export function clockLabel(state: State): string {
 /** How full the phase meter is: 1 at the start of a timed phase, 0 at its end. */
 export function meterFill(state: State): number {
   if (state.phase === 'LOAD') {
-    return 1 - state.phaseElapsedMs / state.profile.loadMs;
+    return 1 - state.phaseElapsedMs / loadDurationMs(state.profile);
   }
   if (state.phase === 'SERVE') {
     return 1 - state.phaseElapsedMs / state.profile.serveMs;

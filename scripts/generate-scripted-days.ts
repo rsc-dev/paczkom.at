@@ -18,7 +18,8 @@ import {
   reduce,
 } from '../src/core/game.js';
 import type { Action, DaySummary, State } from '../src/core/game.js';
-import { DAILY_PROFILE } from '../src/core/profiles.js';
+import { DAILY_PROFILE, SATURDAY, THURSDAY } from '../src/core/profiles.js';
+import type { DayProfile } from '../src/core/profiles.js';
 import { fits } from '../src/core/wall.js';
 
 const TICK_MS = 250;
@@ -46,7 +47,10 @@ function targetSlot(state: State): string | null {
     return null;
   }
   if (active.kind === 'sender') {
-    return freeSlotFor(state, active.needsSize);
+    // A jammed door will not take an outgoing parcel.
+    return state.slots.find(
+      (slot) => slot.state === 'empty' && !slot.jammed && fits(active.needsSize, slot.size),
+    )?.id ?? null;
   }
   return state.slots.find((slot) => slot.parcelId === active.parcelId)?.id ?? null;
 }
@@ -87,9 +91,16 @@ function sweep(take: Take): Take {
   return current;
 }
 
-/** Everything placed, every customer served on the first tap. */
-function perfectDay(seed: number): Take {
-  let current = load(apply({ state: initialState(seed, DAILY_PROFILE), actions: [] }, { type: 'start' }), Infinity);
+const begin = (seed: number, profile: DayProfile): Take =>
+  apply({ state: initialState(seed, profile), actions: [] }, { type: 'start' });
+
+/**
+ * Everything placed, every customer served as soon as they reach the counter.
+ * A jammed door simply costs a second tap, which is what `targetSlot` returning
+ * the same door twice produces.
+ */
+function perfectDay(seed: number, profile: DayProfile): Take {
+  let current = load(begin(seed, profile), Infinity);
   for (let guard = 0; guard < GUARD && current.state.phase === 'SERVE'; guard += 1) {
     const slotId = targetSlot(current.state);
     current = slotId === null ? tick(current) : apply(current, { type: 'tapSlot', slotId });
@@ -98,8 +109,8 @@ function perfectDay(seed: number): Take {
 }
 
 /** One wrong door per customer, so every service is earned with a hint. */
-function hintedDay(seed: number): Take {
-  let current = load(apply({ state: initialState(seed, DAILY_PROFILE), actions: [] }, { type: 'start' }), Infinity);
+function hintedDay(seed: number, profile: DayProfile): Take {
+  let current = load(begin(seed, profile), Infinity);
   for (let guard = 0; guard < GUARD && current.state.phase === 'SERVE'; guard += 1) {
     const active = activeCustomer(current.state);
     if (active === null) {
@@ -118,11 +129,8 @@ function hintedDay(seed: number): Take {
 }
 
 /** Half the van never leaves it and nobody is ever served. */
-function walkedDay(seed: number): Take {
-  let current = load(
-    apply({ state: initialState(seed, DAILY_PROFILE), actions: [] }, { type: 'start' }),
-    Math.floor(DAILY_PROFILE.pickups / 2),
-  );
+function walkedDay(seed: number, profile: DayProfile): Take {
+  let current = load(begin(seed, profile), Math.floor(profile.pickups / 2));
   for (let guard = 0; guard < GUARD && current.state.phase === 'LOAD'; guard += 1) {
     current = tick(current);
   }
@@ -132,10 +140,18 @@ function walkedDay(seed: number): Take {
   return sweep(current);
 }
 
-const takes: { name: string; seed: number; take: Take }[] = [
-  { name: 'perfect day', seed: 20260901, take: perfectDay(20260901) },
-  { name: 'hinted day', seed: 20260902, take: hintedDay(20260902) },
-  { name: 'walked and refused day', seed: 20260903, take: walkedDay(20260903) },
+const takes: { name: string; seed: number; profile: DayProfile; take: Take }[] = [
+  { name: 'perfect day', seed: 20260901, profile: DAILY_PROFILE, take: perfectDay(20260901, DAILY_PROFILE) },
+  { name: 'hinted day', seed: 20260902, profile: DAILY_PROFILE, take: hintedDay(20260902, DAILY_PROFILE) },
+  {
+    name: 'walked and refused day',
+    seed: 20260903,
+    profile: DAILY_PROFILE,
+    take: walkedDay(20260903, DAILY_PROFILE),
+  },
+  // Thursday is the day the jam appears; Saturday has every event at once.
+  { name: 'thursday with a jam', seed: 20260904, profile: THURSDAY, take: perfectDay(20260904, THURSDAY) },
+  { name: 'saturday with everything', seed: 20260905, profile: SATURDAY, take: perfectDay(20260905, SATURDAY) },
 ];
 
 function summaryOf(state: State): DaySummary {
@@ -146,7 +162,7 @@ function summaryOf(state: State): DaySummary {
 }
 
 const body = takes
-  .map(({ name, seed, take }) => {
+  .map(({ name, seed, profile, take }) => {
     const summary = summaryOf(take.state);
     const outcomes = Object.entries(summary.slotOutcomes)
       .map(([slotId, outcome]) => `        ${slotId}: '${outcome}',`)
@@ -157,6 +173,7 @@ const body = takes
     return `  {
     name: '${name}',
     seed: ${String(seed)},
+    profile: '${profile.id}',
     actions: [${actions}],
     expected: {
       served: ${String(summary.served)},
@@ -187,6 +204,8 @@ import type { DaySummary } from '../game.js';
 export interface ScriptedDay {
   readonly name: string;
   readonly seed: number;
+  /** Which profile to replay it against. */
+  readonly profile: string;
   /** Run-length encoded action tokens; expand with \`decodeLog\`. */
   readonly actions: readonly string[];
   readonly expected: DaySummary;
