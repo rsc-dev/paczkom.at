@@ -1,11 +1,17 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { activeCustomer, currentParcel, initialState, reduce } from '../core/game.js';
+import {
+  activeCustomer,
+  currentParcel,
+  initialState,
+  reduce,
+  upcomingParcels,
+} from '../core/game.js';
 import type { State } from '../core/game.js';
 import { DAILY_PROFILE } from '../core/profiles.js';
 import { fits } from '../core/wall.js';
-import { setLang } from '../i18n/index.js';
-import { createGameView, doorLabel, renderGame } from './render.js';
+import { setLang, stickerName } from '../i18n/index.js';
+import { UPCOMING_SHOWN, createGameView, doorLabel, renderGame } from './render.js';
 import type { GameView } from './render.js';
 import { mountApp, recordMutations } from './testing.js';
 
@@ -104,13 +110,49 @@ describe('door rendering', () => {
 });
 
 describe('tray rendering', () => {
-  it('shows the next parcels during LOAD and nothing interactive', () => {
+  it('shows exactly the next two parcels during LOAD, and nothing interactive', () => {
     const cards = view.cards.filter((card) => !card.root.hidden);
-    expect(cards.length).toBeGreaterThan(0);
+    expect(cards).toHaveLength(UPCOMING_SHOWN);
+    expect(UPCOMING_SHOWN).toBe(2);
     for (const card of cards) {
       expect(card.root.dataset['upcoming']).toBe('true');
       expect(card.root.disabled).toBe(true);
       expect(card.root.dataset['customer']).toBeUndefined();
+    }
+    // The one in hand is on the screen panel, not in the tray.
+    expect(cards.map((card) => card.code.textContent)).toEqual(
+      upcomingParcels(state, UPCOMING_SHOWN).map((parcel) => parcel.code),
+    );
+  });
+
+  it('shows the colour and sticker of each upcoming parcel as data attributes', () => {
+    const upcoming = upcomingParcels(state, UPCOMING_SHOWN);
+    const cards = view.cards.filter((card) => !card.root.hidden);
+    cards.forEach((card, index) => {
+      const parcel = upcoming[index];
+      expect(card.swatch.dataset['colour']).toBe(parcel?.colour);
+      expect(card.swatch.hidden).toBe(false);
+      expect(card.sticker.dataset['sticker']).toBe(parcel?.sticker);
+      // The glyph is CSS content, so the name is what a screen reader gets.
+      expect(card.stickerName.textContent).toBe(
+        parcel?.sticker === 'none' ? '' : stickerName(parcel?.sticker ?? 'none'),
+      );
+    });
+  });
+
+  it('never shows what is behind a waiting door', () => {
+    let next = state;
+    while (next.phase === 'LOAD' && currentParcel(next) !== null) {
+      next = placeNext(next);
+    }
+    for (let i = 0; i < 200 && activeCustomer(next) === null; i += 1) {
+      next = reduce(next, { type: 'tick', dtMs: 250 });
+    }
+    renderGame(view, next);
+    for (const card of view.cards.filter((entry) => !entry.root.hidden)) {
+      expect(card.swatch.hidden).toBe(true);
+      expect(card.sticker.dataset['sticker']).toBe('none');
+      expect(card.stickerName.textContent).toBe('');
     }
   });
 

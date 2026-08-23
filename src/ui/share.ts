@@ -4,7 +4,11 @@
  * neither is available. The caller is told which path worked so it can say so.
  */
 
-export type ShareOutcome = 'shared' | 'copied' | 'manual' | 'failed';
+/**
+ * `dismissed` means the player closed the share sheet: they made a choice, and
+ * the right response is to do nothing rather than to quietly copy instead.
+ */
+export type ShareOutcome = 'shared' | 'dismissed' | 'copied' | 'manual';
 
 export interface ShareTargets {
   readonly share?: ((data: ShareData) => Promise<void>) | undefined;
@@ -27,9 +31,20 @@ export function targetsFrom(source: Navigator | undefined): ShareTargets {
   };
 }
 
+/** `AbortError` is what browsers throw when the share sheet is dismissed. */
+function isDismissal(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'name' in error &&
+    (error as { name?: unknown }).name === 'AbortError'
+  );
+}
+
 /**
- * Tries each path in turn. A share sheet the user dismisses counts as failed
- * here, and the caller falls through to showing the text.
+ * Tries each path in turn. A dismissed share sheet stops there — the player
+ * said no, and quietly copying to their clipboard instead is not what they
+ * asked for. Anything else that goes wrong falls through to the next path.
  */
 export async function shareText(text: string, targets: ShareTargets): Promise<ShareOutcome> {
   const payload: ShareData = { text };
@@ -38,8 +53,12 @@ export async function shareText(text: string, targets: ShareTargets): Promise<Sh
     try {
       await targets.share(payload);
       return 'shared';
-    } catch {
-      // Dismissed or refused: fall through rather than leaving the player stuck.
+    } catch (error) {
+      if (isDismissal(error)) {
+        return 'dismissed';
+      }
+      // Refused for some other reason: fall through rather than leaving the
+      // player with no way to get the text out at all.
     }
   }
 

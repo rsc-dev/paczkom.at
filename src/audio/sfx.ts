@@ -94,7 +94,7 @@ export function createSfx(options: SfxOptions = {}): Sfx {
   return {
     unlock(): void {
       const ctx = ensureContext();
-      if (ctx !== null && ctx.state === 'suspended') {
+      if (ctx !== null && ctx.state !== 'running') {
         void ctx.resume();
       }
     },
@@ -106,6 +106,11 @@ export function createSfx(options: SfxOptions = {}): Sfx {
       const ctx = ensureContext();
       if (ctx === null) {
         return;
+      }
+      // A context can be suspended again by the browser — a phone call, a
+      // backgrounded tab — long after the gesture that unlocked it.
+      if (ctx.state !== 'running') {
+        void ctx.resume();
       }
       try {
         for (const voice of VOICES[cue]) {

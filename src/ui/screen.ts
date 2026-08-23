@@ -5,7 +5,8 @@
  */
 import { activeCustomer, currentParcel, hintLevelOf } from '../core/game.js';
 import type { Customer, State } from '../core/game.js';
-import { hintLine, t } from '../i18n/index.js';
+import type { Colour, Sticker } from '../core/parcel.js';
+import { hintLine, stickerName, t } from '../i18n/index.js';
 import { percent, setAttr, setHidden, setText, setVar } from './dom.js';
 
 export interface PanelNodes {
@@ -14,8 +15,17 @@ export interface PanelNodes {
   readonly code: HTMLElement;
   readonly hint: HTMLElement;
   readonly swatch: HTMLElement;
+  readonly sticker: HTMLElement;
+  readonly stickerName: HTMLElement;
   readonly hintText: HTMLElement;
   readonly wait: HTMLElement;
+}
+
+interface PanelHint {
+  readonly colour: Colour | null;
+  /** The theme draws the glyph from `data-sticker`; the name is read out. */
+  readonly sticker: Sticker;
+  readonly text: string;
 }
 
 interface PanelContent {
@@ -23,7 +33,7 @@ interface PanelContent {
   readonly code: string;
   /** True when `code` is prose rather than a four-digit code. */
   readonly prose: boolean;
-  readonly hint: { readonly colour: string | null; readonly text: string } | null;
+  readonly hint: PanelHint | null;
   /** Patience left, 0–1, or `null` when nobody is waiting. */
   readonly wait: number | null;
 }
@@ -48,7 +58,11 @@ function pickupContent(state: State, customer: Customer): PanelContent {
     prose: false,
     hint:
       level >= 1 && parcel !== undefined
-        ? { colour: parcel.colour, text: hintLine(parcel.colour, parcel.sticker) }
+        ? {
+            colour: parcel.colour,
+            sticker: parcel.sticker,
+            text: hintLine(parcel.colour, parcel.sticker),
+          }
         : null,
     wait: 1 - customer.waitedMs / state.profile.patienceMs,
   };
@@ -78,7 +92,11 @@ export function panelContent(state: State): PanelContent {
       kicker: t('screen.thisParcel'),
       code: parcel.code,
       prose: false,
-      hint: { colour: parcel.colour, text: hintLine(parcel.colour, parcel.sticker) },
+      hint: {
+        colour: parcel.colour,
+        sticker: parcel.sticker,
+        text: hintLine(parcel.colour, parcel.sticker),
+      },
       wait: null,
     };
   }
@@ -98,7 +116,7 @@ export function panelContent(state: State): PanelContent {
     kicker: t('hud.phase.sweep'),
     code: t('screen.sweepPrompt'),
     prose: true,
-    hint: { colour: null, text: t('screen.sweepRemaining', { count: marked }) },
+    hint: { colour: null, sticker: 'none', text: t('screen.sweepRemaining', { count: marked }) },
     wait: null,
   };
 }
@@ -114,6 +132,10 @@ export function renderPanel(nodes: PanelNodes, state: State): void {
     setText(nodes.hintText, content.hint.text);
     setHidden(nodes.swatch, content.hint.colour === null);
     setAttr(nodes.swatch, 'data-colour', content.hint.colour);
+    // The theme draws the sticker glyph from `data-sticker`; screen readers get
+    // the name, since CSS-generated content is not reliably announced.
+    setAttr(nodes.sticker, 'data-sticker', content.hint.sticker);
+    setText(nodes.stickerName, content.hint.sticker === 'none' ? '' : stickerName(content.hint.sticker));
   }
 
   setHidden(nodes.wait, content.wait === null);

@@ -353,13 +353,17 @@ button {
  * becomes a full-height column between them, the way a real locker is built.
  */
 .stage {
+  /* The gap in force at this width. The door hit extenders read it too, so the
+     space between doors is never a dead zone at any breakpoint. */
+  --gap-now: var(--gap);
+
   flex: 1 1 auto;
   min-block-size: 0;
-  max-block-size: calc(12 * var(--unit) + 11 * var(--gap) + 2 * var(--space-2) + 6rem);
+  max-block-size: calc(12 * var(--unit) + 11 * var(--gap-now) + 2 * var(--space-2) + 6rem);
   display: grid;
   grid-template-columns: repeat(var(--wall-columns), minmax(0, 1fr));
   grid-template-rows: auto repeat(12, minmax(var(--unit-min), 1fr));
-  gap: var(--gap);
+  gap: var(--gap-now);
   padding: var(--space-2);
   border-radius: var(--radius-lg);
   background: var(--wall-bg);
@@ -368,10 +372,11 @@ button {
 
 @media (min-width: 640px) {
   .stage {
+    --gap-now: var(--space-2);
+
     grid-template-columns: var(--stage-columns, repeat(var(--wall-columns), minmax(0, 1fr)));
     grid-template-rows: repeat(12, minmax(var(--unit-min), 1fr));
-    max-block-size: calc(12 * var(--unit) + 11 * var(--gap) + 2 * var(--space-2));
-    gap: var(--space-2) var(--space-2);
+    max-block-size: calc(12 * var(--unit) + 11 * var(--gap-now) + 2 * var(--space-2));
   }
 }
 
@@ -535,10 +540,10 @@ button {
  */
 .door__hit {
   position: absolute;
-  inset-inline: calc(-0.5 * var(--gap));
+  inset-inline: calc(-0.5 * var(--gap-now, var(--gap)));
   inset-block-start: 50%;
-  inline-size: calc(100% + var(--gap));
-  block-size: max(100%, var(--hit-min));
+  inline-size: calc(100% + var(--gap-now, var(--gap)));
+  block-size: max(calc(100% + var(--gap-now, var(--gap))), var(--hit-min));
   transform: translateY(-50%);
 }
 
@@ -596,6 +601,10 @@ button {
   letter-spacing: 0.04em;
 }
 
+/*
+ * The marker on a door that needs attention. Which glyph belongs to which state
+ * is a theme decision, so it lives here rather than in the renderer.
+ */
 .door__mark {
   position: absolute;
   inset-inline-end: 1.5em;
@@ -605,6 +614,18 @@ button {
   font-weight: 700;
   line-height: 1;
   color: var(--accent);
+}
+
+.door[data-state='outgoing'] .door__mark::after {
+  content: '↑';
+}
+
+.door[data-state='expired'] .door__mark::after {
+  content: '!';
+}
+
+.door[data-state='marked'] .door__mark::after {
+  content: '×';
 }
 
 /* Door states -------------------------------------------------------------- */
@@ -769,18 +790,6 @@ button {
   font-variant-numeric: tabular-nums;
   line-height: 1;
   margin: 0;
-}
-
-.result__badge {
-  display: inline-block;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-size: var(--step--1);
-  font-weight: 700;
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
 }
 
 .result__grid {

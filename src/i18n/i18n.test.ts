@@ -1,3 +1,5 @@
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { COLOURS, STICKERS } from '../core/parcel.js';
 import { en } from './en.js';
@@ -36,6 +38,39 @@ describe('catalogues', () => {
     for (const key of Object.keys(pl) as (keyof typeof pl)[]) {
       expect(placeholders(pl[key]), key).toEqual(placeholders(en[key]));
     }
+  });
+
+  /**
+   * Dead strings accumulate silently and then get translated, reviewed and
+   * shipped for years. A key counts as used when it appears literally, or when
+   * some template builds it — `t(`colour.${colour}`)` covers `colour.red`.
+   */
+  it('has no key that nothing uses', () => {
+    const root = process.cwd();
+    const catalogues = new Set([join(root, 'src', 'i18n', 'pl.ts'), join(root, 'src', 'i18n', 'en.ts')]);
+
+    const sources = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          return sources(path);
+        }
+        return entry.name.endsWith('.ts') && !entry.name.endsWith('.test.ts') && !catalogues.has(path)
+          ? [path]
+          : [];
+      });
+
+    const text = [...sources(join(root, 'src')), join(root, 'index.html')]
+      .map((file) => readFileSync(file, 'utf8'))
+      .join('\n');
+
+    // Prefixes built by template literals, e.g. `size.${size}`.
+    const prefixes = [...text.matchAll(/`([a-zA-Z.]+)\.\$\{/g)].map((match) => `${match[1] ?? ''}.`);
+
+    const unused = Object.keys(pl).filter(
+      (key) => !text.includes(key) && !prefixes.some((prefix) => key.startsWith(prefix)),
+    );
+    expect(unused).toEqual([]);
   });
 
   it('cover every colour, sticker and size token', () => {

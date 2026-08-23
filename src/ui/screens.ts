@@ -20,7 +20,10 @@ export interface ResultNodes {
   readonly score: HTMLElement;
   readonly grid: HTMLElement;
   readonly stats: HTMLElement;
+  /** Which score stands for the day, when this run was practice. */
   readonly note: HTMLElement;
+  /** How the share went. Kept apart from `note` so neither overwrites the other. */
+  readonly shareNote: HTMLElement;
   readonly fallback: HTMLTextAreaElement;
 }
 
@@ -111,6 +114,8 @@ export function renderResult(nodes: ResultNodes, model: ResultModel): void {
       ? `${t('result.official')}: ${String(model.officialScore)}`
       : '',
   );
+  // A fresh result means whatever the last share said is stale.
+  setText(nodes.shareNote, '');
 }
 
 export function titleNodes(root: ParentNode): TitleNodes {
@@ -128,6 +133,7 @@ export function resultNodes(root: ParentNode): ResultNodes {
     grid: need<HTMLElement>(root, '#result-grid'),
     stats: need<HTMLElement>(root, '#result-stats'),
     note: need<HTMLElement>(root, '#result-note'),
+    shareNote: need<HTMLElement>(root, '#share-note'),
     fallback: need<HTMLTextAreaElement>(root, '#share-fallback'),
   };
 }

@@ -6,7 +6,7 @@
 import { activeCustomer, hintColumn, upcomingParcels } from '../core/game.js';
 import type { SlotRuntime, State } from '../core/game.js';
 import type { Parcel } from '../core/parcel.js';
-import { t } from '../i18n/index.js';
+import { stickerName, t } from '../i18n/index.js';
 import { need, percent, setAttr, setHidden, setText, setVar } from './dom.js';
 import type { HudNodes } from './hud.js';
 import { renderHud } from './hud.js';
@@ -18,10 +18,16 @@ import type { WallNodes } from './wall.js';
 export interface CardNodes {
   readonly root: HTMLButtonElement;
   readonly badge: HTMLElement;
+  readonly swatch: HTMLElement;
+  readonly sticker: HTMLElement;
+  readonly stickerName: HTMLElement;
   readonly kind: HTMLElement;
   readonly code: HTMLElement;
   readonly wait: HTMLElement;
 }
+
+/** How many parcels are visible behind the one in hand (design D5). */
+export const UPCOMING_SHOWN = 2;
 
 export interface GameView {
   readonly stage: HTMLElement;
@@ -33,12 +39,6 @@ export interface GameView {
   readonly panel: PanelNodes;
 }
 
-const DOOR_MARK: Readonly<Record<string, string>> = {
-  outgoing: '↑',
-  expired: '!',
-  marked: '×',
-};
-
 function createCard(): CardNodes {
   const root = document.createElement('button');
   root.type = 'button';
@@ -49,9 +49,18 @@ function createCard(): CardNodes {
   top.className = 'card__top';
   const badge = document.createElement('span');
   badge.className = 'size-badge';
+  const swatch = document.createElement('span');
+  swatch.className = 'swatch';
+  swatch.hidden = true;
+  const sticker = document.createElement('span');
+  sticker.className = 'sticker';
+  sticker.dataset['sticker'] = 'none';
+  const stickerName = document.createElement('span');
+  stickerName.className = 'visually-hidden';
+  sticker.append(stickerName);
   const kind = document.createElement('span');
   kind.className = 'card__kind';
-  top.append(badge, kind);
+  top.append(badge, swatch, sticker, kind);
 
   const code = document.createElement('span');
   code.className = 'card__code';
@@ -59,7 +68,7 @@ function createCard(): CardNodes {
   wait.className = 'card__wait';
 
   root.append(top, code, wait);
-  return { root, badge, kind, code, wait };
+  return { root, badge, swatch, sticker, stickerName, kind, code, wait };
 }
 
 /** Builds the game view: doors from the wall geometry, plus a pool of cards. */
@@ -98,6 +107,8 @@ export function createGameView(root: ParentNode, state: State): GameView {
       code: need<HTMLElement>(root, '#panel-code'),
       hint: need<HTMLElement>(root, '#panel-hint'),
       swatch: need<HTMLElement>(root, '#panel-swatch'),
+      sticker: need<HTMLElement>(root, '#panel-sticker'),
+      stickerName: need<HTMLElement>(root, '#panel-sticker-name'),
       hintText: need<HTMLElement>(root, '#panel-hint-text'),
       wait: need<HTMLElement>(root, '#panel-wait'),
     },
@@ -122,7 +133,6 @@ function renderDoors(view: GameView, state: State): void {
     setAttr(door.root, 'data-state', slot.state);
     setAttr(door.root, 'data-hint', hinted !== null && slot.col === hinted ? 'column' : null);
     setAttr(door.root, 'aria-label', doorLabel(slot));
-    setText(door.mark, DOOR_MARK[slot.state] ?? '');
   }
 }
 
@@ -132,9 +142,12 @@ function renderUpcomingCard(card: CardNodes, parcel: Parcel): void {
   setAttr(card.root, 'data-active', 'false');
   setAttr(card.root, 'data-customer', null);
   setAttr(card.root, 'data-kind', 'parcel');
-  setAttr(card.root, 'data-colour', parcel.colour);
   card.root.disabled = true;
   setText(card.badge, parcel.size);
+  setHidden(card.swatch, false);
+  setAttr(card.swatch, 'data-colour', parcel.colour);
+  setAttr(card.sticker, 'data-sticker', parcel.sticker);
+  setText(card.stickerName, parcel.sticker === 'none' ? '' : stickerName(parcel.sticker));
   setText(card.kind, t('screen.nextUp'));
   setText(card.code, parcel.code);
   setHidden(card.wait, true);
@@ -144,7 +157,8 @@ function renderTray(view: GameView, state: State): void {
   const cards = view.cards;
 
   if (state.phase === 'LOAD') {
-    const upcoming = upcomingParcels(state, cards.length);
+    // The current parcel is on the screen panel; the tray shows the next two.
+    const upcoming = upcomingParcels(state, UPCOMING_SHOWN);
     cards.forEach((card, index) => {
       const parcel = upcoming[index];
       if (parcel === undefined) {
@@ -175,7 +189,10 @@ function renderTray(view: GameView, state: State): void {
       setAttr(card.root, 'data-customer', customer.id);
       setAttr(card.root, 'data-kind', customer.kind);
       setAttr(card.root, 'data-active', customer.id === active?.id ? 'true' : 'false');
-      setAttr(card.root, 'data-colour', null);
+      // A customer's card never gives away what is behind the door.
+      setHidden(card.swatch, true);
+      setAttr(card.sticker, 'data-sticker', 'none');
+      setText(card.stickerName, '');
       setText(
         card.badge,
         customer.kind === 'pickup' ? (parcel?.size ?? '') : customer.needsSize,

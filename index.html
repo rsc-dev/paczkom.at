@@ -76,6 +76,9 @@
             <p class="panel__code" id="panel-code"></p>
             <span class="panel__hint" id="panel-hint" hidden>
               <span class="swatch" id="panel-swatch"></span>
+              <span class="sticker" id="panel-sticker" data-sticker="none">
+                <span class="visually-hidden" id="panel-sticker-name"></span>
+              </span>
               <span id="panel-hint-text"></span>
             </span>
             <span class="panel__wait" id="panel-wait"></span>
@@ -101,6 +104,7 @@
           <button class="btn btn--ghost" id="btn-again" data-t="result.playAgain"></button>
           <button class="btn btn--ghost" id="btn-home" data-t="result.home"></button>
         </div>
+        <p class="result__note" id="share-note" aria-live="polite"></p>
         <textarea class="share-fallback" id="share-fallback" readonly hidden></textarea>
       </section>
     </div>

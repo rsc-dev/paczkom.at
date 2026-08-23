@@ -3,9 +3,15 @@ import type { Cue } from '../core/game.js';
 import { createSfx } from './sfx.js';
 
 /** Just enough of the Web Audio API to count the notes that were played. */
-function fakeContext(): { context: AudioContext; starts: () => number; closed: () => boolean } {
+function fakeContext(state: AudioContextState = 'running'): {
+  context: AudioContext;
+  starts: () => number;
+  closed: () => boolean;
+  resumes: () => number;
+} {
   let started = 0;
   let closed = false;
+  let resumed = 0;
   const param = (): unknown => ({
     setValueAtTime: vi.fn(),
     exponentialRampToValueAtTime: vi.fn(),
@@ -13,7 +19,7 @@ function fakeContext(): { context: AudioContext; starts: () => number; closed: (
 
   const context = {
     currentTime: 0,
-    state: 'running',
+    state,
     destination: {},
     createOscillator: (): unknown => ({
       type: 'sine',
@@ -25,14 +31,17 @@ function fakeContext(): { context: AudioContext; starts: () => number; closed: (
       stop: vi.fn(),
     }),
     createGain: (): unknown => ({ gain: param(), connect: vi.fn() }),
-    resume: vi.fn(),
+    resume: () => {
+      resumed += 1;
+      return Promise.resolve();
+    },
     close: () => {
       closed = true;
       return Promise.resolve();
     },
   } as unknown as AudioContext;
 
-  return { context, starts: () => started, closed: () => closed };
+  return { context, starts: () => started, closed: () => closed, resumes: () => resumed };
 }
 
 describe('createSfx', () => {
@@ -77,6 +86,28 @@ describe('createSfx', () => {
     // `done` is the two-note chime.
     sfx.play('done');
     expect(fake.starts()).toBe(4);
+  });
+
+  it('resumes a context the browser suspended, on unlock and on every cue', () => {
+    // Safari suspends the context again after a phone call or a backgrounded
+    // tab, long after the gesture that first unlocked it.
+    const fake = fakeContext('suspended');
+    const sfx = createSfx({ createContext: () => fake.context });
+
+    sfx.unlock();
+    expect(fake.resumes()).toBe(1);
+
+    sfx.play('tap');
+    expect(fake.resumes()).toBe(2);
+    expect(fake.starts()).toBe(1);
+  });
+
+  it('does not resume a context that is already running', () => {
+    const fake = fakeContext('running');
+    const sfx = createSfx({ createContext: () => fake.context });
+    sfx.unlock();
+    sfx.play('tap');
+    expect(fake.resumes()).toBe(0);
   });
 
   it('goes silent the moment it is muted, and drops the context', () => {

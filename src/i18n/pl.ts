@@ -5,7 +5,6 @@
  * registered mark of a parcel-locker operator and must not appear in copy.
  */
 export const pl = {
-  'app.title': 'paczkom.at',
   'app.tagline': 'Ty jesteś pamięcią automatu paczkowego.',
 
   'title.play': 'Dzisiaj',
@@ -25,13 +24,9 @@ export const pl = {
   'hud.phase.load': 'Rozładunek',
   'hud.phase.serve': 'Obsługa',
   'hud.phase.sweep': 'Sprzątanie',
-  'hud.score': 'Punkty',
-  'hud.time': 'Czas',
   'hud.parcelsLeft': 'Paczki: {count}',
   'hud.queue': 'Kolejka: {count}',
-  'hud.mute': 'Wycisz',
-  'hud.unmute': 'Włącz dźwięk',
-  'hud.language': 'Język',
+  'hud.sound': 'Dźwięk',
 
   'a11y.wall': 'Ściana skrytek',
   'door.label': 'Skrytka {id}, rozmiar {size}, {state}',
@@ -44,7 +39,6 @@ export const pl = {
 
   'screen.pickup': 'Odbiór',
   'screen.sender': 'Nadanie',
-  'screen.code': 'Kod',
   'screen.senderNeeds': 'Potrzebuje skrytki: {size}',
   'screen.nextUp': 'Następne',
   'screen.loadPrompt': 'Włóż paczkę do skrytki',
@@ -77,15 +71,11 @@ export const pl = {
   'size.B': 'średnia',
   'size.C': 'duża',
 
-  'result.title': 'Dzień zamknięty',
-  'result.daily': 'Dzisiaj #{number}',
-  'result.score': 'Wynik',
   'result.time': 'Czas',
   'result.streak': 'Seria',
   'result.best': 'Rekord',
   'result.official': 'Dzisiejszy wynik',
   'result.practice': 'Trening — dzisiejszy wynik zostaje bez zmian',
-  'result.practiceScore': 'Trening: {score}',
   'result.playAgain': 'Zagraj jeszcze raz',
   'result.served': 'Obsłużeni: {count}',
   'result.hinted': 'Z podpowiedzią: {count}',
@@ -101,11 +91,10 @@ export const pl = {
   'share.shared': 'Udostępniono',
   'share.copied': 'Skopiowano do schowka',
   'share.manual': 'Skopiuj tekst poniżej',
-  'share.failed': 'Nie udało się udostępnić',
 
   'lang.pl': 'Polski',
   'lang.en': 'English',
-  'lang.toggle': 'PL / EN',
+  'lang.switchTo': 'Przełącz na: {lang}',
 } as const;
 
 export type MessageKey = keyof typeof pl;

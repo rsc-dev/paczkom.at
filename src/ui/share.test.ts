@@ -40,14 +40,29 @@ describe('shareText', () => {
     expect(writeText).toHaveBeenCalledWith(TEXT);
   });
 
-  it('falls through to the clipboard when the share sheet is dismissed', async () => {
+  it('stops when the player dismisses the share sheet', async () => {
+    const abort = Object.assign(new Error('share canceled'), { name: 'AbortError' });
     const share = vi.fn(async () => {
-      await Promise.reject(new Error('AbortError'));
+      await Promise.reject(abort);
+    });
+    const writeText = vi.fn(async () => {
+      await Promise.resolve();
+    });
+
+    // Dismissing is a decision, not a failure: do not quietly copy instead.
+    expect(await shareText(TEXT, { share, writeText })).toBe('dismissed');
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it('falls through to the clipboard when the share sheet fails for real', async () => {
+    const share = vi.fn(async () => {
+      await Promise.reject(new Error('NotAllowedError'));
     });
     const writeText = vi.fn(async () => {
       await Promise.resolve();
     });
     expect(await shareText(TEXT, { share, writeText })).toBe('copied');
+    expect(writeText).toHaveBeenCalledWith(TEXT);
   });
 
   it('asks the caller to show the text when neither API is available', async () => {

@@ -9,7 +9,6 @@ import { setVar } from './dom.js';
 export interface DoorNodes {
   readonly root: HTMLButtonElement;
   readonly face: HTMLElement;
-  readonly mark: HTMLElement;
   readonly slot: Slot;
 }
 
@@ -68,12 +67,16 @@ function doorElement(slot: Slot, columns: number): DoorNodes {
   size.className = 'door__size';
   size.textContent = slot.size;
 
+  // The glyph on a marked, outgoing or expired door is CSS content keyed on
+  // `data-state`, so a theme owns it — and so the Week change's jam marker is a
+  // CSS rule rather than a string in here.
   const mark = document.createElement('span');
   mark.className = 'door__mark';
+  mark.setAttribute('aria-hidden', 'true');
 
   face.append(size, mark);
   root.append(hit, cavity, face);
-  return { root, face, mark, slot };
+  return { root, face, slot };
 }
 
 /**

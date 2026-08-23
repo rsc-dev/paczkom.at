@@ -7,7 +7,6 @@
 import type { MessageKey } from './pl.js';
 
 export const en: Record<MessageKey, string> = {
-  'app.title': 'paczkom.at',
   'app.tagline': 'You are the parcel locker’s memory.',
 
   'title.play': 'Today',
@@ -27,13 +26,9 @@ export const en: Record<MessageKey, string> = {
   'hud.phase.load': 'Loading',
   'hud.phase.serve': 'Serving',
   'hud.phase.sweep': 'Sweeping',
-  'hud.score': 'Score',
-  'hud.time': 'Time',
   'hud.parcelsLeft': 'Parcels: {count}',
   'hud.queue': 'Queue: {count}',
-  'hud.mute': 'Mute',
-  'hud.unmute': 'Unmute',
-  'hud.language': 'Language',
+  'hud.sound': 'Sound',
 
   'a11y.wall': 'Locker wall',
   'door.label': 'Box {id}, size {size}, {state}',
@@ -46,7 +41,6 @@ export const en: Record<MessageKey, string> = {
 
   'screen.pickup': 'Pickup',
   'screen.sender': 'Drop-off',
-  'screen.code': 'Code',
   'screen.senderNeeds': 'Needs a box: {size}',
   'screen.nextUp': 'Next up',
   'screen.loadPrompt': 'Put the parcel in a box',
@@ -77,15 +71,11 @@ export const en: Record<MessageKey, string> = {
   'size.B': 'medium',
   'size.C': 'large',
 
-  'result.title': 'Day closed',
-  'result.daily': 'Today #{number}',
-  'result.score': 'Score',
   'result.time': 'Time',
   'result.streak': 'Streak',
   'result.best': 'Best',
   'result.official': 'Today’s result',
   'result.practice': 'Practice — today’s result stands',
-  'result.practiceScore': 'Practice: {score}',
   'result.playAgain': 'Play again',
   'result.served': 'Served: {count}',
   'result.hinted': 'With a hint: {count}',
@@ -101,9 +91,8 @@ export const en: Record<MessageKey, string> = {
   'share.shared': 'Shared',
   'share.copied': 'Copied to the clipboard',
   'share.manual': 'Copy the text below',
-  'share.failed': 'Sharing did not work',
 
   'lang.pl': 'Polski',
   'lang.en': 'English',
-  'lang.toggle': 'PL / EN',
+  'lang.switchTo': 'Switch to {lang}',
 };

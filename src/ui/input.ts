@@ -34,15 +34,23 @@ export function bindGameInput(stage: HTMLElement, tray: HTMLElement, dispatch: D
 }
 
 /**
- * Runs `handler` once, on the first pointer event anywhere. This is what
- * unlocks audio on iOS: the context may only be created inside a gesture.
+ * Runs `handler` once, on the first user gesture anywhere. This is what unlocks
+ * audio on iOS: the context may only be created inside a gesture.
+ *
+ * `click` is in the list because WebKit does not count `pointerdown` from touch
+ * as an activation event — on an iPhone the first `pointerdown` alone would not
+ * be enough.
  */
+const GESTURES = ['pointerdown', 'click', 'keydown'] as const;
+
 export function onFirstGesture(target: EventTarget, handler: () => void): void {
   const once = (): void => {
-    target.removeEventListener('pointerdown', once);
-    target.removeEventListener('keydown', once);
+    for (const gesture of GESTURES) {
+      target.removeEventListener(gesture, once);
+    }
     handler();
   };
-  target.addEventListener('pointerdown', once);
-  target.addEventListener('keydown', once);
+  for (const gesture of GESTURES) {
+    target.addEventListener(gesture, once);
+  }
 }

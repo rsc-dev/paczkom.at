@@ -57,9 +57,20 @@ describe('onFirstGesture', () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
-  it('also counts a key press, for keyboard players', () => {
+  it.each(['pointerdown', 'click', 'keydown'])('counts %s as a gesture', (gesture) => {
+    // `click` is in the list because WebKit does not treat touch `pointerdown`
+    // as an activation event, so on iOS it alone would not unlock audio.
     const handler = vi.fn();
     onFirstGesture(window, handler);
+    window.dispatchEvent(new Event(gesture));
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops listening to all of them after the first', () => {
+    const handler = vi.fn();
+    onFirstGesture(window, handler);
+    window.dispatchEvent(new Event('click'));
+    window.dispatchEvent(new Event('pointerdown'));
     window.dispatchEvent(new Event('keydown'));
     expect(handler).toHaveBeenCalledTimes(1);
   });

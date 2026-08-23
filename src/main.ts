@@ -75,20 +75,24 @@ function bootTheme(): void {
 function renderChrome(): void {
   applyStaticText(document);
 
-  // The mute button is a glyph so it stays a 40 px square in a crowded HUD;
-  // its name comes from `aria-label`, not from what you can see.
+  // The mute button is an icon toggle: a name that does not change ("Sound")
+  // plus `aria-pressed` for the state, rather than a label that flips under the
+  // reader's feet. Pressed means sound is on.
   for (const id of ['#btn-mute', '#btn-mute-game']) {
     const button = need<HTMLElement>(document, id);
-    button.setAttribute('aria-label', t(sfx.isMuted() ? 'hud.unmute' : 'hud.mute'));
-    button.setAttribute('aria-pressed', String(sfx.isMuted()));
+    button.setAttribute('aria-label', t('hud.sound'));
+    button.setAttribute('aria-pressed', String(!sfx.isMuted()));
     button.dataset['muted'] = String(sfx.isMuted());
   }
 
-  // The language button shows the language it switches *to*.
+  // The language button shows the language it switches *to*, and that visible
+  // text is its accessible name; the explanation goes in the tooltip, so the
+  // name a screen reader hears is the one a sighted user can read out.
   for (const id of ['#btn-lang', '#btn-lang-game']) {
     const button = need<HTMLElement>(document, id);
-    setText(button, otherLang().toUpperCase());
-    button.setAttribute('aria-label', t('hud.language'));
+    const target = otherLang();
+    setText(button, target.toUpperCase());
+    button.title = t('lang.switchTo', { lang: t(`lang.${target}`) });
   }
   renderTitle(title, {
     streak: currentStreak(env),
@@ -192,13 +196,19 @@ async function onShare(): Promise<void> {
   });
 
   const outcome = await shareText(text, targetsFrom(navigator));
+  if (outcome === 'dismissed') {
+    // The player closed the sheet. Saying anything about it would be noise.
+    return;
+  }
   if (outcome === 'manual') {
     showShareFallback(result, text);
   } else {
     hideShareFallback(result);
   }
+  // Its own line, so confirming a share never wipes the practice run's note
+  // about which score actually stands for the day.
   setText(
-    result.note,
+    result.shareNote,
     t(outcome === 'shared' ? 'share.shared' : outcome === 'copied' ? 'share.copied' : 'share.manual'),
   );
 }
