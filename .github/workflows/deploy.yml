@@ -26,9 +26,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # The commit CI actually passed, not whatever `main` points at by now.
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.workflow_run.head_sha || 'main' }}
 
       - uses: actions/setup-node@v4
         with:

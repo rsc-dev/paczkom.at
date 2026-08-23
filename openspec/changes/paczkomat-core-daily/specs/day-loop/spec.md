@@ -45,7 +45,7 @@ During SERVE customers SHALL arrive at their scheduled times. At most 3 customer
 - **THEN** that customer becomes active and the screen shows their request
 
 ### Requirement: Pickup service
-For an active pickup customer, `tapSlot` on the slot holding their parcel SHALL set the slot to `open`, then `empty` after the door animation duration, remove the customer, and record the outcome. Any other slot SHALL count as a wrong tap.
+For an active pickup customer, `tapSlot` on the slot holding their parcel SHALL set the slot to `open`, then `empty` after the door animation duration, remove the customer, and record the outcome. Any other slot SHALL count as a wrong tap, except a slot in state `open` (a door still swinging), which SHALL be ignored so a double-tap never penalises the next customer.
 
 #### Scenario: Correct door first try
 - **WHEN** the active pickup's parcel is in `c0r3` and the user taps `c0r3` with hint level 0 and no prior wrong taps for this customer
@@ -54,6 +54,10 @@ For an active pickup customer, `tapSlot` on the slot holding their parcel SHALL 
 #### Scenario: Wrong door
 - **WHEN** the user taps a slot that does not hold the active pickup's parcel
 - **THEN** the customer's wrong-tap count increments, a `wrong` cue fires and the slot state is unchanged
+
+#### Scenario: Double-tap on an opening door
+- **WHEN** the user taps the correct door and taps it again while it is still `open`
+- **THEN** the second tap changes nothing: the next customer's wrong-tap count and hint level are unchanged and no cue fires
 
 ### Requirement: Hint ladder
 For an active pickup, hint level SHALL become 1 after the first wrong tap or after 6 s active without a tap, and level 2 after the second wrong tap or after 12 s active. Level 1 SHALL reveal the parcel's colour and sticker on the screen; level 2 SHALL additionally mark the column containing the parcel with `data-hint="column"`. A level once reached SHALL be kept for that customer for the rest of the day (levels never decrease); only the idle timer restarts when the active customer changes or a tap occurs. A customer whose level ever reached 1 or more SHALL yield outcome `hinted` when served.
@@ -79,7 +83,7 @@ For an active pickup, hint level SHALL become 1 after the first wrong tap or aft
 - **THEN** the slot outcome is `hinted`
 
 ### Requirement: Sender service
-For an active sender needing size S, `tapSlot` on an `empty` slot with size ≥ S SHALL place an outgoing parcel there (slot state `outgoing`) and remove the customer. Any other slot SHALL count as a wrong tap. Senders SHALL NOT receive hints.
+For an active sender needing size S, `tapSlot` on an `empty` slot with size ≥ S SHALL place an outgoing parcel there (slot state `outgoing`) and remove the customer. Any other slot SHALL count as a wrong tap, except a slot in state `open`, which SHALL be ignored. Senders SHALL NOT receive hints.
 
 #### Scenario: Sender placed
 - **WHEN** the active sender needs size B and the user taps an empty B slot

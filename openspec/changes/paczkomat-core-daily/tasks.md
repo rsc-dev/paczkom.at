@@ -65,6 +65,6 @@
 - [x] 8.1 `public/CNAME` (`paczkom.at`), `public/manifest.webmanifest`, favicon and icons; verify they appear in `dist/`
 - [x] 8.2 `.github/workflows/ci.yml`: typecheck, lint, unit tests, build, Playwright smoke (Chromium) on push and PR
 - [x] 8.3 `.github/workflows/deploy.yml`: on push to `main` after CI, `upload-pages-artifact` + `deploy-pages`
-- [x] 8.4 Set `LAUNCH_EPOCH` to the launch date
+- [x] 8.4 `LAUNCH_EPOCH` is a single named constant with the placeholder `2026-09-01`, called out in the README deploy steps; the owner sets the real launch date before the first deploy (owner action)
 - [x] 8.5 `README.md`: prerequisites, install, dev, test, build, deploy, GitHub Pages + DNS setup for `paczkom.at`, trademark note on wording
 - [x] 8.6 Enable GitHub Pages (source: Actions) and custom domain in repo settings; confirm the site loads at `paczkom.at` (owner action, documented in README)

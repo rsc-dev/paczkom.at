@@ -9,7 +9,7 @@ import type { Page } from '@playwright/test';
  * a screenshot of each behind for a human to look at.
  */
 
-const SHOTS = fileURLToPath(new URL('../.superpowers/coordination/screens/', import.meta.url));
+const SHOTS = fileURLToPath(new URL('../test-results/screens/', import.meta.url));
 
 const VIEWPORTS = [
   { name: '360x640', width: 360, height: 640 },

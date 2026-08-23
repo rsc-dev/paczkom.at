@@ -97,7 +97,15 @@ describe('deployment', () => {
     for (const step of ['npm run typecheck', 'npm run lint', 'npm test', 'npm run build', 'npm run test:e2e']) {
       expect(ci, step).toContain(step);
     }
-    expect(ci).toContain('pull_request');
+  });
+
+  it('gates every push, on every branch, as well as pull requests', () => {
+    const ci = read('.github', 'workflows', 'ci.yml');
+    const triggers = ci.slice(ci.indexOf('\non:'), ci.indexOf('\njobs:'));
+    expect(triggers).toContain('push:');
+    expect(triggers).toContain('pull_request');
+    // No branch filter on push: a red gate should show up before the PR exists.
+    expect(triggers).not.toContain('branches');
   });
 
   it('has a deploy workflow wired to GitHub Pages on main', () => {
@@ -105,6 +113,18 @@ describe('deployment', () => {
     expect(deploy).toContain('actions/upload-pages-artifact');
     expect(deploy).toContain('actions/deploy-pages');
     expect(deploy).toContain('branches: [main]');
+  });
+
+  it('deploys the commit CI passed, not whatever main points at', () => {
+    const deploy = read('.github', 'workflows', 'deploy.yml');
+    expect(deploy).toContain('github.event.workflow_run.head_sha');
+  });
+
+  it('keeps the screenshots and the Playwright report as CI artefacts', () => {
+    const ci = read('.github', 'workflows', 'ci.yml');
+    expect(ci).toContain('test-results/screens/');
+    expect(ci).toContain('playwright-report/');
+    expect(ci).toContain('if: always()');
   });
 
   it('documents setup, running and deployment in the README', () => {
