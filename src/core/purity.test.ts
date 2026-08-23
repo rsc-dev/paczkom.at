@@ -15,6 +15,11 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
+/** Comments talk *about* the banned APIs; only real code counts. */
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+}
+
 /**
  * The ESLint config enforces this too, but the spec states it as a property of
  * the core, so it gets a test that fails loudly regardless of lint config.
@@ -33,7 +38,7 @@ describe('core purity', () => {
     ['window', /\bwindow\s*\./],
     ['localStorage', /\blocalStorage\b/],
   ])('never uses %s', (_label, pattern) => {
-    const offenders = files.filter((file) => pattern.test(readFileSync(file, 'utf8')));
+    const offenders = files.filter((file) => pattern.test(stripComments(readFileSync(file, 'utf8'))));
     expect(offenders).toEqual([]);
   });
 });

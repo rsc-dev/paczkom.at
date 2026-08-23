@@ -16,17 +16,17 @@
 
 ## 3. Core: reducer and scoring
 
-- [ ] 3.1 `core/game.ts`: `State`, `Action` (`start`, `tick`, `tapSlot`, `selectCustomer`, `continue`), `initialState(seed, profile)`, `reduce` skeleton with phase guard; test phase order
-- [ ] 3.2 LOAD: queue, placement validation, timer expiry, unplaced accounting, early completion; tests for valid/invalid placement and both exits
-- [ ] 3.3 SERVE arrivals and queue: visible/pending split, default active, `selectCustomer`; tests
-- [ ] 3.4 SERVE pickup service: correct door → `open` → `empty` after `doorMs`, wrong tap accounting, per-slot outcome; tests
-- [ ] 3.5 Hint ladder: mistake- and time-based levels, column marking, reset on active change; tests for 6 s / 12 s and second mistake
-- [ ] 3.6 Sender service: fit check, `outgoing` placement, wrong tap; tests
-- [ ] 3.7 Patience: drain for visible customers, walk handling for pickups (`expired`) and senders (`refused`); SERVE end on timer or empty queue with remaining customers walking; tests
-- [ ] 3.8 SWEEP: marking, clearing, skip when nothing marked, transition to SUMMARY; tests
-- [ ] 3.9 `core/score.ts`: service points with speed multiplier, penalties, zero floor, total time; wire into reducer; tests per formula
-- [ ] 3.10 Summary assembly (`served, hinted, walked, refused, unplaced, wrongTaps, slotOutcomes, score, timeMs`) and the replay-determinism test
-- [ ] 3.11 Scripted-day fixtures: three `{ seed, actions[] }` logs (perfect day, hinted day, walked/refused day) with snapshot summaries
+- [x] 3.1 `core/game.ts`: `State`, `Action` (`start`, `tick`, `tapSlot`, `selectCustomer`, `continue`), `initialState(seed, profile)`, `reduce` skeleton with phase guard; test phase order
+- [x] 3.2 LOAD: queue, placement validation, timer expiry, unplaced accounting, early completion; tests for valid/invalid placement and both exits
+- [x] 3.3 SERVE arrivals and queue: visible/pending split, default active, `selectCustomer`; tests
+- [x] 3.4 SERVE pickup service: correct door → `open` → `empty` after `doorMs`, wrong tap accounting, per-slot outcome; tests
+- [x] 3.5 Hint ladder: mistake- and time-based levels, column marking, reset on active change; tests for 6 s / 12 s and second mistake
+- [x] 3.6 Sender service: fit check, `outgoing` placement, wrong tap; tests
+- [x] 3.7 Patience: drain for visible customers, walk handling for pickups (`expired`) and senders (`refused`); SERVE end on timer or empty queue with remaining customers walking; tests
+- [x] 3.8 SWEEP: marking, clearing, skip when nothing marked, transition to SUMMARY; tests
+- [x] 3.9 `core/score.ts`: service points with speed multiplier, penalties, zero floor, total time; wire into reducer; tests per formula
+- [x] 3.10 Summary assembly (`served, hinted, walked, refused, unplaced, wrongTaps, slotOutcomes, score, timeMs`) and the replay-determinism test
+- [x] 3.11 Scripted-day fixtures: three `{ seed, actions[] }` logs (perfect day, hinted day, walked/refused day) with snapshot summaries
 
 ## 4. Core: daily, share, storage, i18n
 
