@@ -1,0 +1,70 @@
+/**
+ * The share card (design D8): one emoji per slot in wall order, one line per
+ * column. Labels are localised by the caller; the grid and the URL are not.
+ */
+import type { SlotOutcome } from './game.js';
+import type { Slot } from './wall.js';
+
+export const SHARE_BRAND = 'paczkom.at';
+export const SHARE_URL = 'https://paczkom.at';
+
+export const OUTCOME_EMOJI: Readonly<Record<SlotOutcome, string>> = {
+  perfect: '📦',
+  hinted: '🟧',
+  walked: '🟥',
+  /** The slot never held a pickup parcel. */
+  none: '⬜',
+};
+
+export interface ShareLabels {
+  /** Localised mode name, e.g. "Dzisiaj" / "Today". */
+  readonly mode: string;
+  /** Localised points abbreviation, e.g. "pkt" / "pts". */
+  readonly points: string;
+}
+
+export interface ShareParams {
+  readonly labels: ShareLabels;
+  readonly number: number;
+  readonly grid: readonly string[];
+  readonly score: number;
+  readonly timeMs: number;
+}
+
+/** One string per wall column, slots listed top to bottom. */
+export function buildGrid(
+  wall: readonly Slot[],
+  outcomes: Readonly<Record<string, SlotOutcome>>,
+): string[] {
+  const columns = new Map<number, Slot[]>();
+  for (const slot of wall) {
+    const column = columns.get(slot.col) ?? [];
+    column.push(slot);
+    columns.set(slot.col, column);
+  }
+  return [...columns.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([, slots]) =>
+      slots
+        .sort((a, b) => a.index - b.index)
+        .map((slot) => OUTCOME_EMOJI[outcomes[slot.id] ?? 'none'])
+        .join(''),
+    );
+}
+
+/** `m:ss`, counting past 60 minutes rather than rolling over to hours. */
+export function formatTime(ms: number): string {
+  const total = Math.floor(Math.max(0, ms) / 1000);
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  return `${String(minutes)}:${String(seconds).padStart(2, '0')}`;
+}
+
+export function buildShareText(params: ShareParams): string {
+  return [
+    `${SHARE_BRAND} · ${params.labels.mode} #${String(params.number)}`,
+    ...params.grid,
+    `${String(params.score)} ${params.labels.points} · ${formatTime(params.timeMs)}`,
+    SHARE_URL,
+  ].join('\n');
+}

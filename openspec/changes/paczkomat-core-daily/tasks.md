@@ -30,10 +30,10 @@
 
 ## 4. Core: daily, share, storage, i18n
 
-- [ ] 4.1 `core/daily.ts`: UTC date string, seed derivation, Daily number from `LAUNCH_EPOCH`, streak and best computation from records; tests for streak continue/break and epoch day
-- [ ] 4.2 `core/share.ts`: emoji grid from slot outcomes in wall order (one line per column), share text builder; tests for shape, mapping, PL/EN header and `m:ss` formatting
-- [ ] 4.3 `storage.ts`: `pk:v1:` namespace, JSON get/set, try/catch with in-memory fallback, corrupt-value tolerance; tests with a throwing `localStorage` stub
-- [ ] 4.4 `i18n/pl.ts`, `i18n/en.ts`, `i18n/index.ts` (`t`, `setLang`, `detectLang`); key-parity test; brand-name scan test; hint-line builders for colour/sticker
+- [x] 4.1 `core/daily.ts`: UTC date string, seed derivation, Daily number from `LAUNCH_EPOCH`, streak and best computation from records; tests for streak continue/break and epoch day
+- [x] 4.2 `core/share.ts`: emoji grid from slot outcomes in wall order (one line per column), share text builder; tests for shape, mapping, PL/EN header and `m:ss` formatting
+- [x] 4.3 `storage.ts`: `pk:v1:` namespace, JSON get/set, try/catch with in-memory fallback, corrupt-value tolerance; tests with a throwing `localStorage` stub
+- [x] 4.4 `i18n/pl.ts`, `i18n/en.ts`, `i18n/index.ts` (`t`, `setLang`, `detectLang`); key-parity test; brand-name scan test; hint-line builders for colour/sticker
 
 ## 5. UI and theme
 
