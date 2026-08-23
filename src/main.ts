@@ -12,25 +12,16 @@ import './theme/signage.css';
 import './theme/app.css';
 
 import { createSfx } from './audio/sfx.js';
-import {
-  LAUNCH_EPOCH,
-  computeBest,
-  computeStreak,
-  dailyNumber,
-  dailySeed,
-  recordRun,
-  utcDateString,
-} from './core/daily.js';
-import type { DailyRecords } from './core/daily.js';
-import { initialState, reduce } from './core/game.js';
+import { initialState, reduce, slotOutcomes } from './core/game.js';
 import type { Action, State } from './core/game.js';
-import { DAILY_PROFILE } from './core/profiles.js';
 import { buildGrid, buildShareText } from './core/share.js';
+import { currentStreak, finishDailyRun, readBest, startDailyRun } from './run.js';
+import type { DayRun, RunEnvironment } from './run.js';
 import { STORAGE_KEYS, storage } from './storage.js';
 import { detectLang, getLang, otherLang, setLang, t } from './i18n/index.js';
 import { need, setText } from './ui/dom.js';
 import { bindGameInput, onFirstGesture } from './ui/input.js';
-import { createGameView, outcomesOf, renderGame } from './ui/render.js';
+import { createGameView, renderGame } from './ui/render.js';
 import type { GameView } from './ui/render.js';
 import { shareText, targetsFrom } from './ui/share.js';
 import {
@@ -53,21 +44,17 @@ const app = need<HTMLElement>(document, '#app');
 const title = titleNodes(document);
 const result = resultNodes(document);
 
-const today = utcDateString(new Date());
-const seed = dailySeed(today);
+/** The clock and the storage the run logic reads; injected so it is testable. */
+const env: RunEnvironment = { now: () => new Date(), storage };
 
-let game: State = initialState(seed, DAILY_PROFILE);
+/** Fixed when a day starts, read when it finishes. Null between days. */
+let run: DayRun | null = startDailyRun(env);
+
+let game: State = initialState(run.seed, run.profile);
 let view: GameView;
 let frameHandle = 0;
 let lastFrame = 0;
 let lastResult: ResultModel | null = null;
-
-// ------------------------------------------------------------------ storage
-
-const readRecords = (): DailyRecords => storage.get<DailyRecords>(STORAGE_KEYS.daily) ?? {};
-
-const readBest = (): number =>
-  Math.max(storage.get<number>(STORAGE_KEYS.best) ?? 0, computeBest(readRecords()));
 
 const sfx = createSfx({ muted: storage.get<boolean>(STORAGE_KEYS.mute) ?? false });
 
@@ -104,8 +91,8 @@ function renderChrome(): void {
     button.setAttribute('aria-label', t('hud.language'));
   }
   renderTitle(title, {
-    streak: computeStreak(readRecords(), today),
-    best: readBest(),
+    streak: currentStreak(env),
+    best: readBest(storage),
     persistent: storage.persistent,
   });
   if (lastResult !== null) {
@@ -124,6 +111,7 @@ function renderCurrent(): void {
 // ---------------------------------------------------------------- the loop
 
 function dispatch(action: Action): void {
+  const previous = game;
   const next = reduce(game, action);
   for (const cue of next.cues) {
     sfx.play(cue);
@@ -132,7 +120,9 @@ function dispatch(action: Action): void {
   if (currentScreen(app) === 'game') {
     renderGame(view, game);
   }
-  if (game.phase === 'SUMMARY') {
+  // On the *transition* into SUMMARY, never on being in it: a second call would
+  // file the same day twice and turn the real result into a practice run.
+  if (previous.phase !== 'SUMMARY' && next.phase === 'SUMMARY') {
     finishDay();
   }
 }
@@ -162,7 +152,10 @@ function stopLoop(): void {
 // ------------------------------------------------------------- day lifecycle
 
 function startDay(): void {
-  game = initialState(seed, DAILY_PROFILE);
+  // The date and the seed are decided here, not at boot: a tab left open past
+  // midnight UTC starts today's day, and a day started at 23:59 stays that day.
+  run = startDailyRun(env);
+  game = initialState(run.seed, run.profile);
   hideShareFallback(result);
   renderGame(view, game);
   showScreen(app, 'game');
@@ -173,31 +166,11 @@ function startDay(): void {
 function finishDay(): void {
   stopLoop();
   const summary = game.summary;
-  if (summary === null) {
+  if (summary === null || run === null) {
     return;
   }
 
-  const grid = buildGrid(game.slots, outcomesOf(game));
-  const before = readRecords();
-  const officialBefore = before[today]?.result?.score ?? null;
-  const { records, isPractice } = recordRun(before, today, {
-    score: summary.score,
-    timeMs: summary.timeMs,
-    grid,
-  });
-  storage.set(STORAGE_KEYS.daily, records);
-  storage.set(STORAGE_KEYS.best, Math.max(storage.get<number>(STORAGE_KEYS.best) ?? 0, computeBest(records)));
-
-  lastResult = {
-    dailyNumber: dailyNumber(today, LAUNCH_EPOCH),
-    date: today,
-    summary,
-    grid,
-    streak: computeStreak(records, today),
-    best: readBest(),
-    isPractice,
-    officialScore: isPractice ? officialBefore : null,
-  };
+  lastResult = finishDailyRun(env, run, summary, buildGrid(game.slots, slotOutcomes(game)));
 
   renderChrome();
   renderResult(result, lastResult);

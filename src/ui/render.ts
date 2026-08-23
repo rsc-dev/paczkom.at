@@ -4,7 +4,7 @@
  * decides what anything looks like — the theme reads the attributes.
  */
 import { activeCustomer, hintColumn, upcomingParcels } from '../core/game.js';
-import type { SlotOutcome, SlotRuntime, State } from '../core/game.js';
+import type { SlotRuntime, State } from '../core/game.js';
 import type { Parcel } from '../core/parcel.js';
 import { t } from '../i18n/index.js';
 import { need, percent, setAttr, setHidden, setText, setVar } from './dom.js';
@@ -206,9 +206,4 @@ export function renderGame(view: GameView, state: State): void {
   renderPanel(view.panel, state);
   renderDoors(view, state);
   renderTray(view, state);
-}
-
-/** The share grid needs outcomes keyed by slot id; the view has them already. */
-export function outcomesOf(state: State): Record<string, SlotOutcome> {
-  return Object.fromEntries(state.slots.map((slot) => [slot.id, slot.outcome]));
 }

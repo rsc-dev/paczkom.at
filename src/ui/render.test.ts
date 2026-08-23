@@ -5,7 +5,7 @@ import type { State } from '../core/game.js';
 import { DAILY_PROFILE } from '../core/profiles.js';
 import { fits } from '../core/wall.js';
 import { setLang } from '../i18n/index.js';
-import { createGameView, doorLabel, outcomesOf, renderGame } from './render.js';
+import { createGameView, doorLabel, renderGame } from './render.js';
 import type { GameView } from './render.js';
 import { mountApp, recordMutations } from './testing.js';
 
@@ -132,10 +132,3 @@ describe('tray rendering', () => {
   });
 });
 
-describe('outcomesOf', () => {
-  it('reports an outcome for every slot', () => {
-    const outcomes = outcomesOf(state);
-    expect(Object.keys(outcomes)).toHaveLength(state.slots.length);
-    expect(new Set(Object.values(outcomes))).toEqual(new Set(['none']));
-  });
-});

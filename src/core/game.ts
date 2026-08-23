@@ -541,9 +541,11 @@ function tapSlotServe(state: State, slotId: string): State {
     return state;
   }
 
-  // A door mid-open is about to become empty; a sender aiming at it is early,
-  // not wrong.
-  if (customer.kind === 'sender' && slot.state === 'open') {
+  // A door that is still swinging open is about to become empty. Whoever is at
+  // the counter, a tap on it is early rather than wrong — and in particular a
+  // double-tap on the door you just opened must not be charged to the customer
+  // who stepped up behind them.
+  if (slot.state === 'open') {
     return state;
   }
 
@@ -591,6 +593,11 @@ function enterSweep(state: State): State {
 }
 
 function tickSweep(state: State, dtMs: number): State {
+  // SWEEP is untimed, so unlike LOAD and SERVE nothing clamps the step for us;
+  // an infinite frame would make the day's total time infinite forever after.
+  if (!Number.isFinite(dtMs)) {
+    return state;
+  }
   const phaseElapsedMs = state.phaseElapsedMs + dtMs;
   return {
     ...state,
@@ -636,9 +643,9 @@ export function reduce(state: State, action: Action): State {
 
   switch (action.type) {
     case 'tick': {
-      // Written as `!(dtMs > 0)` so NaN is rejected too, rather than poisoning
-      // every elapsed counter for the rest of the day.
-      if (!(action.dtMs > 0)) {
+      // NaN and Infinity are rejected here as well as zero and negatives: any
+      // of them would poison every elapsed counter for the rest of the day.
+      if (!(action.dtMs > 0) || !Number.isFinite(action.dtMs)) {
         return fresh;
       }
       switch (fresh.phase) {

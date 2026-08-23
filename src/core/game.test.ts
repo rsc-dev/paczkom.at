@@ -137,12 +137,12 @@ describe('initialState', () => {
     expect(reduce(ticked, { type: 'start' }).started).toBe(true);
   });
 
-  it('ignores a tick that is not a positive number', () => {
+  it('ignores a tick that is not a positive, finite number', () => {
     const state = started(1, DAILY_PROFILE);
-    for (const dtMs of [0, -100, Number.NaN, Number.POSITIVE_INFINITY * 0]) {
+    for (const dtMs of [0, -100, Number.NaN, Number.POSITIVE_INFINITY]) {
       const ticked = reduce(state, { type: 'tick', dtMs });
       expect(ticked.phaseElapsedMs).toBe(0);
-      expect(Number.isNaN(ticked.phaseElapsedMs)).toBe(false);
+      expect(Number.isFinite(ticked.phaseElapsedMs)).toBe(true);
       expect(ticked.elapsed).toEqual({ load: 0, serve: 0, sweep: 0 });
     }
   });
@@ -340,6 +340,26 @@ describe('SERVE pickup service', () => {
     expect(tapped.cues).toEqual(['wrong']);
     expect(reduce(tapped, { type: 'tick', dtMs: 16 }).cues).toEqual([]);
     expect(reduce(tapped, { type: 'tick', dtMs: 0 }).cues).toEqual([]);
+  });
+
+  it('ignores a second tap on the door it just opened', () => {
+    const state = atServe();
+    const slot = customerSlot(state, activeCustomer(state));
+    const opened = reduce(state, { type: 'tapSlot', slotId: slot.id });
+    expect(findSlot(opened, slot.id)?.state).toBe('open');
+
+    // Somebody else has stepped up to the counter by now; the stray tap from
+    // the first customer's double-tap must not be charged to them.
+    const next = activeCustomer(opened);
+    expect(next).not.toBeNull();
+
+    const doubleTapped = reduce(opened, { type: 'tapSlot', slotId: slot.id });
+    expect(activeCustomer(doubleTapped)?.wrongTaps).toBe(0);
+    expect(hintLevelOf(doubleTapped, activeCustomer(doubleTapped))).toBe(0);
+    expect(doubleTapped.stats.wrongTaps).toBe(0);
+    expect(doubleTapped.score).toBe(opened.score);
+    expect(doubleTapped.cues).toEqual([]);
+    expect({ ...doubleTapped, cues: [] }).toEqual({ ...opened, cues: [] });
   });
 
   it('marks a service after a hint as hinted', () => {
@@ -784,6 +804,16 @@ describe('SWEEP', () => {
     const state = reduce(atSweep(), { type: 'tick', dtMs: 3_000 });
     expect(state.elapsed.sweep).toBe(3_000);
     expect(totalTimeMs(state)).toBe(state.elapsed.load + state.elapsed.serve + 3_000);
+  });
+
+  it('never lets a broken frame make the day take forever', () => {
+    // SWEEP is untimed, so nothing clamps the step the way LOAD and SERVE do.
+    const state = reduce(atSweep(), { type: 'tick', dtMs: 3_000 });
+    for (const dtMs of [Number.POSITIVE_INFINITY, Number.NaN, -1]) {
+      const ticked = reduce(state, { type: 'tick', dtMs });
+      expect(ticked.elapsed.sweep).toBe(3_000);
+      expect(Number.isFinite(totalTimeMs(ticked))).toBe(true);
+    }
   });
 
   it('is skipped when nothing needs sweeping', () => {
