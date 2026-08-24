@@ -7,14 +7,24 @@ import { formatTime } from '../core/share.js';
 import type { State } from '../core/game.js';
 import { loadDurationMs } from '../core/profiles.js';
 import { t } from '../i18n/index.js';
-import { percent, setText, setVar } from './dom.js';
+import { percent, setHidden, setText, setVar } from './dom.js';
+import { renderStars } from './stars.js';
 
 export interface HudNodes {
   readonly phase: HTMLElement;
   readonly clock: HTMLElement;
   readonly meter: HTMLElement;
   readonly count: HTMLElement;
+  /** Something worth saying about today, such as a late van. */
+  readonly note: HTMLElement;
+  /** Reputation, shown only during a Week run. */
+  readonly stars: HTMLElement;
   readonly score: HTMLElement;
+}
+
+/** Reputation to draw in the HUD, or `null` outside a Week run. */
+export interface HudStars {
+  readonly stars: number;
 }
 
 const PHASE_KEY = {
@@ -70,10 +80,25 @@ export function countLabel(state: State): string {
   });
 }
 
-export function renderHud(nodes: HudNodes, state: State): void {
+/** The one line of weather worth putting in the HUD, or nothing. */
+export function noteLabel(state: State): string {
+  return state.phase === 'LOAD' && state.profile.lateVan ? t('hud.lateVan') : '';
+}
+
+export function renderHud(nodes: HudNodes, state: State, stars: HudStars | null): void {
   setText(nodes.phase, t(PHASE_KEY[state.phase]));
   setText(nodes.clock, clockLabel(state));
   setVar(nodes.meter, '--fill', percent(meterFill(state)));
   setText(nodes.count, countLabel(state));
+
+  const note = noteLabel(state);
+  setText(nodes.note, note);
+  setHidden(nodes.note, note === '');
+
+  setHidden(nodes.stars, stars === null);
+  if (stars !== null) {
+    renderStars(nodes.stars, { stars: stars.stars });
+  }
+
   setText(nodes.score, `${String(state.score)} ${t('share.points')}`);
 }

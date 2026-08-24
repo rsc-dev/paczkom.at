@@ -73,6 +73,8 @@
   /* Motion. `--motion` is the door swing; nothing animates longer. */
   --motion: 200ms;
   --motion-fast: 110ms;
+  /* Long enough to notice a star going out, short enough not to wait for it. */
+  --motion-slow: 480ms;
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
 
   /*
@@ -103,5 +105,6 @@
   :root {
     --motion: 0ms;
     --motion-fast: 0ms;
+    --motion-slow: 0ms;
   }
 }

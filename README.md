@@ -5,8 +5,22 @@ at: remembering which box the parcel went into.
 
 A day runs in three phases. **Load** the wall as the courier — each parcel has to
 go in a box it fits. **Serve** the customers as the locker's memory — they give
-you a code, you open the right door. **Sweep** what is left behind. One seeded
-day per UTC date, the same for everyone, with a shareable emoji grid at the end.
+you a code, you open the right door. **Sweep** what is left behind.
+
+Two ways to play:
+
+- **Dzisiaj / Today** — one seeded day per UTC date, the same for everyone, with
+  a shareable emoji grid at the end. First attempt counts; practice is free.
+- **Tydzień / Week** — six escalating days in one sitting, Monday to Saturday.
+  The wall grows from two columns to five, the queue from eight parcels to
+  twenty-seven, and from Thursday things start going wrong: a door jams, a
+  customer forgets their code, rain smudges a digit off every label, the van
+  turns up late. You have three stars; every parcel left on the van, every
+  drop-off you cannot house and every customer who walks away costs one. Lose
+  all three and the week ends on a complaint form.
+
+A week lives in its URL — `paczkom.at/?week=k3j9x` — so you can hand someone the
+exact week you just played and dare them to beat it.
 
 No backend, no accounts, no tracking, and no runtime dependencies: the whole
 thing is a static page of hand-written TypeScript and CSS.
@@ -71,12 +85,30 @@ npm run preview    # serve dist/ locally
 
 ```
 src/core/     the rules: a pure reducer, seeded RNG, no DOM and no clock
+src/core/week.ts  the Week run: six days, a star ledger, seeds in links
+src/run.ts    what a run is (daily or week) and what finishing one means
 src/ui/       the view: builds a stable DOM tree, writes data-* attributes
 src/theme/    every colour, radius, font and duration, as CSS custom properties
 src/i18n/     Polish and English catalogues with a shared key set
-src/audio/    four synthesised cues, no audio files
-e2e/          Playwright: the smoke test and the viewport checks
+src/audio/    five synthesised cues, no audio files
+e2e/          Playwright: the smoke test, viewport checks and a full week
 ```
+
+### Tuning the difficulty
+
+Every number that makes a day easy or hard is a row in `src/core/profiles.ts`:
+columns, parcels, senders, look-alike code pairs, the three timers, and which
+events are switched on (`jams`, `forgotten`, `rain`, `lateVan`). `WEEK_PROFILES`
+is Monday to Saturday in order; `DAILY_PROFILE` is the Thursday row. Changing
+the arc is a data edit — no reducer changes, no new code paths.
+
+One invariant is enforced by a test: `arrivalWindowMs + patienceMs <= serveMs`,
+so nobody ever walks away merely because the day ended before they were served.
+
+After a profile edit, regenerate the scripted fixtures (`npm run gen:fixtures`)
+and read the diff: those summaries are what the change actually did.
+
+### Rules of the house
 
 Three rules hold the design together:
 

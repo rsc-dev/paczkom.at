@@ -12,7 +12,7 @@ export interface DoorNodes {
   readonly slot: Slot;
 }
 
-export type WallNodes = ReadonlyMap<string, DoorNodes>;
+export type WallNodes = Map<string, DoorNodes>;
 
 /**
  * Where the screen panel sits among the door columns on wide viewports: just
@@ -84,7 +84,7 @@ function doorElement(slot: Slot, columns: number): DoorNodes {
  * (the screen panel), and returns them keyed by slot id.
  */
 export function buildWallDom(stage: HTMLElement, slots: readonly Slot[], columns: number): WallNodes {
-  const doors = new Map<string, DoorNodes>();
+  const doors: WallNodes = new Map();
   const fragment = document.createDocumentFragment();
   for (const slot of slots) {
     const door = doorElement(slot, columns);

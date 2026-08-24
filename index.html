@@ -23,6 +23,7 @@
 
           <div class="title__actions">
             <button class="btn btn--primary" id="btn-play" data-t="title.play"></button>
+            <button class="btn btn--primary btn--week" id="btn-week" data-t="title.week"></button>
             <button class="btn btn--ghost" id="btn-howto" data-t="title.howto"></button>
           </div>
 
@@ -45,6 +46,8 @@
           <li class="howto__step"><span data-t="howto.step1"></span></li>
           <li class="howto__step"><span data-t="howto.step2"></span></li>
           <li class="howto__step"><span data-t="howto.step3"></span></li>
+          <li class="howto__step"><span data-t="howto.step4"></span></li>
+          <li class="howto__step"><span data-t="howto.step5"></span></li>
         </ol>
         <p class="howto__note" data-t="howto.hintNote"></p>
         <hr class="rule" />
@@ -61,6 +64,8 @@
           <span class="hud__clock" id="hud-clock"></span>
           <span class="hud__meter" id="hud-meter"></span>
           <span class="hud__count" id="hud-count"></span>
+          <span class="hud__note" id="hud-note" hidden></span>
+          <span class="stars" id="hud-stars" hidden></span>
           <span class="hud__score" id="hud-score"></span>
           <span class="hud__buttons">
             <button class="btn btn--ghost btn--small" id="btn-lang-game"></button>
@@ -107,6 +112,61 @@
         </div>
         <p class="result__note" id="share-note" aria-live="polite"></p>
         <textarea class="share-fallback" id="share-fallback" readonly hidden></textarea>
+      </section>
+
+      <!-- --------------------------------------------------- day summary -->
+      <section class="screen" id="screen-day" aria-labelledby="day-headline">
+        <div class="result__body">
+          <span class="result__kicker" id="day-kicker"></span>
+          <h2 class="result__headline" id="day-headline"></h2>
+          <p class="result__score" id="day-score"></p>
+          <span class="stars stars--large" id="day-stars"></span>
+          <p class="result__note" id="day-lost"></p>
+          <ul class="result__stats" id="day-stats"></ul>
+        </div>
+        <div class="result__actions">
+          <button class="btn btn--primary" id="btn-next-day" data-t="week.nextDay"></button>
+        </div>
+      </section>
+
+      <!-- -------------------------------------------------- week summary -->
+      <section class="screen" id="screen-week" aria-labelledby="week-headline">
+        <div class="result__body">
+          <span class="result__kicker" id="week-kicker"></span>
+          <h2 class="result__headline" id="week-headline" data-t="week.title"></h2>
+          <p class="result__score" id="week-total"></p>
+          <span class="stars stars--large" id="week-stars"></span>
+          <p class="result__note" id="week-best"></p>
+          <table class="week-table">
+            <tbody id="week-rows"></tbody>
+          </table>
+        </div>
+        <div class="result__actions">
+          <button class="btn btn--primary" id="btn-week-share" data-t="share.button"></button>
+          <button class="btn btn--ghost" id="btn-week-retry" data-t="week.retry"></button>
+          <button class="btn btn--ghost" id="btn-week-new" data-t="week.new"></button>
+          <button class="btn btn--ghost" id="btn-week-home" data-t="result.home"></button>
+        </div>
+        <p class="result__note" id="week-share-note" aria-live="polite"></p>
+        <textarea class="share-fallback" id="week-share-fallback" readonly hidden></textarea>
+      </section>
+
+      <!-- --------------------------------------------------- reklamacja -->
+      <section class="screen" id="screen-fail" aria-labelledby="fail-headline">
+        <div class="result__body">
+          <span class="result__kicker" id="fail-kicker"></span>
+          <h2 class="result__headline" id="fail-headline" data-t="fail.title"></h2>
+          <p class="fail__lead" data-t="fail.lead"></p>
+          <p class="result__score" id="fail-total"></p>
+          <span class="result__kicker" data-t="week.incidents"></span>
+          <ul class="result__stats" id="fail-incidents"></ul>
+        </div>
+        <div class="result__actions">
+          <button class="btn btn--primary" id="btn-fail-retry" data-t="week.retry"></button>
+          <button class="btn btn--ghost" id="btn-fail-share" data-t="share.button"></button>
+          <button class="btn btn--ghost" id="btn-fail-new" data-t="week.new"></button>
+          <button class="btn btn--ghost" id="btn-fail-home" data-t="result.home"></button>
+        </div>
       </section>
     </div>
 

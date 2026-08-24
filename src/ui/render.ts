@@ -3,12 +3,12 @@
  * dispatch, writes only the `data-*` attributes and text that changed. It never
  * decides what anything looks like — the theme reads the attributes.
  */
-import { activeCustomer, hintColumn, upcomingParcels } from '../core/game.js';
+import { activeCustomer, displayCode, hintColumn, upcomingParcels } from '../core/game.js';
 import type { SlotRuntime, State } from '../core/game.js';
 import type { Parcel } from '../core/parcel.js';
 import { stickerName, t } from '../i18n/index.js';
 import { need, percent, setAttr, setHidden, setText, setVar } from './dom.js';
-import type { HudNodes } from './hud.js';
+import type { HudNodes, HudStars } from './hud.js';
 import { renderHud } from './hud.js';
 import type { PanelNodes } from './screen.js';
 import { renderPanel } from './screen.js';
@@ -30,6 +30,8 @@ export interface CardNodes {
 export const UPCOMING_SHOWN = 2;
 
 export interface GameView {
+  /** The game screen itself; carries the phase for the theme to key on. */
+  readonly root: HTMLElement;
   readonly stage: HTMLElement;
   readonly tray: HTMLElement;
   readonly trayEmpty: HTMLElement;
@@ -89,6 +91,7 @@ export function createGameView(root: ParentNode, state: State): GameView {
   tray.append(...cards.map((card) => card.root), trayEmpty);
 
   return {
+    root: need<HTMLElement>(root, '#screen-game'),
     stage,
     tray,
     trayEmpty,
@@ -99,6 +102,8 @@ export function createGameView(root: ParentNode, state: State): GameView {
       clock: need<HTMLElement>(root, '#hud-clock'),
       meter: need<HTMLElement>(root, '#hud-meter'),
       count: need<HTMLElement>(root, '#hud-count'),
+      note: need<HTMLElement>(root, '#hud-note'),
+      stars: need<HTMLElement>(root, '#hud-stars'),
       score: need<HTMLElement>(root, '#hud-score'),
     },
     panel: {
@@ -115,12 +120,34 @@ export function createGameView(root: ParentNode, state: State): GameView {
   };
 }
 
+/**
+ * Throws the wall away and builds it again. A Week day can be a different size
+ * from the one before it — Monday is two columns, Saturday is five — so the
+ * door DOM cannot be built once at boot and kept.
+ */
+export function rebuildWall(view: GameView, state: State): void {
+  if (
+    view.doors.size === state.slots.length &&
+    state.slots.every((slot) => view.doors.has(slot.id))
+  ) {
+    return;
+  }
+  for (const door of view.doors.values()) {
+    door.root.remove();
+  }
+  view.doors.clear();
+  for (const [id, door] of buildWallDom(view.stage, state.slots, state.profile.columns)) {
+    view.doors.set(id, door);
+  }
+}
+
 export function doorLabel(slot: SlotRuntime): string {
-  return t('door.label', {
+  const label = t('door.label', {
     id: slot.id,
     size: t(`size.${slot.size}`),
     state: t(`door.state.${slot.state}`),
   });
+  return slot.jammed ? `${label}, ${t('screen.jammed')}` : label;
 }
 
 function renderDoors(view: GameView, state: State): void {
@@ -132,11 +159,12 @@ function renderDoors(view: GameView, state: State): void {
     }
     setAttr(door.root, 'data-state', slot.state);
     setAttr(door.root, 'data-hint', hinted !== null && slot.col === hinted ? 'column' : null);
+    setAttr(door.root, 'data-jammed', slot.jammed ? 'true' : null);
     setAttr(door.root, 'aria-label', doorLabel(slot));
   }
 }
 
-function renderUpcomingCard(card: CardNodes, parcel: Parcel): void {
+function renderUpcomingCard(card: CardNodes, parcel: Parcel, code: string): void {
   setHidden(card.root, false);
   setAttr(card.root, 'data-upcoming', 'true');
   setAttr(card.root, 'data-active', 'false');
@@ -149,7 +177,7 @@ function renderUpcomingCard(card: CardNodes, parcel: Parcel): void {
   setAttr(card.sticker, 'data-sticker', parcel.sticker);
   setText(card.stickerName, parcel.sticker === 'none' ? '' : stickerName(parcel.sticker));
   setText(card.kind, t('screen.nextUp'));
-  setText(card.code, parcel.code);
+  setText(card.code, code);
   setHidden(card.wait, true);
 }
 
@@ -165,7 +193,7 @@ function renderTray(view: GameView, state: State): void {
         setHidden(card.root, true);
         return;
       }
-      renderUpcomingCard(card, parcel);
+      renderUpcomingCard(card, parcel, displayCode(state, parcel.code));
     });
     setHidden(view.trayEmpty, upcoming.length > 0);
     setText(view.trayEmpty, t('screen.loadPrompt'));
@@ -179,6 +207,9 @@ function renderTray(view: GameView, state: State): void {
       const customer = visible[index];
       if (customer === undefined) {
         setHidden(card.root, true);
+        // A hidden card must not keep claiming to be the active customer.
+        setAttr(card.root, 'data-active', 'false');
+        setAttr(card.root, 'data-customer', null);
         return;
       }
       const parcel =
@@ -200,7 +231,11 @@ function renderTray(view: GameView, state: State): void {
       setText(card.kind, t(customer.kind === 'pickup' ? 'screen.pickup' : 'screen.sender'));
       setText(
         card.code,
-        customer.kind === 'pickup' ? (parcel?.code ?? '') : t(`size.${customer.needsSize}`),
+        customer.kind === 'pickup'
+          ? customer.forgotten
+            ? t('screen.forgottenCode')
+            : displayCode(state, parcel?.code ?? '')
+          : t(`size.${customer.needsSize}`),
       );
       setHidden(card.wait, false);
       setVar(card.wait, '--fill', percent(1 - customer.waitedMs / state.profile.patienceMs));
@@ -218,8 +253,9 @@ function renderTray(view: GameView, state: State): void {
 }
 
 /** Writes the whole state to the DOM, touching only what changed. */
-export function renderGame(view: GameView, state: State): void {
-  renderHud(view.hud, state);
+export function renderGame(view: GameView, state: State, stars: HudStars | null = null): void {
+  setAttr(view.root, 'data-phase', state.phase);
+  renderHud(view.hud, state, stars);
   renderPanel(view.panel, state);
   renderDoors(view, state);
   renderTray(view, state);

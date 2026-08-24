@@ -21,17 +21,17 @@
 
 ## 4. UI
 
-- [ ] 4.1 Screen panel: jam marker on doors, forgotten-code description-only layout, masked code rendering, late-van HUD note, star display in HUD during Week
-- [ ] 4.2 Title screen: Week button, best-week record; how-to: events and stars steps (PL/EN)
-- [ ] 4.3 Day-summary screen with star-loss animation and "Next day"
-- [ ] 4.4 Week-summary screen: per-day table, totals, best comparison, share, retry, new week
-- [ ] 4.5 Reklamacja screen: day reached, total, final-day incidents, share, retry, new week
-- [ ] 4.6 `core/share.ts`: Week share text (completed and failed variants); share button wiring on week screens; tests
-- [ ] 4.7 i18n: all new strings in PL and EN; key-parity test green
-- [ ] 4.8 Layout pass for 4- and 5-column walls at 360×640, 390×844, 1280×800; adjust `--unit` floor or hit-area padding if needed
+- [x] 4.1 Screen panel: jam marker on doors, forgotten-code description-only layout, masked code rendering, late-van HUD note, star display in HUD during Week
+- [x] 4.2 Title screen: Week button, best-week record; how-to: events and stars steps (PL/EN)
+- [x] 4.3 Day-summary screen with star-loss animation and "Next day"
+- [x] 4.4 Week-summary screen: per-day table, totals, best comparison, share, retry, new week
+- [x] 4.5 Reklamacja screen: day reached, total, final-day incidents, share, retry, new week
+- [x] 4.6 `core/share.ts`: Week share text (completed and failed variants); share button wiring on week screens; tests
+- [x] 4.7 i18n: all new strings in PL and EN; key-parity test green
+- [x] 4.8 Layout pass for 4- and 5-column walls at 360×640, 390×844, 1280×800; adjust `--unit` floor or hit-area padding if needed
 
 ## 5. Quality gates and docs
 
-- [ ] 5.1 Smoke test: start Week from title, verify `?week=` in URL, Monday LOAD renders; 5-column layout assertion at 360×640
-- [ ] 5.2 ESLint, typecheck, unit tests, build green
-- [ ] 5.3 README: Week mode, seeded links, tuning profiles in `core/profiles.ts`
+- [x] 5.1 Smoke test: start Week from title, verify `?week=` in URL, Monday LOAD renders; 5-column layout assertion at 360×640
+- [x] 5.2 ESLint, typecheck, unit tests, build green
+- [x] 5.3 README: Week mode, seeded links, tuning profiles in `core/profiles.ts`

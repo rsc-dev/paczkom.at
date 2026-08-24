@@ -68,7 +68,10 @@ button {
 #app[data-screen='title'] #screen-title,
 #app[data-screen='howto'] #screen-howto,
 #app[data-screen='game'] #screen-game,
-#app[data-screen='result'] #screen-result {
+#app[data-screen='result'] #screen-result,
+#app[data-screen='day'] #screen-day,
+#app[data-screen='week'] #screen-week,
+#app[data-screen='fail'] #screen-fail {
   display: flex;
   flex-direction: column;
 }
@@ -628,6 +631,25 @@ button {
   content: '×';
 }
 
+/* A stuck door. The marker wins over the state glyph: it is the thing in the
+   way, and it is what the next tap will deal with. */
+.door[data-jammed='true'] .door__mark::after {
+  content: '⚠';
+}
+
+.door[data-jammed='true'] .door__face {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--door-face-empty) 0 5px,
+    var(--door-outgoing) 5px 10px
+  );
+  border-color: var(--door-ink);
+}
+
+.door[data-jammed='true'] .door__face::after {
+  opacity: 0.5;
+}
+
 /* Door states -------------------------------------------------------------- */
 
 .door[data-state='full'] .door__face {
@@ -848,6 +870,101 @@ button {
 
 .share-fallback[hidden] {
   display: none;
+}
+
+/* ------------------------------------------------------------------ stars */
+
+/*
+ * Reputation. A typographic star rather than an emoji, so it takes the theme's
+ * accent and sits on the same baseline as the rest of the HUD.
+ */
+.stars {
+  display: inline-flex;
+  gap: 0.1em;
+  line-height: 1;
+}
+
+.stars__star::after {
+  content: '★';
+  color: var(--hairline);
+}
+
+.stars__star[data-filled='true']::after {
+  color: var(--accent);
+}
+
+.stars--large {
+  font-size: var(--step-2);
+}
+
+.stars__star[data-lost='true']::after {
+  animation: star-lost var(--motion-slow, 480ms) var(--ease) both;
+}
+
+@keyframes star-lost {
+  0% {
+    color: var(--accent);
+    transform: scale(1);
+  }
+  40% {
+    color: var(--accent);
+    transform: scale(1.25);
+  }
+  100% {
+    color: var(--hairline);
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars__star[data-lost='true']::after {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------- week table */
+
+.week-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--step-0);
+  font-variant-numeric: tabular-nums;
+}
+
+.week-table td {
+  padding: var(--space-1) 0;
+  border-block-end: 1px solid var(--hairline);
+}
+
+.week-table td:first-child {
+  font-weight: 700;
+  inline-size: 4rem;
+}
+
+.week-table td:last-child {
+  text-align: end;
+}
+
+.week-table tr[data-failed='true'] td {
+  color: var(--accent);
+}
+
+.fail__lead {
+  font-size: var(--step-1);
+  color: var(--ink-soft);
+  max-inline-size: 34ch;
+  margin: 0;
+}
+
+.hud__note {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.btn--week {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
 }
 
 .visually-hidden {

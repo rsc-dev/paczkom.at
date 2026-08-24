@@ -7,7 +7,27 @@ import { formatTime } from '../core/share.js';
 import { isMessageKey, t } from '../i18n/index.js';
 import { need, setHidden, setText } from './dom.js';
 
-export type ScreenName = 'title' | 'howto' | 'game' | 'result';
+export type ScreenName =
+  | 'title'
+  | 'howto'
+  | 'game'
+  | 'result'
+  /** Between two days of a Week. */
+  | 'day'
+  /** After Saturday. */
+  | 'week'
+  /** When the stars run out. */
+  | 'fail';
+
+const SCREEN_NAMES: readonly ScreenName[] = [
+  'title',
+  'howto',
+  'game',
+  'result',
+  'day',
+  'week',
+  'fail',
+];
 
 export interface TitleNodes {
   readonly stats: HTMLElement;
@@ -30,6 +50,8 @@ export interface ResultNodes {
 export interface TitleModel {
   readonly streak: number;
   readonly best: number;
+  /** Highest total from a completed Week; 0 before the first one. */
+  readonly weekBest: number;
   /** False when the browser refused to store anything. */
   readonly persistent: boolean;
 }
@@ -54,7 +76,7 @@ export function showScreen(app: HTMLElement, name: ScreenName): void {
 
 export function currentScreen(app: HTMLElement): ScreenName {
   const name = app.dataset['screen'];
-  return name === 'howto' || name === 'game' || name === 'result' ? name : 'title';
+  return SCREEN_NAMES.find((screen) => screen === name) ?? 'title';
 }
 
 /** Fills every element carrying a `data-t` key. Re-run on a language switch. */
@@ -72,6 +94,9 @@ export function renderTitle(nodes: TitleNodes, model: TitleModel): void {
     model.streak > 0
       ? [t('title.streak', { count: model.streak }), t('title.best', { score: model.best })]
       : [t('title.noStreak')];
+  if (model.weekBest > 0) {
+    parts.push(t('title.weekBest', { score: model.weekBest }));
+  }
   setText(nodes.stats, parts.join(' · '));
   setText(nodes.note, model.persistent ? '' : t('title.noStorage'));
 }

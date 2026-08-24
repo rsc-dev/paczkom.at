@@ -14,14 +14,25 @@ import './theme/app.css';
 import { createSfx } from './audio/sfx.js';
 import { initialState, reduce, slotOutcomes } from './core/game.js';
 import type { Action, State } from './core/game.js';
-import { buildGrid, buildShareText } from './core/share.js';
-import { currentStreak, finishDailyRun, readBest, startDailyRun } from './run.js';
-import type { DayRun, RunEnvironment } from './run.js';
+import { buildGrid, buildShareText, buildWeekShareText } from './core/share.js';
+import { encodeSeed, seedFromText } from './core/week.js';
+import type { WeekState } from './core/week.js';
+import {
+  continueWeekRun,
+  currentStreak,
+  finishDailyRun,
+  finishWeekDay,
+  readBest,
+  readWeekBest,
+  startDailyRun,
+  startWeekRun,
+} from './run.js';
+import type { DayRun, RunEnvironment, WeekRun } from './run.js';
 import { STORAGE_KEYS, storage } from './storage.js';
 import { detectLang, getLang, otherLang, setLang, t } from './i18n/index.js';
-import { need, setText } from './ui/dom.js';
+import { need, setHidden, setText } from './ui/dom.js';
 import { bindGameInput, onFirstGesture } from './ui/input.js';
-import { createGameView, renderGame } from './ui/render.js';
+import { createGameView, rebuildWall, renderGame } from './ui/render.js';
 import type { GameView } from './ui/render.js';
 import { shareText, targetsFrom } from './ui/share.js';
 import {
@@ -36,6 +47,15 @@ import {
   titleNodes,
 } from './ui/screens.js';
 import type { ResultModel } from './ui/screens.js';
+import {
+  dayScreenNodes,
+  failScreenNodes,
+  renderDayScreen,
+  renderFailScreen,
+  renderWeekScreen,
+  weekScreenNodes,
+  weekShareDays,
+} from './ui/week-screens.js';
 
 /** A frame after a backgrounded tab can be minutes long; do not lose the day. */
 const MAX_FRAME_MS = 250;
@@ -43,6 +63,9 @@ const MAX_FRAME_MS = 250;
 const app = need<HTMLElement>(document, '#app');
 const title = titleNodes(document);
 const result = resultNodes(document);
+const dayScreen = dayScreenNodes(document);
+const weekScreen = weekScreenNodes(document);
+const failScreen = failScreenNodes(document);
 
 /** The clock and the storage the run logic reads; injected so it is testable. */
 const env: RunEnvironment = { now: () => new Date(), storage };
@@ -55,6 +78,8 @@ let view: GameView;
 let frameHandle = 0;
 let lastFrame = 0;
 let lastResult: ResultModel | null = null;
+/** The week the last finished day belonged to, for the share buttons. */
+let lastWeek: WeekState | null = null;
 
 const sfx = createSfx({ muted: storage.get<boolean>(STORAGE_KEYS.mute) ?? false });
 
@@ -97,6 +122,7 @@ function renderChrome(): void {
   renderTitle(title, {
     streak: currentStreak(env),
     best: readBest(storage),
+    weekBest: readWeekBest(storage),
     persistent: storage.persistent,
   });
   if (lastResult !== null) {
@@ -104,11 +130,33 @@ function renderChrome(): void {
   }
 }
 
+/** Reputation goes in the HUD during a Week, and nowhere else. */
+function hudStars(): { stars: number } | null {
+  return run !== null && run.mode === 'week' ? { stars: run.week.stars } : null;
+}
+
 /** Re-renders whatever is on screen; used after a language switch. */
 function renderCurrent(): void {
   renderChrome();
-  if (currentScreen(app) === 'game') {
-    renderGame(view, game);
+  const screen = currentScreen(app);
+  if (screen === 'game') {
+    renderGame(view, game, hudStars());
+    return;
+  }
+  if (lastWeek === null) {
+    return;
+  }
+  const day = lastWeek.days.at(-1);
+  if (screen === 'day' && day !== undefined) {
+    renderDayScreen(dayScreen, lastWeek, day);
+  } else if (screen === 'week') {
+    renderWeekScreen(weekScreen, {
+      week: lastWeek,
+      best: readWeekBest(storage),
+      isBest: false,
+    });
+  } else if (screen === 'fail') {
+    renderFailScreen(failScreen, lastWeek);
   }
 }
 
@@ -122,7 +170,7 @@ function dispatch(action: Action): void {
   }
   game = next;
   if (currentScreen(app) === 'game') {
-    renderGame(view, game);
+    renderGame(view, game, hudStars());
   }
   // On the *transition* into SUMMARY, never on being in it: a second call would
   // file the same day twice and turn the real result into a practice run.
@@ -155,33 +203,140 @@ function stopLoop(): void {
 
 // ------------------------------------------------------------- day lifecycle
 
-function startDay(): void {
-  // The date and the seed are decided here, not at boot: a tab left open past
-  // midnight UTC starts today's day, and a day started at 23:59 stays that day.
-  run = startDailyRun(env);
-  game = initialState(run.seed, run.profile);
+/** Puts a day on the screen and starts its clock. */
+function playRun(next: DayRun): void {
+  run = next;
+  game = initialState(next.seed, next.profile);
   hideShareFallback(result);
-  renderGame(view, game);
+  // A Week day can be a different size from the one before it.
+  rebuildWall(view, game);
+  renderGame(view, game, hudStars());
   showScreen(app, 'game');
   dispatch({ type: 'start' });
   startLoop();
 }
 
+function startDay(): void {
+  // The date and the seed are decided here, not at boot: a tab left open past
+  // midnight UTC starts today's day, and a day started at 23:59 stays that day.
+  playRun(startDailyRun(env));
+}
+
+function startWeek(seed: number): void {
+  const week = startWeekRun(seed);
+  writeWeekSeed(week.week.seed);
+  playRun(week);
+}
+
 function finishDay(): void {
   stopLoop();
   const summary = game.summary;
-  if (summary === null || run === null || run.mode !== 'daily') {
+  if (summary === null || run === null) {
+    return;
+  }
+  const grid = buildGrid(game.slots, slotOutcomes(game));
+
+  if (run.mode === 'week') {
+    finishWeekDayScreen(run, grid);
     return;
   }
 
-  lastResult = finishDailyRun(env, run, summary, buildGrid(game.slots, slotOutcomes(game)));
-
+  lastResult = finishDailyRun(env, run, summary, grid);
   renderChrome();
   renderResult(result, lastResult);
   showScreen(app, 'result');
 }
 
+function finishWeekDayScreen(weekRun: WeekRun, grid: readonly string[]): void {
+  const summary = game.summary;
+  if (summary === null) {
+    return;
+  }
+  const outcome = finishWeekDay(env, weekRun, summary, grid);
+  lastWeek = outcome.week;
+  run = { ...weekRun, week: outcome.week };
+  renderChrome();
+
+  if (outcome.week.status === 'failed') {
+    renderFailScreen(failScreen, outcome.week);
+    showScreen(app, 'fail');
+    return;
+  }
+  if (outcome.week.status === 'done') {
+    renderWeekScreen(weekScreen, {
+      week: outcome.week,
+      best: outcome.best,
+      isBest: outcome.isBest,
+    });
+    showScreen(app, 'week');
+    return;
+  }
+  renderDayScreen(dayScreen, outcome.week, outcome.day);
+  showScreen(app, 'day');
+}
+
+function nextWeekDay(): void {
+  if (run === null || run.mode !== 'week') {
+    return;
+  }
+  playRun(continueWeekRun(run.week));
+}
+
+// ------------------------------------------------------- the seed in the URL
+
+/** `?week=<seed>` from the address bar, or `null` if there is not one. */
+function readWeekSeed(): number | null {
+  const text = new URLSearchParams(window.location.search).get('week');
+  return text === null || text === '' ? null : seedFromText(text);
+}
+
+/**
+ * Puts the seed in the address bar without navigating, so the URL is shareable
+ * from the moment the week starts rather than only at the end of it.
+ */
+function writeWeekSeed(seed: number | null): void {
+  const url = new URL(window.location.href);
+  if (seed === null) {
+    url.searchParams.delete('week');
+  } else {
+    url.searchParams.set('week', encodeSeed(seed));
+  }
+  window.history.replaceState(null, '', url);
+}
+
+/** A week nobody has played before. */
+function randomWeekSeed(): number {
+  return Math.floor(Math.random() * 0xffffffff) >>> 0;
+}
+
 // ------------------------------------------------------------------- share
+
+async function onWeekShare(): Promise<void> {
+  if (lastWeek === null) {
+    return;
+  }
+  const text = buildWeekShareText({
+    modeLabel: t('week.share.mode'),
+    days: weekShareDays(lastWeek),
+    seed: encodeSeed(lastWeek.seed),
+  });
+
+  const outcome = await shareText(text, targetsFrom(navigator));
+  if (outcome === 'dismissed') {
+    return;
+  }
+  if (outcome === 'manual') {
+    weekScreen.fallback.value = text;
+    setHidden(weekScreen.fallback, false);
+    weekScreen.fallback.select();
+  } else {
+    setHidden(weekScreen.fallback, true);
+  }
+  setText(
+    weekScreen.shareNote,
+    t(outcome === 'shared' ? 'share.shared' : outcome === 'copied' ? 'share.copied' : 'share.manual'),
+  );
+}
 
 async function onShare(): Promise<void> {
   if (lastResult === null) {
@@ -260,6 +415,40 @@ function boot(): void {
   onClick('#btn-share', () => {
     void onShare();
   });
+
+  // ---- week ----
+  const goHome = (): void => {
+    stopLoop();
+    run = null;
+    lastWeek = null;
+    writeWeekSeed(null);
+    showScreen(app, 'title');
+    renderChrome();
+  };
+  const retryWeek = (): void => {
+    if (lastWeek !== null) {
+      startWeek(lastWeek.seed);
+    }
+  };
+  const newWeek = (): void => {
+    startWeek(randomWeekSeed());
+  };
+
+  onClick('#btn-week', newWeek);
+  onClick('#btn-next-day', nextWeekDay);
+  onClick('#btn-week-retry', retryWeek);
+  onClick('#btn-fail-retry', retryWeek);
+  onClick('#btn-week-new', newWeek);
+  onClick('#btn-fail-new', newWeek);
+  onClick('#btn-week-home', goHome);
+  onClick('#btn-fail-home', goHome);
+  onClick('#btn-week-share', () => {
+    void onWeekShare();
+  });
+  onClick('#btn-fail-share', () => {
+    void onWeekShare();
+  });
+
   onClick('#btn-lang', toggleLanguage);
   onClick('#btn-lang-game', toggleLanguage);
   onClick('#btn-mute', toggleMute);
@@ -276,6 +465,12 @@ function boot(): void {
   renderChrome();
   renderGame(view, game);
   showScreen(app, 'title');
+
+  // A shared link opens straight into that week.
+  const shared = readWeekSeed();
+  if (shared !== null) {
+    startWeek(shared);
+  }
 }
 
 boot();

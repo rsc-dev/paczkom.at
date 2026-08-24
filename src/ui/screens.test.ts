@@ -82,7 +82,7 @@ describe('applyStaticText', () => {
 
 describe('renderTitle', () => {
   it('shows the streak and best once there is one', () => {
-    renderTitle(titleNodes(document), { streak: 4, best: 3200, persistent: true });
+    renderTitle(titleNodes(document), { streak: 4, best: 3200, weekBest: 0, persistent: true });
     const stats = document.querySelector('#title-stats')?.textContent ?? '';
     expect(stats).toContain('4');
     expect(stats).toContain('3200');
@@ -90,12 +90,12 @@ describe('renderTitle', () => {
   });
 
   it('says so before the first game', () => {
-    renderTitle(titleNodes(document), { streak: 0, best: 0, persistent: true });
+    renderTitle(titleNodes(document), { streak: 0, best: 0, weekBest: 0, persistent: true });
     expect(document.querySelector('#title-stats')?.textContent).toBe('Dziś jeszcze bez gry');
   });
 
   it('warns when the browser will not remember anything', () => {
-    renderTitle(titleNodes(document), { streak: 0, best: 0, persistent: false });
+    renderTitle(titleNodes(document), { streak: 0, best: 0, weekBest: 0, persistent: false });
     expect(document.querySelector('#title-note')?.textContent).not.toBe('');
   });
 });
