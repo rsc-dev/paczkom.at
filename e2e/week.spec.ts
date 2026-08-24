@@ -187,3 +187,64 @@ test('running out of stars ends the week on the reklamacja screen', async ({ pag
   await expect(page.locator('#btn-fail-retry')).toBeVisible();
   await expect(page.locator('#btn-fail-new')).toBeVisible();
 });
+
+test('the fail screen shares the week where the player can see it', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  // No share sheet, no clipboard: the text has to appear on the page itself.
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
+  });
+  await page.goto(`/?week=${SEED}`);
+
+  await idleThroughDay(page);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'fail');
+
+  await page.locator('#btn-fail-share').click();
+
+  // The confirmation and the text land on the Reklamacja screen, not on the
+  // hidden week summary.
+  await expect(page.locator('#fail-share-note')).not.toBeEmpty();
+  await expect(page.locator('#fail-share-fallback')).toBeVisible();
+  await expect(page.locator('#fail-share-fallback')).toHaveValue(/paczkom\.at/);
+  await expect(page.locator('#fail-share-fallback')).toHaveValue(new RegExp(`\\?week=${SEED}`));
+  await expect(page.locator('#week-share-note')).toBeEmpty();
+});
+
+test('retry replays the same week, new week does not', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  await page.goto(`/?week=${SEED}`);
+  await idleThroughDay(page);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'fail');
+
+  // Retry: Monday again, same seed in the URL, same first parcel.
+  await page.locator('#btn-fail-retry').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
+  await expect(page).toHaveURL(new RegExp(`\\?week=${SEED}`));
+  await expect(page.locator('.door')).toHaveCount(14);
+  await expect(page.locator('#hud-stars .stars__star[data-filled="true"]')).toHaveCount(3);
+  const retried = await page.locator('#panel-code').textContent();
+
+  await idleThroughDay(page);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'fail');
+
+  // New week: a different seed, and a different Monday.
+  await page.locator('#btn-fail-new').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
+  const url = new URL(page.url());
+  expect(url.searchParams.get('week')).not.toBe(SEED);
+  expect(url.searchParams.get('week')).toMatch(/^[0-9a-z]+$/);
+  await expect(page.locator('#panel-code')).not.toHaveText(retried ?? '');
+});
+
+test('an auto-capitalised link is still the same week', async ({ page }) => {
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  await page.goto(`/?week=${SEED}`);
+  const lower = await page.locator('#panel-code').textContent();
+
+  await page.goto(`/?week=${SEED.toUpperCase()}`);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
+  await expect(page.locator('#panel-code')).toHaveText(lower ?? '');
+});

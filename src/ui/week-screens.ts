@@ -4,11 +4,12 @@
  * out. All three read a `WeekState` and nothing else.
  */
 import { formatTime } from '../core/share.js';
-import { STARTING_STARS, WEEK_LENGTH, dayReached, totalScore } from '../core/week.js';
+import { WEEK_LENGTH, dayReached, totalScore } from '../core/week.js';
 import type { DayResult, WeekState } from '../core/week.js';
 import { WEEK_DAY_KEYS } from '../core/profiles.js';
 import { t } from '../i18n/index.js';
 import { need, setHidden, setText } from './dom.js';
+import type { ScreenName } from './screens.js';
 import { renderStars } from './stars.js';
 
 export interface DayScreenNodes {
@@ -20,17 +21,21 @@ export interface DayScreenNodes {
   readonly stats: HTMLElement;
 }
 
-export interface WeekScreenNodes {
+/** Where a share confirmation and its fallback text go on a given screen. */
+export interface ShareOutlet {
+  readonly shareNote: HTMLElement;
+  readonly fallback: HTMLTextAreaElement;
+}
+
+export interface WeekScreenNodes extends ShareOutlet {
   readonly kicker: HTMLElement;
   readonly total: HTMLElement;
   readonly stars: HTMLElement;
   readonly best: HTMLElement;
   readonly rows: HTMLElement;
-  readonly shareNote: HTMLElement;
-  readonly fallback: HTMLTextAreaElement;
 }
 
-export interface FailScreenNodes {
+export interface FailScreenNodes extends ShareOutlet {
   readonly kicker: HTMLElement;
   readonly total: HTMLElement;
   readonly incidents: HTMLElement;
@@ -129,8 +134,7 @@ export function renderWeekScreen(nodes: WeekScreenNodes, model: WeekSummaryModel
     }),
   );
 
-  setText(nodes.shareNote, '');
-  setHidden(nodes.fallback, true);
+  clearShareOutlet(nodes);
 }
 
 export function renderFailScreen(nodes: FailScreenNodes, week: WeekState): void {
@@ -141,6 +145,35 @@ export function renderFailScreen(nodes: FailScreenNodes, week: WeekState): void 
   );
   setText(nodes.total, String(totalScore(week)));
   listItems(nodes.incidents, last === undefined ? [] : incidentLines(last));
+  clearShareOutlet(nodes);
+}
+
+/**
+ * Which screen's share outlet to write to. A week can be shared from the week
+ * summary or from the Reklamacja screen, and the confirmation has to land on
+ * the one the player is looking at — the other is hidden, so a note written
+ * there is a note nobody ever reads.
+ */
+export function weekShareOutlet(
+  screen: ScreenName,
+  week: WeekScreenNodes,
+  fail: FailScreenNodes,
+): ShareOutlet {
+  return screen === 'fail' ? fail : week;
+}
+
+/** A freshly rendered screen has nothing to say about a share that has not happened. */
+export function clearShareOutlet(outlet: ShareOutlet): void {
+  setText(outlet.shareNote, '');
+  setHidden(outlet.fallback, true);
+}
+
+/** Puts the share text where the player can select it, on whichever screen they are on. */
+export function showShareText(outlet: ShareOutlet, text: string): void {
+  outlet.fallback.value = text;
+  setHidden(outlet.fallback, false);
+  outlet.fallback.focus();
+  outlet.fallback.select();
 }
 
 export function dayScreenNodes(root: ParentNode): DayScreenNodes {
@@ -171,6 +204,8 @@ export function failScreenNodes(root: ParentNode): FailScreenNodes {
     kicker: need<HTMLElement>(root, '#fail-kicker'),
     total: need<HTMLElement>(root, '#fail-total'),
     incidents: need<HTMLElement>(root, '#fail-incidents'),
+    shareNote: need<HTMLElement>(root, '#fail-share-note'),
+    fallback: need<HTMLTextAreaElement>(root, '#fail-share-fallback'),
   };
 }
 
@@ -189,4 +224,3 @@ export function weekShareDays(week: WeekState): {
   }));
 }
 
-export { STARTING_STARS };

@@ -16,7 +16,6 @@ import { initialState, reduce, slotOutcomes } from './core/game.js';
 import type { Action, State } from './core/game.js';
 import { buildGrid, buildShareText, buildWeekShareText } from './core/share.js';
 import { encodeSeed, seedFromText } from './core/week.js';
-import type { WeekState } from './core/week.js';
 import {
   continueWeekRun,
   currentStreak,
@@ -27,7 +26,7 @@ import {
   startDailyRun,
   startWeekRun,
 } from './run.js';
-import type { DayRun, RunEnvironment, WeekRun } from './run.js';
+import type { DayRun, RunEnvironment, WeekOutcome, WeekRun } from './run.js';
 import { STORAGE_KEYS, storage } from './storage.js';
 import { detectLang, getLang, otherLang, setLang, t } from './i18n/index.js';
 import { need, setHidden, setText } from './ui/dom.js';
@@ -46,15 +45,17 @@ import {
   showShareFallback,
   titleNodes,
 } from './ui/screens.js';
-import type { ResultModel } from './ui/screens.js';
+import type { ResultModel, ScreenName } from './ui/screens.js';
 import {
   dayScreenNodes,
   failScreenNodes,
   renderDayScreen,
   renderFailScreen,
   renderWeekScreen,
+  showShareText,
   weekScreenNodes,
   weekShareDays,
+  weekShareOutlet,
 } from './ui/week-screens.js';
 
 /** A frame after a backgrounded tab can be minutes long; do not lose the day. */
@@ -78,8 +79,13 @@ let view: GameView;
 let frameHandle = 0;
 let lastFrame = 0;
 let lastResult: ResultModel | null = null;
-/** The week the last finished day belonged to, for the share buttons. */
-let lastWeek: WeekState | null = null;
+/**
+ * The last finished Week day: the run it belonged to, and what the week layer
+ * made of it. Kept so a language switch can re-render the screen exactly as it
+ * was — including "new best", which is not recoverable from storage once the
+ * best has been written.
+ */
+let lastWeekOutcome: WeekOutcome | null = null;
 
 const sfx = createSfx({ muted: storage.get<boolean>(STORAGE_KEYS.mute) ?? false });
 
@@ -143,20 +149,24 @@ function renderCurrent(): void {
     renderGame(view, game, hudStars());
     return;
   }
-  if (lastWeek === null) {
+  if (lastWeekOutcome === null) {
     return;
   }
-  const day = lastWeek.days.at(-1);
-  if (screen === 'day' && day !== undefined) {
-    renderDayScreen(dayScreen, lastWeek, day);
+  renderWeekEnd(lastWeekOutcome, screen);
+}
+
+/** Draws whichever of the three week screens is showing, from one outcome. */
+function renderWeekEnd(outcome: WeekOutcome, screen: ScreenName): void {
+  if (screen === 'day') {
+    renderDayScreen(dayScreen, outcome.week, outcome.day);
   } else if (screen === 'week') {
     renderWeekScreen(weekScreen, {
-      week: lastWeek,
-      best: readWeekBest(storage),
-      isBest: false,
+      week: outcome.week,
+      best: outcome.best,
+      isBest: outcome.isBest,
     });
   } else if (screen === 'fail') {
-    renderFailScreen(failScreen, lastWeek);
+    renderFailScreen(failScreen, outcome.week);
   }
 }
 
@@ -253,26 +263,14 @@ function finishWeekDayScreen(weekRun: WeekRun, grid: readonly string[]): void {
     return;
   }
   const outcome = finishWeekDay(env, weekRun, summary, grid);
-  lastWeek = outcome.week;
+  lastWeekOutcome = outcome;
   run = { ...weekRun, week: outcome.week };
   renderChrome();
 
-  if (outcome.week.status === 'failed') {
-    renderFailScreen(failScreen, outcome.week);
-    showScreen(app, 'fail');
-    return;
-  }
-  if (outcome.week.status === 'done') {
-    renderWeekScreen(weekScreen, {
-      week: outcome.week,
-      best: outcome.best,
-      isBest: outcome.isBest,
-    });
-    showScreen(app, 'week');
-    return;
-  }
-  renderDayScreen(dayScreen, outcome.week, outcome.day);
-  showScreen(app, 'day');
+  const screen =
+    outcome.week.status === 'failed' ? 'fail' : outcome.week.status === 'done' ? 'week' : 'day';
+  renderWeekEnd(outcome, screen);
+  showScreen(app, screen);
 }
 
 function nextWeekDay(): void {
@@ -312,13 +310,14 @@ function randomWeekSeed(): number {
 // ------------------------------------------------------------------- share
 
 async function onWeekShare(): Promise<void> {
-  if (lastWeek === null) {
+  if (lastWeekOutcome === null) {
     return;
   }
+  const outlet = weekShareOutlet(currentScreen(app), weekScreen, failScreen);
   const text = buildWeekShareText({
     modeLabel: t('week.share.mode'),
-    days: weekShareDays(lastWeek),
-    seed: encodeSeed(lastWeek.seed),
+    days: weekShareDays(lastWeekOutcome.week),
+    seed: encodeSeed(lastWeekOutcome.week.seed),
   });
 
   const outcome = await shareText(text, targetsFrom(navigator));
@@ -326,14 +325,12 @@ async function onWeekShare(): Promise<void> {
     return;
   }
   if (outcome === 'manual') {
-    weekScreen.fallback.value = text;
-    setHidden(weekScreen.fallback, false);
-    weekScreen.fallback.select();
+    showShareText(outlet, text);
   } else {
-    setHidden(weekScreen.fallback, true);
+    setHidden(outlet.fallback, true);
   }
   setText(
-    weekScreen.shareNote,
+    outlet.shareNote,
     t(outcome === 'shared' ? 'share.shared' : outcome === 'copied' ? 'share.copied' : 'share.manual'),
   );
 }
@@ -420,14 +417,14 @@ function boot(): void {
   const goHome = (): void => {
     stopLoop();
     run = null;
-    lastWeek = null;
+    lastWeekOutcome = null;
     writeWeekSeed(null);
     showScreen(app, 'title');
     renderChrome();
   };
   const retryWeek = (): void => {
-    if (lastWeek !== null) {
-      startWeek(lastWeek.seed);
+    if (lastWeekOutcome !== null) {
+      startWeek(lastWeekOutcome.week.seed);
     }
   };
   const newWeek = (): void => {

@@ -7,6 +7,7 @@ import { setLang } from '../i18n/index.js';
 import { renderStars } from './stars.js';
 import { mountApp } from './testing.js';
 import {
+  clearShareOutlet,
   dayLabel,
   dayName,
   dayScreenNodes,
@@ -15,6 +16,7 @@ import {
   renderDayScreen,
   renderFailScreen,
   renderWeekScreen,
+  showShareText,
   weekScreenNodes,
   weekShareDays,
 } from './week-screens.js';
@@ -164,6 +166,21 @@ describe('week summary', () => {
     expect(document.querySelector('#week-best')?.textContent).toContain('9000');
   });
 
+  it('keeps the new-best marker when the language is switched', () => {
+    // The language toggle re-renders from the cached outcome, not from storage:
+    // by then the best has already been written, so storage can no longer tell
+    // us the run beat it.
+    const nodes = weekScreenNodes(document);
+    const model = { week: finished(), best: 7000, isBest: true };
+    renderWeekScreen(nodes, model);
+    expect(nodes.best.textContent).toBe('Nowy rekord tygodnia');
+
+    setLang('en');
+    renderWeekScreen(nodes, model);
+    expect(nodes.best.textContent).toBe('New best week');
+    expect(nodes.best.textContent).not.toContain('7000');
+  });
+
   it('clears any stale share confirmation', () => {
     const nodes = weekScreenNodes(document);
     nodes.shareNote.textContent = 'Skopiowano';
@@ -188,6 +205,54 @@ describe('week summary', () => {
       stars: 0,
       failed: true,
     });
+  });
+});
+
+describe('sharing a week', () => {
+  it('puts the text and the confirmation on the screen the player is looking at', () => {
+    // Both screens have their own outlet; the week summary's is hidden while
+    // the Reklamacja screen is up, so a note written there is a note nobody
+    // ever reads.
+    const week = weekScreenNodes(document);
+    const fail = failScreenNodes(document);
+    expect(week.shareNote).not.toBe(fail.shareNote);
+    expect(week.fallback).not.toBe(fail.fallback);
+
+    showShareText(fail, 'paczkom.at · Tydzień');
+    expect(fail.fallback.hidden).toBe(false);
+    expect(fail.fallback.value).toBe('paczkom.at · Tydzień');
+    expect(fail.fallback.readOnly).toBe(true);
+    // The week summary's own box is untouched.
+    expect(week.fallback.hidden).toBe(true);
+    expect(week.fallback.value).toBe('');
+  });
+
+  it('selects the text so it can be copied by hand', () => {
+    const fail = failScreenNodes(document);
+    showShareText(fail, 'abc');
+    expect(document.activeElement).toBe(fail.fallback);
+    expect(fail.fallback.selectionStart).toBe(0);
+    expect(fail.fallback.selectionEnd).toBe(3);
+  });
+
+  it('clears a stale confirmation when a screen is rendered again', () => {
+    const fail = failScreenNodes(document);
+    showShareText(fail, 'abc');
+    fail.shareNote.textContent = 'Skopiowano';
+
+    renderFailScreen(fail, play(startWeek(1), { walked: 3 }));
+    expect(fail.shareNote.textContent).toBe('');
+    expect(fail.fallback.hidden).toBe(true);
+  });
+
+  it('is cleared on both screens independently', () => {
+    const week = weekScreenNodes(document);
+    const fail = failScreenNodes(document);
+    showShareText(week, 'week text');
+    clearShareOutlet(fail);
+    expect(week.fallback.hidden).toBe(false);
+    clearShareOutlet(week);
+    expect(week.fallback.hidden).toBe(true);
   });
 });
 
