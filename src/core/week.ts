@@ -129,11 +129,16 @@ export function encodeSeed(seed: number): string {
   return (seed >>> 0).toString(36);
 }
 
+/**
+ * Case is not part of a seed. Messengers and phone keyboards capitalise the
+ * first letter of a pasted link, and `?week=K3j9x` must still be that week.
+ */
 export function decodeSeed(text: string): number | null {
-  if (!/^[0-9a-z]{1,7}$/.test(text)) {
+  const normalised = text.toLowerCase();
+  if (!/^[0-9a-z]{1,7}$/.test(normalised)) {
     return null;
   }
-  const value = Number.parseInt(text, 36);
+  const value = Number.parseInt(normalised, 36);
   return Number.isSafeInteger(value) && value >= 0 && value <= 0xffffffff ? value : null;
 }
 

@@ -135,6 +135,69 @@ describe('jammed door', () => {
     expect(opened.score).toBeGreaterThan(before.score);
   });
 
+  it('does not cost the customer an outcome tier', () => {
+    // Hesitate almost long enough for a hint, then find the right door: the
+    // jam takes a tap to shift, and that tap must restart the idle timer the
+    // way any other tap does. Otherwise the wrestle itself earns the hint.
+    let state = atJam(11);
+    const stuck = state.slots.find((slot) => slot.jammed);
+    const parcelId = stuck?.parcelId;
+    const owns = (customer: Customer): boolean =>
+      customer.kind === 'pickup' && customer.parcelId === parcelId;
+
+    state = advanceUntil(state, (candidate) =>
+      candidate.customers.some((customer) => customer.visible && owns(customer)),
+    );
+    const owner = state.customers.find((customer) => customer.visible && owns(customer));
+    state = reduce(state, { type: 'selectCustomer', customerId: owner?.id ?? '' });
+
+    state = reduce(state, { type: 'tick', dtMs: JAM.hintDelay1Ms - 100 });
+    expect(hintLevelOf(state, activeCustomer(state))).toBe(0);
+
+    const freed = reduce(state, { type: 'tapSlot', slotId: stuck?.id ?? '' });
+    expect(activeCustomer(freed)?.activeMs).toBe(0);
+
+    const opened = reduce(reduce(freed, { type: 'tick', dtMs: 200 }), {
+      type: 'tapSlot',
+      slotId: stuck?.id ?? '',
+    });
+    expect(findSlot(opened, stuck?.id ?? '')?.outcome).toBe('perfect');
+    expect(opened.stats.hinted).toBe(0);
+  });
+
+  it('falls back to a seeded door when its parcel never left the van', () => {
+    // Load everything *except* the parcel the jam is aimed at, so there are
+    // still customers coming but the target door does not exist.
+    const start = started(11, JAM);
+    const jam = start.schedule.filter(isJamEvent)[0];
+    expect(jam?.targetParcelId).not.toBeNull();
+
+    let state = start;
+    while (state.phase === 'LOAD') {
+      const parcel = currentParcel(state);
+      if (parcel === null || parcel.id === jam?.targetParcelId) {
+        break;
+      }
+      const slot = state.slots.find(
+        (candidate) =>
+          candidate.state === 'empty' &&
+          candidate.id !== jam?.fallbackSlotId &&
+          fits(parcel.size, candidate.size),
+      );
+      if (slot === undefined) {
+        break;
+      }
+      state = reduce(state, { type: 'tapSlot', slotId: slot.id });
+    }
+    state = reduce(state, { type: 'tick', dtMs: JAM.loadMs });
+    expect(state.stats.unplaced).toBeGreaterThan(0);
+    expect(state.slots.some((slot) => slot.parcelId === jam?.targetParcelId)).toBe(false);
+
+    state = advanceUntil(state, (candidate) => candidate.slots.some((slot) => slot.jammed));
+    const stuck = state.slots.find((slot) => slot.jammed);
+    expect(stuck?.id).toBe(jam?.fallbackSlotId);
+  });
+
   it('will not take a sender&#39;s parcel', () => {
     const sender = profileWith({
       id: 'test-jam-sender',

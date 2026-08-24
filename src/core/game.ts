@@ -577,9 +577,15 @@ function tickServe(state: State, dtMs: number): State {
  * The right door, but stuck. Freeing it costs a tap and nothing else: no
  * penalty, no mark against the customer, and the outcome they are heading for
  * is unchanged.
+ *
+ * That last part is why the idle timer restarts here as it does on any other
+ * tap. Without it, someone who hesitated five seconds and *then* found the
+ * right door would cross the hint threshold while wrestling with the jam, and
+ * a perfect service would be recorded as a hinted one.
  */
-function unjam(state: State, slot: SlotRuntime): State {
-  return withCue(patchSlot(state, slot.id, { jammed: false }), 'thunk');
+function unjam(state: State, customer: Customer, slot: SlotRuntime): State {
+  const freed = patchSlot(state, slot.id, { jammed: false });
+  return withCue(patchCustomer(freed, customer.id, { activeMs: 0 }), 'thunk');
 }
 
 function servePickup(state: State, customer: Customer, slot: SlotRuntime): State {
@@ -649,7 +655,7 @@ function tapSlotServe(state: State, slotId: string): State {
   const served = theirDoor
     ? // Their door, but stuck: the first tap frees it, the second opens it.
       slot.jammed
-      ? unjam(state, slot)
+      ? unjam(state, customer, slot)
       : servePickup(state, customer, slot)
     : customer.kind === 'sender' &&
         !slot.jammed &&

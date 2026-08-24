@@ -158,9 +158,17 @@ describe('seeds in links', () => {
   });
 
   it('refuse nonsense', () => {
-    for (const text of ['', 'ABC', 'k3j9x!', 'zzzzzzzzzz', '../etc']) {
+    for (const text of ['', 'k3j9x!', 'zzzzzzzzzz', '../etc', 'k3 j9x']) {
       expect(decodeSeed(text)).toBeNull();
     }
+  });
+
+  it('ignore case, because messengers capitalise pasted links', () => {
+    expect(decodeSeed('K3J9X')).toBe(decodeSeed('k3j9x'));
+    expect(decodeSeed('K3j9x')).toBe(decodeSeed('k3j9x'));
+    expect(seedFromText('K3J9X')).toBe(seedFromText('k3j9x'));
+    // ... and an auto-capitalised link is the same week, not a different one.
+    expect(seedFromText(encodeSeed(12345).toUpperCase())).toBe(12345);
   });
 
   it('take any text as a seed when the link was hand-written', () => {
