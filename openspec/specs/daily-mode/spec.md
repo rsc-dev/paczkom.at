@@ -13,11 +13,11 @@ The Daily seed SHALL be the FNV-1a 32-bit hash of the current UTC date formatted
 - **THEN** both values are equal
 
 ### Requirement: Daily profile
-Daily SHALL use the profile: 3 columns, 16 pickups, 4 senders, 2 look-alike pairs, LOAD 25 s, SERVE 65 s, patience 20 s.
+Daily SHALL use the Thursday profile: 3 columns, 15 pickups, 4 senders, 2 look-alike pairs, one jammed door, LOAD 25 s, SERVE 65 s, patience 20 s.
 
 #### Scenario: Profile applied
 - **WHEN** a Daily day is started
-- **THEN** the wall has 21 slots and the load queue has 16 parcels
+- **THEN** the wall has 21 slots, the load queue has 15 parcels, and the schedule contains one jam entry
 
 ### Requirement: First attempt counts
 The first completed Daily on a UTC date SHALL be stored as that date's result. Subsequent runs on the same date SHALL be practice: they replay the same seed, increment a practice counter, and SHALL NOT overwrite the result.

@@ -6,11 +6,15 @@ The site around the game: screens, installable static build output, zero runtime
 ## Requirements
 
 ### Requirement: Screens
-The site SHALL provide a title screen (name, Daily button, how-to button, PL/EN toggle, mute toggle, streak), a how-to screen explaining LOAD/SERVE/SWEEP in three short steps, the game screen, and the Daily result screen. All screens SHALL be reachable without page navigation.
+The site SHALL provide a title screen (name, Daily button, Week button, how-to button, PL/EN toggle, mute toggle, streak, best week), a how-to screen explaining LOAD/SERVE/SWEEP, events and stars in short steps, the game screen, the Daily result screen, the day-summary screen, the week-summary screen and the Reklamacja screen. All screens SHALL be reachable without page navigation.
 
 #### Scenario: Title to game
 - **WHEN** the user taps the Daily button on the title screen
 - **THEN** the game screen appears in LOAD phase
+
+#### Scenario: Title to week
+- **WHEN** the user taps the Week button on the title screen
+- **THEN** the game screen appears in LOAD phase with the Monday profile and the URL contains `?week=`
 
 ### Requirement: Installable static site
 The build SHALL emit a single `index.html`, a web manifest with name, icons and standalone display, a favicon, and a `CNAME` file containing `paczkom.at`.
