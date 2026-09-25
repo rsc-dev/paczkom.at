@@ -70,7 +70,7 @@ change what they produce, and review the diff:
 
 ```sh
 npm run gen:fixtures   # -> src/core/fixtures/scripted-days.ts
-npm run gen:icons      # -> public/icon-*.png, public/apple-touch-icon.png
+npm run gen:icons      # -> public/icon-*.png, public/apple-touch-icon.png, public/og.png
 ```
 
 The scripted days are the regression net for the whole game loop: a seed, a

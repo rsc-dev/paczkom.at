@@ -44,6 +44,7 @@ jobs:
           test -f dist/icon-192.png
           test -f dist/icon-512.png
           test -f dist/favicon.svg
+          test -f dist/og.png
           grep -qx 'paczkom.at' dist/CNAME
 
       - name: Install Chromium

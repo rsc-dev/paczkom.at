@@ -153,3 +153,26 @@ describe('deployment', () => {
     expect(readme).toContain('LAUNCH_EPOCH');
   });
 });
+
+describe('link previews', () => {
+  const html = read('index.html');
+  const meta = (attr: 'property' | 'name', key: string): string | undefined =>
+    new RegExp(`<meta ${attr}="${key}" content="([^"]*)"`).exec(html)?.[1];
+
+  it('describe the game to anything that unfurls a link', () => {
+    expect(meta('property', 'og:title')).toBe('paczkom.at');
+    expect(meta('property', 'og:description')).not.toBe('');
+    expect(meta('property', 'og:url')).toBe('https://paczkom.at/');
+    expect(meta('name', 'twitter:card')).toBe('summary_large_image');
+  });
+
+  it('point at an absolute image that ships, at the size they claim', () => {
+    expect(meta('property', 'og:image')).toBe('https://paczkom.at/og.png');
+    const png = readFileSync(join(root, 'public', 'og.png'));
+    expect(png.subarray(1, 4).toString('ascii')).toBe('PNG');
+    // IHDR: width and height are the first two big-endian words after the tag.
+    expect(png.readUInt32BE(16)).toBe(Number(meta('property', 'og:image:width')));
+    expect(png.readUInt32BE(20)).toBe(Number(meta('property', 'og:image:height')));
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+  });
+});

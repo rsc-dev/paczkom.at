@@ -21,11 +21,11 @@ The site SHALL provide a title screen (name, Daily button, Week button, a contin
 - **THEN** a continue action naming Thursday is visible, and it is hidden again once no run is saved
 
 ### Requirement: Installable static site
-The build SHALL emit a single `index.html`, a web manifest with name, icons and standalone display, a favicon, and a `CNAME` file containing `paczkom.at`.
+The build SHALL emit a single `index.html`, a web manifest with name, icons and standalone display, a favicon, a 1200×630 link-preview image `og.png` referenced by absolute URL from Open Graph and Twitter card tags in `index.html`, and a `CNAME` file containing `paczkom.at`.
 
 #### Scenario: Build output
 - **WHEN** `vite build` completes
-- **THEN** `dist/` contains `index.html`, `manifest.webmanifest`, `CNAME` with `paczkom.at`, and icon files
+- **THEN** `dist/` contains `index.html`, `manifest.webmanifest`, `CNAME` with `paczkom.at`, icon files and `og.png`
 
 ### Requirement: Zero runtime dependencies
 `package.json` SHALL declare no `dependencies`; all packages SHALL be `devDependencies`.

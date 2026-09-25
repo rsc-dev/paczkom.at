@@ -1,5 +1,6 @@
 /**
- * Renders the PWA icons from the same glyph as `public/favicon.svg`, with no
+ * Renders the PWA icons and the link-preview card from the same glyph as
+ * `public/favicon.svg`, with no
  * image library: a handful of rounded rectangles rasterised into a PNG that is
  * assembled by hand (zlib is in Node; CRC-32 is twenty lines).
  *
@@ -46,14 +47,29 @@ function insideRounded(box: Box, x: number, y: number): boolean {
   return dx * dx + dy * dy <= r * r;
 }
 
-/** RGBA pixels, 4× supersampled so the rounded corners do not look chewed. */
-function rasterise(size: number): Buffer {
-  const scale = size / 64;
-  const samples = 4;
-  const pixels = Buffer.alloc(size * size * 4);
+/**
+ * The link-preview card, 1200×630: the glyph centred on paper, in the same
+ * 64-unit design space scaled so one unit is 6 px (the glyph is 384 px tall).
+ */
+const CARD_WIDTH = 1200;
+const CARD_HEIGHT = 630;
+const CARD_UNIT = 6;
+const CARD: Box[] = [
+  { x: 0, y: 0, w: CARD_WIDTH / CARD_UNIT, h: CARD_HEIGHT / CARD_UNIT, r: 0, fill: PAPER },
+  ...GLYPH.map((box) => ({
+    ...box,
+    x: box.x + (CARD_WIDTH / CARD_UNIT - 64) / 2,
+    y: box.y + (CARD_HEIGHT / CARD_UNIT - 64) / 2,
+  })),
+];
 
-  for (let py = 0; py < size; py += 1) {
-    for (let px = 0; px < size; px += 1) {
+/** RGBA pixels, 4× supersampled so the rounded corners do not look chewed. */
+function rasterise(width: number, height: number, boxes: readonly Box[], scale: number): Buffer {
+  const samples = 4;
+  const pixels = Buffer.alloc(width * height * 4);
+
+  for (let py = 0; py < height; py += 1) {
+    for (let px = 0; px < width; px += 1) {
       let r = 0;
       let g = 0;
       let b = 0;
@@ -63,7 +79,7 @@ function rasterise(size: number): Buffer {
           const x = (px + (sx + 0.5) / samples) / scale;
           const y = (py + (sy + 0.5) / samples) / scale;
           let hit: Rgb | null = null;
-          for (const box of GLYPH) {
+          for (const box of boxes) {
             if (insideRounded(box, x, y)) {
               hit = box.fill;
             }
@@ -77,7 +93,7 @@ function rasterise(size: number): Buffer {
         }
       }
       const total = samples * samples;
-      const offset = (py * size + px) * 4;
+      const offset = (py * width + px) * 4;
       const coverage = a / total;
       // Un-premultiply so edge pixels keep their colour instead of going dark.
       const weight = a === 0 ? 0 : 255 / a;
@@ -115,19 +131,19 @@ function chunk(type: string, data: Buffer): Buffer {
   return Buffer.concat([length, body, crc]);
 }
 
-function encodePng(size: number, pixels: Buffer): Buffer {
+function encodePng(width: number, height: number, pixels: Buffer): Buffer {
   const header = Buffer.alloc(13);
-  header.writeUInt32BE(size, 0);
-  header.writeUInt32BE(size, 4);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
   header[8] = 8; // bit depth
   header[9] = 6; // truecolour with alpha
   header[10] = 0; // deflate
   header[11] = 0; // adaptive filtering
   header[12] = 0; // no interlace
 
-  const stride = size * 4;
-  const raw = Buffer.alloc((stride + 1) * size);
-  for (let y = 0; y < size; y += 1) {
+  const stride = width * 4;
+  const raw = Buffer.alloc((stride + 1) * height);
+  for (let y = 0; y < height; y += 1) {
     raw[y * (stride + 1)] = 0; // filter: none
     pixels.copy(raw, y * (stride + 1) + 1, y * stride, (y + 1) * stride);
   }
@@ -146,8 +162,13 @@ const targets: [string, number][] = [
   ['apple-touch-icon.png', 180],
 ];
 
-for (const [name, size] of targets) {
+const write = (name: string, width: number, height: number, pixels: Buffer): void => {
   const target = fileURLToPath(new URL(`../public/${name}`, import.meta.url));
-  writeFileSync(target, encodePng(size, rasterise(size)));
-  process.stdout.write(`wrote ${target} (${String(size)}px)\n`);
+  writeFileSync(target, encodePng(width, height, pixels));
+  process.stdout.write(`wrote ${target} (${String(width)}×${String(height)})\n`);
+};
+
+for (const [name, size] of targets) {
+  write(name, size, size, rasterise(size, size, GLYPH, size / 64));
 }
+write('og.png', CARD_WIDTH, CARD_HEIGHT, rasterise(CARD_WIDTH, CARD_HEIGHT, CARD, CARD_UNIT));
