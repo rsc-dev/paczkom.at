@@ -138,10 +138,9 @@ Pages via `upload-pages-artifact` and `deploy-pages`.
 
 ### Before the first deploy
 
-1. **Set the launch date.** `LAUNCH_EPOCH` in `src/core/daily.ts` is the date
-   that counts as Daily #1. It currently holds the placeholder `2026-09-01`.
-   Set it to the real launch date, or the Daily number will be wrong from the
-   first day.
+1. **The launch date is set.** `LAUNCH_EPOCH` in `src/core/daily.ts` is
+   `2026-09-25`, the date that counts as Daily #1. Never change it after launch:
+   every Daily number anyone has shared is counted from it.
 2. **Enable Pages.** Repository → Settings → Pages → Source: **GitHub Actions**.
 3. **Set the custom domain** to `paczkom.at` in the same settings page. That
    repository setting is what Pages actually serves from; `public/CNAME` ships
@@ -152,7 +151,7 @@ Pages via `upload-pages-artifact` and `deploy-pages`.
    | ------ | ----- | ------------------------------------------------------------------ |
    | A      | `@`   | `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` |
    | AAAA   | `@`   | `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153` |
-   | CNAME  | `www` | `<owner>.github.io.`                                               |
+   | CNAME  | `www` | `rsc-dev.github.io.`                                               |
 
    Until DNS propagates the site is reachable at the `github.io` URL. Once it
    has, tick **Enforce HTTPS** in the Pages settings.

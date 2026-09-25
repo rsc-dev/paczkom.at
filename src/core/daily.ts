@@ -6,8 +6,8 @@
  */
 import { fnv1a } from './rng.js';
 
-/** Day #1. Set to the real launch date before the first deploy (task 8.4). */
-export const LAUNCH_EPOCH = '2026-09-01';
+/** Day #1: the date paczkom.at went live. Never change it after launch. */
+export const LAUNCH_EPOCH = '2026-09-25';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const MS_PER_DAY = 86_400_000;
