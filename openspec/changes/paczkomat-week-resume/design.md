@@ -52,7 +52,7 @@ At boot, in this order:
 
 ### D5. Validation lives in the core
 
-`parseWeekState(value: unknown): WeekState | null` in `core/week.ts` accepts only a value the rules could have produced: `seed` an unsigned 32-bit integer; `status === 'playing'`; `dayIndex` an integer in `[0, WEEK_LENGTH)`; `stars` an integer in `[1, STARTING_STARS]`; `days` an array of exactly `dayIndex` entries whose `dayIndex` fields are `0..n-1` in order, with finite non-negative `score`, `timeMs`, `starsLost` and incident counts, integer `stars` in `[1, STARTING_STARS]` that never increase from one day to the next and end on the week's `stars`, and a `grid` of strings. Anything else is `null`; the caller removes the key.
+`parseWeekState(value: unknown): WeekState | null` in `core/week.ts` accepts only a value the rules could have produced: `seed` an unsigned 32-bit integer; `status === 'playing'`; `dayIndex` an integer in `[0, WEEK_LENGTH)`; `stars` an integer in `[1, STARTING_STARS]`; `days` an array of exactly `dayIndex` entries whose `dayIndex` fields are `0..n-1` in order, with finite non-negative `score`, `timeMs`, `starsLost` and incident counts, integer `stars` in `[1, STARTING_STARS]` that never increase from one day to the next, drop each day by exactly that day's `starsLost`, and end on the week's `stars`, and a `grid` of strings. Anything else is `null`; the caller removes the key.
 
 *Why in the core:* it is a pure function over data the core defines, and it is where the invariants (`WEEK_LENGTH`, `STARTING_STARS`) already live. The storage layer stays ignorant of what it stores.
 

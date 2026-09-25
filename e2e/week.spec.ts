@@ -255,6 +255,38 @@ test('the title offers to continue a saved week', async ({ page }) => {
   await expect(page.locator('.door')).toHaveCount(14);
 });
 
+test('a week with nothing filed yet resumes straight into Monday', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  await page.goto(`/?week=${SEED}`);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
+  const firstParcel = await page.locator('#panel-code').textContent();
+
+  await page.goto('/');
+  await page.locator('#btn-continue-week').click();
+  // There is no summary to show, so it is Monday again — the same Monday.
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
+  await expect(page.locator('#panel-code')).toHaveText(firstParcel ?? '');
+  await expect(page).toHaveURL(new RegExp(`week=${SEED}`));
+});
+
+test('a different link starts its own week instead of resuming the saved one', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  await page.goto(`/?week=${SEED}`);
+  await playDayWell(page);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'day');
+
+  await page.goto('/?week=abc12');
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
+  await expect(page.locator('#hud-stars .stars__star[data-filled="true"]')).toHaveCount(3);
+
+  // And that is the saved week now: Monday, nothing filed.
+  await page.goto('/');
+  await expect(page.locator('#btn-continue-week')).toContainText(/Poniedziałek|Monday/);
+});
+
 test('a week that is over leaves nothing to continue', async ({ page }) => {
   test.setTimeout(90_000);
   await page.setViewportSize({ width: 390, height: 844 });
