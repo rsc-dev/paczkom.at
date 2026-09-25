@@ -34,3 +34,6 @@ pnpm-debug.log*
 
 # Brainstorm companion sessions
 .superpowers/
+
+# agent-code-reviewer state
+.agent-review/
