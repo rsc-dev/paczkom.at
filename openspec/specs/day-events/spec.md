@@ -38,8 +38,8 @@ On a rain day every displayed pickup code SHALL have one seeded digit position m
 On a late-van day the LOAD duration SHALL be 60 % of the profile value and the HUD SHALL show a late-van note during LOAD.
 
 #### Scenario: Shortened load
-- **WHEN** Friday starts with LOAD 25 s and late van
-- **THEN** the LOAD timer is 15 s
+- **WHEN** Friday starts with LOAD 40 s and late van
+- **THEN** the LOAD timer is 24 s
 
 ### Requirement: Event determinism
 Jam slots and times, forgotten-code customers, and rain mask positions SHALL be derived from the day seed and SHALL be identical across replays of the same seed.

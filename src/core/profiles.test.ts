@@ -45,6 +45,15 @@ describe.each(PROFILES)('profile $id', (profile) => {
     expect(profile.forgotten).toBeLessThanOrEqual(profile.pickups);
     expect(profile.jams).toBeLessThanOrEqual(profile.pickups);
   });
+
+  /**
+   * A parcel left on the van costs a star, so the load budget is the sharpest
+   * edge in the game. Measured after the late van has taken its cut: a courier
+   * who cannot hesitate at all is not a courier anyone can be.
+   */
+  it('gives the courier at least a second per parcel, late van included', () => {
+    expect(loadDurationMs(profile) / profile.pickups).toBeGreaterThanOrEqual(1_000);
+  });
 });
 
 describe('the week', () => {
@@ -60,6 +69,17 @@ describe('the week', () => {
       expect(day?.columns).toBeGreaterThanOrEqual(before?.columns ?? 0);
       expect(day?.pickups).toBeGreaterThan(before?.pickups ?? 0);
       expect(day?.patienceMs).toBeLessThanOrEqual(before?.patienceMs ?? 0);
+    }
+  });
+
+  it('tightens the load budget per parcel day by day, and never by more than half', () => {
+    const budgets = WEEK_PROFILES.map((profile) => loadDurationMs(profile) / profile.pickups);
+    for (let i = 1; i < budgets.length; i += 1) {
+      const before = budgets[i - 1] ?? 0;
+      const today = budgets[i] ?? 0;
+      expect(today).toBeLessThanOrEqual(before);
+      // The old Friday halved Thursday's budget in one step; that is the cliff.
+      expect(today).toBeGreaterThanOrEqual(before / 2);
     }
   });
 
@@ -107,7 +127,7 @@ describe('loadDurationMs', () => {
 
   it('is 60 % of it when the van is late', () => {
     expect(LATE_VAN_FACTOR).toBe(0.6);
-    expect(loadDurationMs(SATURDAY)).toBe(15_000);
+    expect(loadDurationMs(SATURDAY)).toBe(30_000);
   });
 });
 

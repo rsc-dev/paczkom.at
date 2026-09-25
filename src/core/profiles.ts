@@ -82,6 +82,13 @@ const CALM = {
  *
  * The arrival window is always `serveMs - patienceMs`, which is the invariant
  * that stops anyone walking merely because the day ended.
+ *
+ * `loadMs` is sized to the parcel count *after* the late van has taken its cut:
+ * about 3 s a parcel on Monday, tightening to just over 1 s on Saturday, and a
+ * test keeps that budget monotonic and never under a second. Friday and
+ * Saturday carry a longer nominal `loadMs` for exactly that reason — 60 % of
+ * 25 s for 27 parcels is half a second a tap, and a parcel left on the van
+ * costs a star.
  */
 export const MONDAY: DayProfile = {
   ...CALM,
@@ -143,7 +150,7 @@ export const FRIDAY: DayProfile = {
   pickups: 20,
   senders: 6,
   lookalikePairs: 2,
-  loadMs: 25_000,
+  loadMs: 40_000,
   serveMs: 70_000,
   patienceMs: 20_000,
   arrivalWindowMs: 50_000,
@@ -158,7 +165,7 @@ export const SATURDAY: DayProfile = {
   pickups: 27,
   senders: 8,
   lookalikePairs: 3,
-  loadMs: 25_000,
+  loadMs: 50_000,
   serveMs: 75_000,
   patienceMs: 18_000,
   arrivalWindowMs: 57_000,

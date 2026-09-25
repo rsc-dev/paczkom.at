@@ -369,18 +369,18 @@ describe('rain', () => {
 // -------------------------------------------------------------------- late van
 
 describe('late van', () => {
-  it('gives Friday 15 seconds to load instead of 25', () => {
-    expect(FRIDAY.loadMs).toBe(25_000);
-    expect(loadDurationMs(FRIDAY)).toBe(15_000);
+  it('gives Friday 24 seconds to load instead of 40', () => {
+    expect(FRIDAY.loadMs).toBe(40_000);
+    expect(loadDurationMs(FRIDAY)).toBe(24_000);
   });
 
   it('ends LOAD on the shortened clock', () => {
     const state = started(3, FRIDAY);
-    const nearly = reduce(state, { type: 'tick', dtMs: 14_900 });
+    const nearly = reduce(state, { type: 'tick', dtMs: 23_900 });
     expect(nearly.phase).toBe('LOAD');
     const over = reduce(nearly, { type: 'tick', dtMs: 200 });
     expect(over.phase).toBe('SERVE');
-    expect(over.elapsed.load).toBe(15_000);
+    expect(over.elapsed.load).toBe(24_000);
   });
 
   it('leaves an on-time day at its full length', () => {

@@ -102,8 +102,11 @@ events are switched on (`jams`, `forgotten`, `rain`, `lateVan`). `WEEK_PROFILES`
 is Monday to Saturday in order; `DAILY_PROFILE` is the Thursday row. Changing
 the arc is a data edit — no reducer changes, no new code paths.
 
-One invariant is enforced by a test: `arrivalWindowMs + patienceMs <= serveMs`,
+Two invariants are enforced by tests. `arrivalWindowMs + patienceMs <= serveMs`,
 so nobody ever walks away merely because the day ended before they were served.
+And the load budget per parcel — `loadMs`, after the late van's cut, divided by
+`pickups` — never drops below one second and never halves from one day to the
+next, so a parcel left on the van is a mistake and not an inevitability.
 
 After a profile edit, regenerate the scripted fixtures (`npm run gen:fixtures`)
 and read the diff: those summaries are what the change actually did.
