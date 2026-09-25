@@ -89,6 +89,10 @@ export interface WeekShareDay {
 export interface WeekShareParams {
   /** Localised mode name, e.g. "Tydzień" / "Week". */
   readonly modeLabel: string;
+  /** Localised label for the week's total, e.g. "Razem" / "Total". */
+  readonly totalLabel: string;
+  /** Localised points abbreviation, e.g. "pkt" / "pts". */
+  readonly points: string;
   readonly days: readonly WeekShareDay[];
   /** The seed, already encoded for a URL. */
   readonly seed: string;
@@ -100,8 +104,9 @@ export function weekUrl(seed: string): string {
 }
 
 /**
- * One line per day played (design D6). A failed week simply stops at the day it
- * failed on, with ❌ where the stars would be.
+ * One line per day played (design D6), then the week's total. A failed week
+ * simply stops at the day it failed on, with ❌ where the stars would be; its
+ * total still counts what that day scored, as the Reklamacja screen does.
  */
 export function buildWeekShareText(params: WeekShareParams): string {
   const lines = params.days.map((day) =>
@@ -109,5 +114,11 @@ export function buildWeekShareText(params: WeekShareParams): string {
       ? `${day.label} ${FAILED_DAY}`
       : `${day.label} ${STAR.repeat(day.stars)} ${String(day.score)}`,
   );
-  return [`${SHARE_BRAND} · ${params.modeLabel}`, ...lines, weekUrl(params.seed)].join('\n');
+  const total = params.days.reduce((sum, day) => sum + day.score, 0);
+  return [
+    `${SHARE_BRAND} · ${params.modeLabel}`,
+    ...lines,
+    `${params.totalLabel} ${String(total)} ${params.points}`,
+    weekUrl(params.seed),
+  ].join('\n');
 }

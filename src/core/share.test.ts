@@ -102,6 +102,8 @@ describe('buildWeekShareText', () => {
     expect(
       buildWeekShareText({
         modeLabel: 'Tydzień',
+        totalLabel: 'Razem',
+        points: 'pkt',
         seed: 'k3j9x',
         days: [
           day('Pn', 3, 1240),
@@ -121,6 +123,7 @@ describe('buildWeekShareText', () => {
         'Cz ⭐⭐ 1720',
         'Pt ⭐ 1950',
         'So ❌',
+        'Razem 7900 pkt',
         'https://paczkom.at/?week=k3j9x',
       ].join('\n'),
     );
@@ -129,10 +132,12 @@ describe('buildWeekShareText', () => {
   it('has one line per day and ends with the link that replays it', () => {
     const text = buildWeekShareText({
       modeLabel: 'Week',
+      totalLabel: 'Total',
+      points: 'pts',
       seed: 'k3j9x',
       days: Array.from({ length: 6 }, (_unused, i) => day('Mo', 3, 100 * i)),
     });
-    expect(text.split('\n')).toHaveLength(8);
+    expect(text.split('\n')).toHaveLength(9);
     expect(text.endsWith(weekUrl('k3j9x'))).toBe(true);
     expect(text).toContain('https://paczkom.at/?week=k3j9x');
   });
@@ -140,6 +145,8 @@ describe('buildWeekShareText', () => {
   it('stops at the day a failed week ran out on', () => {
     const text = buildWeekShareText({
       modeLabel: 'Tydzień',
+      totalLabel: 'Razem',
+      points: 'pkt',
       seed: 'abc',
       days: [
         day('Pn', 3, 100),
@@ -150,8 +157,8 @@ describe('buildWeekShareText', () => {
       ],
     });
     const lines = text.split('\n');
-    // Header, five days, URL — no Saturday.
-    expect(lines).toHaveLength(7);
+    // Header, five days, total, URL — no Saturday.
+    expect(lines).toHaveLength(8);
     expect(lines[5]).toBe('Pt ❌');
     expect(text).not.toContain('So');
   });
@@ -159,10 +166,23 @@ describe('buildWeekShareText', () => {
   it('leaves the day labels to the caller and the emoji alone', () => {
     const text = buildWeekShareText({
       modeLabel: 'Week',
+      totalLabel: 'Total',
+      points: 'pts',
       seed: 'abc',
       days: [day('Mon', 3, 10)],
     });
     expect(text).toContain('Mon ⭐⭐⭐ 10');
+  });
+
+  it('adds the days up above the link, failed day included', () => {
+    const lines = buildWeekShareText({
+      modeLabel: 'Week',
+      totalLabel: 'Total',
+      points: 'pts',
+      seed: 'abc',
+      days: [day('Mon', 3, 1200), { label: 'Tue', stars: 0, score: 300, failed: true }],
+    }).split('\n');
+    expect(lines.at(-2)).toBe('Total 1500 pts');
   });
 });
 

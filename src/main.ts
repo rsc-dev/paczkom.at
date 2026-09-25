@@ -346,6 +346,8 @@ async function onWeekShare(): Promise<void> {
   const outlet = weekShareOutlet(currentScreen(app), weekScreen, failScreen);
   const text = buildWeekShareText({
     modeLabel: t('week.share.mode'),
+    totalLabel: t('week.total'),
+    points: t('share.points'),
     days: weekShareDays(lastWeekOutcome.week),
     seed: encodeSeed(lastWeekOutcome.week.seed),
   });
