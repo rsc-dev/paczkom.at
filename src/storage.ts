@@ -117,4 +117,6 @@ export const STORAGE_KEYS = {
   best: 'best',
   /** Highest total from a *completed* week. */
   weekBest: 'week:best',
+  /** The Week run in progress, saved between days; absent once it is over. */
+  weekRun: 'week:run',
 } as const;

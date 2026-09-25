@@ -3,6 +3,7 @@
  * All four screens live in the same document; routing is one attribute.
  */
 import type { DaySummary } from '../core/game.js';
+import { WEEK_DAY_KEYS } from '../core/profiles.js';
 import { formatTime } from '../core/share.js';
 import { isMessageKey, t } from '../i18n/index.js';
 import { need, setHidden, setText } from './dom.js';
@@ -32,6 +33,8 @@ const SCREEN_NAMES: readonly ScreenName[] = [
 export interface TitleNodes {
   readonly stats: HTMLElement;
   readonly note: HTMLElement;
+  /** "Continue week · Wednesday"; hidden unless a run is saved. */
+  readonly continueWeek: HTMLElement;
 }
 
 export interface ResultNodes {
@@ -54,6 +57,8 @@ export interface TitleModel {
   readonly weekBest: number;
   /** False when the browser refused to store anything. */
   readonly persistent: boolean;
+  /** The day a saved Week run is about to play, or `null` when nothing is saved. */
+  readonly savedDay: number | null;
 }
 
 export interface ResultModel {
@@ -99,6 +104,14 @@ export function renderTitle(nodes: TitleNodes, model: TitleModel): void {
   }
   setText(nodes.stats, parts.join(' · '));
   setText(nodes.note, model.persistent ? '' : t('title.noStorage'));
+
+  const savedKey = model.savedDay === null ? undefined : WEEK_DAY_KEYS[model.savedDay];
+  if (savedKey === undefined) {
+    setHidden(nodes.continueWeek, true);
+  } else {
+    setText(nodes.continueWeek, t('title.continueWeek', { day: t(`day.full.${savedKey}`) }));
+    setHidden(nodes.continueWeek, false);
+  }
 }
 
 function statLine(labelKey: Parameters<typeof t>[0], value: string): string {
@@ -147,6 +160,7 @@ export function titleNodes(root: ParentNode): TitleNodes {
   return {
     stats: need<HTMLElement>(root, '#title-stats'),
     note: need<HTMLElement>(root, '#title-note'),
+    continueWeek: need<HTMLElement>(root, '#btn-continue-week'),
   };
 }
 

@@ -82,7 +82,7 @@ describe('applyStaticText', () => {
 
 describe('renderTitle', () => {
   it('shows the streak and best once there is one', () => {
-    renderTitle(titleNodes(document), { streak: 4, best: 3200, weekBest: 0, persistent: true });
+    renderTitle(titleNodes(document), { streak: 4, best: 3200, weekBest: 0, persistent: true, savedDay: null });
     const stats = document.querySelector('#title-stats')?.textContent ?? '';
     expect(stats).toContain('4');
     expect(stats).toContain('3200');
@@ -90,12 +90,26 @@ describe('renderTitle', () => {
   });
 
   it('says so before the first game', () => {
-    renderTitle(titleNodes(document), { streak: 0, best: 0, weekBest: 0, persistent: true });
+    renderTitle(titleNodes(document), { streak: 0, best: 0, weekBest: 0, persistent: true, savedDay: null });
     expect(document.querySelector('#title-stats')?.textContent).toBe('Dziś jeszcze bez gry');
   });
 
+  it('offers to continue a saved week, naming the day about to be played', () => {
+    const nodes = titleNodes(document);
+    renderTitle(nodes, { streak: 0, best: 0, weekBest: 0, persistent: true, savedDay: 2 });
+    expect(nodes.continueWeek.hidden).toBe(false);
+    expect(nodes.continueWeek.textContent).toBe('Dokończ tydzień · Środa');
+  });
+
+  it('hides the offer once nothing is saved', () => {
+    const nodes = titleNodes(document);
+    renderTitle(nodes, { streak: 0, best: 0, weekBest: 0, persistent: true, savedDay: 2 });
+    renderTitle(nodes, { streak: 0, best: 0, weekBest: 0, persistent: true, savedDay: null });
+    expect(nodes.continueWeek.hidden).toBe(true);
+  });
+
   it('warns when the browser will not remember anything', () => {
-    renderTitle(titleNodes(document), { streak: 0, best: 0, weekBest: 0, persistent: false });
+    renderTitle(titleNodes(document), { streak: 0, best: 0, weekBest: 0, persistent: false, savedDay: null });
     expect(document.querySelector('#title-note')?.textContent).not.toBe('');
   });
 });

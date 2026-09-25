@@ -10,13 +10,14 @@ import {
   finishWeekDay,
   readBest,
   readRecords,
+  readSavedWeek,
   readWeekBest,
   startDailyRun,
   startWeekRun,
 } from './run.js';
 import type { RunEnvironment } from './run.js';
 import { STORAGE_KEYS, createStorage } from './storage.js';
-import type { Storage } from './storage.js';
+import type { Storage, StorageBackend } from './storage.js';
 
 const summary = (score: number, timeMs = 90_000): DaySummary => ({
   served: 20,
@@ -139,7 +140,7 @@ describe('week runs', () => {
   });
 
   it('starts on Monday with the Monday profile and its own day seed', () => {
-    const run = startWeekRun(42);
+    const run = startWeekRun(env(), 42);
     expect(run.mode).toBe('week');
     expect(run.profile.id).toBe('mon');
     expect(run.week.dayIndex).toBe(0);
@@ -148,7 +149,7 @@ describe('week runs', () => {
   });
 
   it('walks to the next day, and its profile, when a day is filed', () => {
-    const monday = startWeekRun(42);
+    const monday = startWeekRun(env(), 42);
     const outcome = finishWeekDay(env(), monday, weekSummary({ score: 900 }), ['📦']);
     expect(outcome.week.status).toBe('playing');
     expect(outcome.day.dayIndex).toBe(0);
@@ -160,7 +161,7 @@ describe('week runs', () => {
   });
 
   it('records a completed week as the new best', () => {
-    let run = startWeekRun(42);
+    let run = startWeekRun(env(), 42);
     let outcome = finishWeekDay(env(), run, weekSummary({ score: 100 }), ['📦']);
     for (let i = 1; i < 6; i += 1) {
       run = continueWeekRun(outcome.week);
@@ -174,7 +175,7 @@ describe('week runs', () => {
 
   it('does not beat a higher stored best', () => {
     storage.set(STORAGE_KEYS.weekBest, 5_000);
-    let run = startWeekRun(42);
+    let run = startWeekRun(env(), 42);
     let outcome = finishWeekDay(env(), run, weekSummary({ score: 100 }), ['📦']);
     for (let i = 1; i < 6; i += 1) {
       run = continueWeekRun(outcome.week);
@@ -185,7 +186,7 @@ describe('week runs', () => {
   });
 
   it('never records a week that ran out of stars', () => {
-    const run = startWeekRun(42);
+    const run = startWeekRun(env(), 42);
     const outcome = finishWeekDay(env(), run, weekSummary({ score: 9_999, walked: 3 }), ['🟥']);
     expect(outcome.week.status).toBe('failed');
     expect(outcome.isBest).toBe(false);
@@ -193,7 +194,7 @@ describe('week runs', () => {
   });
 
   it('spends stars on the incidents of the day just played', () => {
-    const run = startWeekRun(42);
+    const run = startWeekRun(env(), 42);
     const outcome = finishWeekDay(env(), run, weekSummary({ refused: 1, unplaced: 1 }), ['📦']);
     expect(outcome.day.starsLost).toBe(2);
     expect(outcome.week.stars).toBe(1);
@@ -201,9 +202,81 @@ describe('week runs', () => {
   });
 
   it('leaves the Daily storage untouched', () => {
-    const run = startWeekRun(42);
+    const run = startWeekRun(env(), 42);
     finishWeekDay(env(), run, weekSummary(), ['📦']);
     expect(readRecords(storage)).toEqual({});
+  });
+});
+
+describe('a week in progress', () => {
+  const weekSummary = (overrides: Partial<DaySummary> = {}): DaySummary => ({
+    ...summary(1000),
+    served: 10,
+    ...overrides,
+  });
+
+  const playToTheEnd = (seed: number, overrides: Partial<DaySummary> = {}): void => {
+    let run = startWeekRun(env(), seed);
+    let outcome = finishWeekDay(env(), run, weekSummary(overrides), ['📦']);
+    while (outcome.week.status === 'playing') {
+      run = continueWeekRun(outcome.week);
+      outcome = finishWeekDay(env(), run, weekSummary(overrides), ['📦']);
+    }
+  };
+
+  it('is saved the moment it starts', () => {
+    const run = startWeekRun(env(), 42);
+    expect(readSavedWeek(storage)).toEqual(run.week);
+  });
+
+  it('is saved again after each day, on the day about to be played', () => {
+    const outcome = finishWeekDay(env(), startWeekRun(env(), 42), weekSummary({ score: 900 }), ['📦']);
+    const saved = readSavedWeek(storage);
+    expect(saved).toEqual(outcome.week);
+    expect(saved?.dayIndex).toBe(1);
+    expect(saved?.stars).toBe(3);
+    expect(saved?.days).toHaveLength(1);
+  });
+
+  it('is gone once Saturday is filed', () => {
+    playToTheEnd(42);
+    expect(readSavedWeek(storage)).toBeNull();
+    expect(storage.get(STORAGE_KEYS.weekRun)).toBeUndefined();
+  });
+
+  it('is gone once the stars are', () => {
+    playToTheEnd(42, { walked: 3 });
+    expect(readSavedWeek(storage)).toBeNull();
+    expect(storage.get(STORAGE_KEYS.weekRun)).toBeUndefined();
+  });
+
+  it('is replaced by whichever week starts next', () => {
+    finishWeekDay(env(), startWeekRun(env(), 42), weekSummary(), ['📦']);
+    const fresh = startWeekRun(env(), 7);
+    expect(readSavedWeek(storage)).toEqual(fresh.week);
+    expect(readSavedWeek(storage)?.days).toHaveLength(0);
+  });
+
+  it('is ignored and forgotten when it does not add up', () => {
+    storage.set(STORAGE_KEYS.weekRun, { ...startWeekRun(env(), 42).week, stars: 6 });
+    expect(readSavedWeek(storage)).toBeNull();
+    expect(storage.get(STORAGE_KEYS.weekRun)).toBeUndefined();
+  });
+
+  it('still starts when the browser refuses to store anything', () => {
+    const refusing: StorageBackend = {
+      getItem: () => {
+        throw new Error('no');
+      },
+      setItem: () => {
+        throw new Error('no');
+      },
+      removeItem: () => {
+        throw new Error('no');
+      },
+    };
+    const run = startWeekRun({ now: () => new Date(clock), storage: createStorage(refusing) }, 42);
+    expect(run.profile.id).toBe('mon');
   });
 });
 

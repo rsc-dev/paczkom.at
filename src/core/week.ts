@@ -121,6 +121,106 @@ export function dayReached(week: WeekState): number {
 }
 
 // ---------------------------------------------------------------------------
+// A saved run
+// ---------------------------------------------------------------------------
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isCount = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isInteger(value) && value >= 0;
+
+const isDuration = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0;
+
+/** Stars a *playing* week can hold: none left means it is not playing. */
+const isStars = (value: unknown): value is number =>
+  isCount(value) && value >= 1 && value <= STARTING_STARS;
+
+function parseIncidents(value: unknown): Incidents | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+  const unplaced = value['unplaced'];
+  const refused = value['refused'];
+  const walked = value['walked'];
+  return isCount(unplaced) && isCount(refused) && isCount(walked)
+    ? { unplaced, refused, walked }
+    : null;
+}
+
+/** One filed day, which must be the day at `dayIndex` and must add up. */
+function parseDayResult(value: unknown, dayIndex: number): DayResult | null {
+  if (!isRecord(value) || value['dayIndex'] !== dayIndex) {
+    return null;
+  }
+  const score = value['score'];
+  const timeMs = value['timeMs'];
+  const stars = value['stars'];
+  const starsLost = value['starsLost'];
+  const grid = value['grid'];
+  const incidents = parseIncidents(value['incidents']);
+  if (
+    !isCount(score) ||
+    !isDuration(timeMs) ||
+    !isStars(stars) ||
+    !isCount(starsLost) ||
+    incidents === null ||
+    !Array.isArray(grid) ||
+    !grid.every((line): line is string => typeof line === 'string')
+  ) {
+    return null;
+  }
+  return { dayIndex, score, timeMs, stars, starsLost, incidents, grid: [...grid] };
+}
+
+/**
+ * A `WeekState` read back from storage, or `null` unless it is one the rules
+ * could have produced: still playing, on a day the week has, with exactly the
+ * days before it filed in order, and stars that only ever went down — by the
+ * amount each day says it lost — to end on what the week holds now.
+ *
+ * Storage is the player's own, so this is not a defence against tampering. It
+ * is what keeps a stale or hand-edited value from putting the game somewhere
+ * its own rules cannot reach.
+ */
+export function parseWeekState(value: unknown): WeekState | null {
+  if (!isRecord(value) || value['status'] !== 'playing') {
+    return null;
+  }
+  const seed = value['seed'];
+  const dayIndex = value['dayIndex'];
+  const stars = value['stars'];
+  const days = value['days'];
+  if (
+    !isCount(seed) ||
+    seed > 0xffffffff ||
+    !isCount(dayIndex) ||
+    dayIndex >= WEEK_LENGTH ||
+    !isStars(stars) ||
+    !Array.isArray(days) ||
+    days.length !== dayIndex
+  ) {
+    return null;
+  }
+
+  const filed: DayResult[] = [];
+  let starsBefore = STARTING_STARS;
+  for (const [index, entry] of days.entries()) {
+    const day = parseDayResult(entry, index);
+    if (day === null || day.stars > starsBefore || starsBefore - day.stars !== day.starsLost) {
+      return null;
+    }
+    filed.push(day);
+    starsBefore = day.stars;
+  }
+  if (starsBefore !== stars) {
+    return null;
+  }
+  return { seed, dayIndex, stars, days: filed, status: 'playing' };
+}
+
+// ---------------------------------------------------------------------------
 // Seeds in links
 // ---------------------------------------------------------------------------
 

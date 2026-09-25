@@ -15,13 +15,15 @@ import { createSfx } from './audio/sfx.js';
 import { initialState, reduce, slotOutcomes } from './core/game.js';
 import type { Action, State } from './core/game.js';
 import { buildGrid, buildShareText, buildWeekShareText } from './core/share.js';
-import { encodeSeed, seedFromText } from './core/week.js';
+import { encodeSeed, seedFromText, totalScore } from './core/week.js';
+import type { WeekState } from './core/week.js';
 import {
   continueWeekRun,
   currentStreak,
   finishDailyRun,
   finishWeekDay,
   readBest,
+  readSavedWeek,
   readWeekBest,
   startDailyRun,
   startWeekRun,
@@ -130,6 +132,7 @@ function renderChrome(): void {
     best: readBest(storage),
     weekBest: readWeekBest(storage),
     persistent: storage.persistent,
+    savedDay: readSavedWeek(storage)?.dayIndex ?? null,
   });
   if (lastResult !== null) {
     renderResult(result, lastResult);
@@ -233,7 +236,7 @@ function startDay(): void {
 }
 
 function startWeek(seed: number): void {
-  const week = startWeekRun(seed);
+  const week = startWeekRun(env, seed);
   writeWeekSeed(week.week.seed);
   playRun(week);
 }
@@ -278,6 +281,33 @@ function nextWeekDay(): void {
     return;
   }
   playRun(continueWeekRun(run.week));
+}
+
+/**
+ * Picks a saved week up where it left off: on the day summary of the last day
+ * filed, so the player re-reads their stars before the next day starts to
+ * count — or straight into Monday when nothing has been filed yet.
+ */
+function resumeWeek(week: WeekState): void {
+  const next = continueWeekRun(week);
+  writeWeekSeed(week.seed);
+  const day = week.days.at(-1);
+  if (day === undefined) {
+    playRun(next);
+    return;
+  }
+  stopLoop();
+  run = next;
+  lastWeekOutcome = {
+    week,
+    day,
+    total: totalScore(week),
+    best: readWeekBest(storage),
+    isBest: false,
+  };
+  renderChrome();
+  renderWeekEnd(lastWeekOutcome, 'day');
+  showScreen(app, 'day');
 }
 
 // ------------------------------------------------------- the seed in the URL
@@ -432,6 +462,12 @@ function boot(): void {
   };
 
   onClick('#btn-week', newWeek);
+  onClick('#btn-continue-week', () => {
+    const saved = readSavedWeek(storage);
+    if (saved !== null) {
+      resumeWeek(saved);
+    }
+  });
   onClick('#btn-next-day', nextWeekDay);
   onClick('#btn-week-retry', retryWeek);
   onClick('#btn-fail-retry', retryWeek);
@@ -463,10 +499,17 @@ function boot(): void {
   renderGame(view, game);
   showScreen(app, 'title');
 
-  // A shared link opens straight into that week.
+  // A shared link opens straight into that week — and if it is the week that
+  // was already under way here, which a plain reload makes it, the run picks
+  // up where it left off rather than starting Monday over.
   const shared = readWeekSeed();
   if (shared !== null) {
-    startWeek(shared);
+    const saved = readSavedWeek(storage);
+    if (saved !== null && saved.seed === shared) {
+      resumeWeek(saved);
+    } else {
+      startWeek(shared);
+    }
   }
 }
 

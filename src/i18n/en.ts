@@ -94,6 +94,7 @@ export const en: Record<MessageKey, string> = {
 
   'title.week': 'Week',
   'title.weekBest': 'Best week: {score}',
+  'title.continueWeek': 'Continue week · {day}',
 
   'day.mon': 'Mon',
   'day.tue': 'Tue',

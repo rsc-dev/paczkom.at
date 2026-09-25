@@ -20,7 +20,10 @@ Two ways to play:
   all three and the week ends on a complaint form.
 
 A week lives in its URL — `paczkom.at/?week=k3j9x` — so you can hand someone the
-exact week you just played and dare them to beat it.
+exact week you just played and dare them to beat it. It is also saved between
+days: close the tab on Thursday and the title screen offers to continue it, and
+a reload mid-week picks the run up on the day summary it left. Only the day in
+progress is lost, never the week.
 
 No backend, no accounts, no tracking, and no runtime dependencies: the whole
 thing is a static page of hand-written TypeScript and CSS.

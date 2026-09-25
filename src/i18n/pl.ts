@@ -94,6 +94,7 @@ export const pl = {
 
   'title.week': 'Tydzień',
   'title.weekBest': 'Najlepszy tydzień: {score}',
+  'title.continueWeek': 'Dokończ tydzień · {day}',
 
   'day.mon': 'Pn',
   'day.tue': 'Wt',

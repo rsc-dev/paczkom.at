@@ -9,6 +9,7 @@ import {
   daySeed,
   decodeSeed,
   encodeSeed,
+  parseWeekState,
   recordDay,
   seedFromText,
   startWeek,
@@ -175,5 +176,96 @@ describe('seeds in links', () => {
     expect(seedFromText('k3j9x')).toBe(decodeSeed('k3j9x'));
     expect(seedFromText('hello world')).toBe(seedFromText('hello world'));
     expect(seedFromText('hello world')).not.toBe(seedFromText('goodbye'));
+  });
+});
+
+describe('a saved run', () => {
+  /** Monday clean, Tuesday with a walker: two days filed, two stars left. */
+  const played = (): WeekState => {
+    let week = startWeek(42);
+    week = recordDay(week, summary({ score: 900 }), ['📦📦']);
+    week = recordDay(week, summary({ score: 1200, walked: 1 }), ['📦🟥']);
+    return week;
+  };
+
+  /** What comes back out of storage: JSON, not the object that went in. */
+  const stored = (value: unknown): unknown => JSON.parse(JSON.stringify(value));
+
+  it('comes back exactly as it went in', () => {
+    const week = played();
+    expect(parseWeekState(stored(week))).toEqual(week);
+  });
+
+  it('may have nothing filed yet', () => {
+    expect(parseWeekState(stored(startWeek(7)))).toEqual(startWeek(7));
+  });
+
+  it.each([null, undefined, 'k3j9x', 42, [], {}])('is never %s', (value) => {
+    expect(parseWeekState(value)).toBeNull();
+  });
+
+  it('must still be playing', () => {
+    const week = played();
+    expect(parseWeekState(stored({ ...week, status: 'done' }))).toBeNull();
+    expect(parseWeekState(stored({ ...week, status: 'failed' }))).toBeNull();
+  });
+
+  it('cannot hold more stars than a week starts with, or none at all', () => {
+    const week = played();
+    expect(parseWeekState(stored({ ...week, stars: STARTING_STARS + 1 }))).toBeNull();
+    expect(parseWeekState(stored({ ...week, stars: 0 }))).toBeNull();
+  });
+
+  it('cannot be on a day the week does not have', () => {
+    const week = played();
+    expect(parseWeekState(stored({ ...week, dayIndex: WEEK_LENGTH }))).toBeNull();
+    expect(parseWeekState(stored({ ...week, dayIndex: -1 }))).toBeNull();
+    expect(parseWeekState(stored({ ...week, dayIndex: 1.5 }))).toBeNull();
+  });
+
+  it('has filed exactly the days before the one it is on', () => {
+    const week = played();
+    expect(parseWeekState(stored({ ...week, dayIndex: 3 }))).toBeNull();
+    expect(parseWeekState(stored({ ...week, days: [] }))).toBeNull();
+  });
+
+  it('files its days in order', () => {
+    const week = played();
+    const [mon, tue] = week.days;
+    expect(parseWeekState(stored({ ...week, days: [tue, mon] }))).toBeNull();
+  });
+
+  it('never gains a star from one day to the next', () => {
+    const week = played();
+    const [mon, tue] = week.days;
+    const gained = { ...week, stars: 3, days: [{ ...mon, stars: 2 }, { ...tue, stars: 3 }] };
+    expect(parseWeekState(stored(gained))).toBeNull();
+  });
+
+  it('ends its days on the stars it has', () => {
+    const week = played();
+    expect(week.stars).toBe(2);
+    expect(parseWeekState(stored({ ...week, stars: 3 }))).toBeNull();
+  });
+
+  it('needs a seed that fits in a link', () => {
+    const week = played();
+    expect(parseWeekState(stored({ ...week, seed: -1 }))).toBeNull();
+    expect(parseWeekState(stored({ ...week, seed: 0x1_0000_0000 }))).toBeNull();
+    expect(parseWeekState(stored({ ...week, seed: 'k3j9x' }))).toBeNull();
+  });
+
+  it('rejects a day whose numbers could not have happened', () => {
+    const week = played();
+    const [mon, tue] = week.days;
+    const withMonday = (patch: object): unknown =>
+      stored({ ...week, days: [{ ...mon, ...patch }, tue] });
+    expect(parseWeekState(withMonday({ score: -1 }))).toBeNull();
+    expect(parseWeekState(withMonday({ timeMs: 'soon' }))).toBeNull();
+    expect(parseWeekState(withMonday({ grid: [1, 2] }))).toBeNull();
+    expect(parseWeekState(withMonday({ starsLost: -1 }))).toBeNull();
+    expect(
+      parseWeekState(withMonday({ incidents: { unplaced: -1, refused: 0, walked: 0 } })),
+    ).toBeNull();
   });
 });

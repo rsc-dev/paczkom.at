@@ -212,6 +212,62 @@ test('the fail screen shares the week where the player can see it', async ({ pag
   await expect(page.locator('#week-share-note')).toBeEmpty();
 });
 
+test('a reload mid-week picks the week up at the day summary', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  await page.goto(`/?week=${SEED}`);
+  await playDayWell(page);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'day');
+
+  // The seed is still in the address bar, so a reload is the common case: the
+  // run comes back on the day summary it left, Monday filed and Tuesday next.
+  await page.reload();
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'day');
+  await expect(page.locator('#day-kicker')).toContainText('1/6');
+  await expect(page.locator('#day-stars .stars__star[data-filled="true"]')).toHaveCount(3);
+
+  await page.locator('#btn-next-day').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'game');
+  await expect(page.locator('.door')).toHaveCount(14);
+  await expect(page.locator('#hud-stars .stars__star[data-filled="true"]')).toHaveCount(3);
+});
+
+test('the title offers to continue a saved week', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  await page.goto(`/?week=${SEED}`);
+  await playDayWell(page);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'day');
+
+  await page.goto('/');
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'title');
+  const resume = page.locator('#btn-continue-week');
+  await expect(resume).toBeVisible();
+  await expect(resume).toContainText(/Wtorek|Tuesday/);
+  await page.screenshot({ path: `${SHOTS}week-resume-390x844.png` });
+
+  await resume.click();
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'day');
+  await expect(page).toHaveURL(new RegExp(`week=${SEED}`));
+  await page.locator('#btn-next-day').click();
+  await expect(page.locator('.door')).toHaveCount(14);
+});
+
+test('a week that is over leaves nothing to continue', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.install({ time: '2026-09-14T12:00:00Z' });
+  await page.goto(`/?week=${SEED}`);
+  await idleThroughDay(page);
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'fail');
+
+  await page.goto('/');
+  await expect(page.locator('#app')).toHaveAttribute('data-screen', 'title');
+  await expect(page.locator('#btn-continue-week')).toBeHidden();
+});
+
 test('retry replays the same week, new week does not', async ({ page }) => {
   test.setTimeout(120_000);
   await page.clock.install({ time: '2026-09-14T12:00:00Z' });
