@@ -142,19 +142,26 @@ Pages via `upload-pages-artifact` and `deploy-pages`.
    `2026-09-25`, the date that counts as Daily #1. Never change it after launch:
    every Daily number anyone has shared is counted from it.
 2. **Enable Pages.** Repository → Settings → Pages → Source: **GitHub Actions**.
-3. **Set the custom domain** to `paczkom.at` in the same settings page. That
-   repository setting is what Pages actually serves from; `public/CNAME` ships
-   the same value with the build so the two cannot silently disagree.
-4. **Point DNS at GitHub Pages.** At the registrar for `paczkom.at`:
+3. **Set the custom domain** to `www.paczkom.at` in the same settings page.
+   That repository setting is what Pages actually serves from; `public/CNAME`
+   ships the same value with the build so the two cannot silently disagree.
+4. **Point DNS at GitHub Pages.** At the registrar (OVH) for `paczkom.at`:
 
-   | Record | Name  | Value                                                              |
-   | ------ | ----- | ------------------------------------------------------------------ |
-   | A      | `@`   | `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` |
-   | AAAA   | `@`   | `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153` |
-   | CNAME  | `www` | `rsc-dev.github.io.`                                               |
+   | Record | Name  | Value                                                      |
+   | ------ | ----- | ---------------------------------------------------------- |
+   | CNAME  | `www` | `rsc-dev.github.io.`                                       |
+   | A      | `@`   | `213.186.33.5` — OVH's redirect server (see below)         |
 
-   Until DNS propagates the site is reachable at the `github.io` URL. Once it
-   has, tick **Enforce HTTPS** in the Pages settings.
+   The apex is not on GitHub: it gets an OVH web redirection (`paczkom.at` →
+   `http://www.paczkom.at`, permanent), the same setup as `matusiak.me`. With
+   the apex on GitHub, Pages requested one certificate for both names and it
+   never got past `authorization_created`; with `www` alone it covers one name.
+   The cost is that `https://paczkom.at` does not load (OVH's redirect is
+   HTTP-only), so every URL the game prints or shares is
+   `https://www.paczkom.at`.
+
+   Until DNS propagates the site is reachable at the `github.io` URL. Once the
+   certificate is issued, tick **Enforce HTTPS** in the Pages settings.
 
 Rolling back is `git revert` on `main`: the deploy workflow republishes the
 previous build.

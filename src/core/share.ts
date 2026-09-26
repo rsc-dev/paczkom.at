@@ -6,7 +6,7 @@ import type { SlotOutcome } from './game.js';
 import type { Slot } from './wall.js';
 
 export const SHARE_BRAND = 'paczkom.at';
-export const SHARE_URL = 'https://paczkom.at';
+export const SHARE_URL = 'https://www.paczkom.at';
 
 export const OUTCOME_EMOJI: Readonly<Record<SlotOutcome, string>> = {
   perfect: '📦',
