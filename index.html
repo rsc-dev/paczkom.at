@@ -28,6 +28,18 @@
   </head>
   <body>
     <div id="app" data-screen="title">
+      <!-- ------------------------------------------------------ picker -->
+      <section class="screen" id="screen-picker" aria-labelledby="picker-title">
+        <h1 class="screen__title" id="picker-title" data-t="picker.title"></h1>
+        <p class="tagline" data-t="app.tagline"></p>
+        <label class="visually-hidden" for="picker-input" data-t="picker.placeholder"></label>
+        <input class="picker__input" id="picker-input" type="search" autocomplete="off" spellcheck="false" />
+        <ul class="picker__results" id="picker-results"></ul>
+        <p class="picker__empty" id="picker-empty" data-t="picker.noMatch" hidden></p>
+        <button class="btn btn--ghost" id="btn-locate" data-t="picker.locate"></button>
+        <p class="picker__status" id="picker-status" role="status"></p>
+      </section>
+
       <!-- ------------------------------------------------------- title -->
       <section class="screen" id="screen-title" aria-labelledby="title-mark">
         <div class="title__body">
