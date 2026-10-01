@@ -121,6 +121,9 @@ export function writeOutputs(out: string, output: CollectOutput, shell: string):
   mkdirSync(join(out, 'data', 'towns'), { recursive: true });
   writeJson(join(out, 'data', 'index.json'), output.index);
   writeJson(join(out, 'data', 'national.json'), output.national);
+  // Pages serves this for any unknown path (e.g. a retired or mistyped slug);
+  // the app's own route logic falls back to the town picker from there.
+  writeFileSync(join(out, '404.html'), shell);
   const when = formatWhen(Date.parse(output.national.updatedAt), 'pl');
   for (const card of output.cards) {
     writeJson(join(out, 'data', 'towns', `${card.slug}.json`), card);

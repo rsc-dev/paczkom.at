@@ -44,8 +44,10 @@ test('a shared town opens without replacing your own, until you say so', async (
 
 test('a town page carries its own link preview', async ({ request }) => {
   const html = await (await request.get('/krakow/')).text();
-  expect(html).toContain('<meta property="og:url" content="https://paczkom.at/krakow" />');
+  // Pages 301s /krakow to /krakow/; og:url names that final address.
+  expect(html).toContain('<meta property="og:url" content="https://paczkom.at/krakow/" />');
   expect(html).toContain('<meta property="og:image" content="https://paczkom.at/krakow/og.png" />');
+  expect(html).toMatch(/<meta property="og:image:alt" content="Kraków: [^"]+" \/>/);
   expect((await request.get('/krakow/og.png')).headers()['content-type']).toContain('image/png');
 });
 

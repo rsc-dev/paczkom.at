@@ -26,7 +26,10 @@ export function townPage(shell: string, card: TownCard, when: string): string {
   let html = shell.replace(/<title>[^<]*<\/title>/, () => `<title>${escape(card.name)} · paczkom.at</title>`);
   html = replaceMeta(html, 'og:title', title);
   html = replaceMeta(html, 'og:description', description);
-  html = replaceMeta(html, 'og:url', url);
+  // Pages 301s a town path to its trailing slash; og:url names that final
+  // address, while og:image sits alongside it under the slug without one.
+  html = replaceMeta(html, 'og:url', `${url}/`);
   html = replaceMeta(html, 'og:image', `${url}/og.png`);
+  html = replaceMeta(html, 'og:image:alt', title);
   return html;
 }

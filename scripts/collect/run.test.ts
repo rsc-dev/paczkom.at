@@ -11,7 +11,8 @@ import townsJson from '../../src/data/towns.json' with { type: 'json' };
 import { loadSources, readHistory, writeOutputs } from './run.js';
 
 const FIXTURES = 'scripts/collect/fixtures';
-const SHELL = '<title>x</title><meta property="og:title" content="" /><meta property="og:description" content="" /><meta property="og:url" content="" /><meta property="og:image" content="" />';
+const SHELL =
+  '<title>x</title><meta property="og:title" content="" /><meta property="og:description" content="" /><meta property="og:url" content="" /><meta property="og:image" content="" /><meta property="og:image:alt" content="" />';
 // The fixtures were recorded at this instant (Task 10); grading against it
 // yields real levels instead of "too old" for almost everything.
 const NOW_MS = Date.parse('2026-10-01T17:12:00Z');
@@ -132,5 +133,15 @@ describe('writeOutputs', () => {
     expect(isTownCard(read(`data/towns/${slug}.json`))).toBe(true);
     expect(existsSync(join(out, slug, 'index.html'))).toBe(true);
     expect(existsSync(join(out, slug, 'og.png'))).toBe(true);
+  });
+
+  it('ships the shell as 404.html, so an unknown slug lands in the app', async () => {
+    const sources = await loadSources({ fixtures: FIXTURES });
+    const out = mkdtempSync(join(tmpdir(), 'out-'));
+    const output = buildOutputs({
+      towns: (townsJson as Town[]).slice(0, 3), ...sources, history: EMPTY_HISTORY, nowMs: NOW_MS,
+    });
+    writeOutputs(out, output, SHELL);
+    expect(readFileSync(join(out, '404.html'), 'utf8')).toBe(SHELL);
   });
 });
