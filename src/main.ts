@@ -8,7 +8,7 @@ import './theme/tokens.css';
 import './theme/app.css';
 
 import { isNationalSummary, isTownCard, isTownIndex } from './core/publish.js';
-import type { TownIndexEntry } from './core/publish.js';
+import type { NationalSummary, TownCard, TownIndexEntry } from './core/publish.js';
 import { fetchJson } from './data.js';
 import { detectLang, getLang, otherLang, setLang, t } from './i18n/index.js';
 import { parseRoute, resolveInitialTown } from './route.js';
@@ -16,10 +16,12 @@ import { STORAGE_KEYS, storage } from './storage.js';
 import { cardModel, cardNodes, isStale, renderCard, shareTextFor } from './ui/card.js';
 import type { CardNodes } from './ui/card.js';
 import { need, setHidden, setText } from './ui/dom.js';
-import { formatTime } from './ui/format.js';
+import { formatWhen } from './ui/format.js';
 import { pickerNodes, renderSuggestions, townFromPosition } from './ui/picker.js';
 import { rankingNodes, renderRanking } from './ui/ranking.js';
+import { createRequestToken } from './ui/request-token.js';
 import { applyStaticText, showScreen } from './ui/screens.js';
+import type { ScreenName } from './ui/screens.js';
 import { shareText, targetsFrom } from './ui/share.js';
 
 const app = need<HTMLElement>(document, '#app');
@@ -29,9 +31,18 @@ const ranking = rankingNodes(document);
 const langButton = need<HTMLButtonElement>(document, '#btn-lang');
 const staleNotice = need<HTMLElement>(document, '#notice-stale');
 const route = parseRoute(location.pathname, location.search);
+const requests = createRequestToken();
+
+type PickerStatusKey = 'picker.locating' | 'picker.locateFailed' | null;
 
 let towns: TownIndexEntry[] = [];
 let current: { slug: string; shared: boolean } | null = null;
+/** The card last painted, so a language toggle can re-render without re-fetching. */
+let lastCard: TownCard | null = null;
+/** The ranking last painted, for the same reason. */
+let lastSummary: NationalSummary | null = null;
+/** Which status message the picker is showing, so a language toggle can re-translate it. */
+let pickerStatusKey: PickerStatusKey = null;
 
 setLang(detectLang({ stored: storage.get(STORAGE_KEYS.lang), navigatorLanguage: navigator.language }));
 setHidden(need(document, '#notice-retired'), !route.retired);
@@ -42,23 +53,51 @@ function paintStatic(): void {
   setText(langButton, t('lang.toggle'));
 }
 
+function paintStaleNotice(updatedAt: string): void {
+  const stale = isStale(updatedAt, Date.now());
+  setText(staleNotice, stale ? t('stale.warning', { time: formatWhen(Date.parse(updatedAt), getLang()) }) : '');
+  setHidden(staleNotice, !stale);
+}
+
+/**
+ * The only place screens change. The stale notice is about the card
+ * specifically, so it is hidden on every other screen and repainted (from
+ * the last loaded card, if any) whenever the card is shown.
+ */
+function goTo(name: ScreenName): void {
+  showScreen(app, name);
+  if (name !== 'card') {
+    setHidden(staleNotice, true);
+  } else if (lastCard !== null) {
+    paintStaleNotice(lastCard.updatedAt);
+  }
+}
+
+function setPickerStatus(key: PickerStatusKey): void {
+  pickerStatusKey = key;
+  setText(picker.status, key === null ? '' : t(key));
+}
+
 async function openTown(slug: string, shared: boolean): Promise<void> {
-  current = { slug, shared };
-  showScreen(app, 'loading');
+  const token = requests.next();
+  goTo('loading');
   const data = await fetchJson(`/data/towns/${slug}.json`, isTownCard);
-  if (data === null) {
-    showScreen(app, 'error');
+  if (!requests.isCurrent(token)) {
+    // A newer request has since taken over; this response is stale.
     return;
   }
+  if (data === null) {
+    goTo('error');
+    return;
+  }
+  current = { slug, shared };
+  lastCard = data;
   renderCard(card, cardModel(data, getLang()));
   setHidden(card.makeMine, !shared);
   setText(card.note, '');
   setHidden(card.fallback, true);
-  const stale = isStale(data.updatedAt, Date.now());
-  setText(staleNotice, stale ? t('stale.warning', { time: formatTime(Date.parse(data.updatedAt), getLang()) }) : '');
-  setHidden(staleNotice, !stale);
   card.share.onclick = () => void share(shareTextFor(data, getLang()));
-  showScreen(app, 'card');
+  goTo('card');
 }
 
 async function share(text: string | null): Promise<void> {
@@ -78,24 +117,25 @@ async function share(text: string | null): Promise<void> {
 
 function choose(slug: string): void {
   storage.set(STORAGE_KEYS.town, slug);
+  // A shared link (/krakow/) must not win over this choice on a later retry or reload.
+  history.replaceState(null, '', '/');
   void openTown(slug, false);
 }
 
 function showPicker(): void {
   picker.input.value = '';
   renderSuggestions(picker, towns, '');
-  setText(picker.status, '');
-  setHidden(staleNotice, true);
-  showScreen(app, 'picker');
+  setPickerStatus(null);
+  goTo('picker');
   picker.input.focus();
 }
 
 async function boot(): Promise<void> {
   paintStatic();
-  showScreen(app, 'loading');
+  goTo('loading');
   const index = await fetchJson('/data/index.json', isTownIndex);
   if (index === null) {
-    showScreen(app, 'error');
+    goTo('error');
     return;
   }
   towns = index;
@@ -117,18 +157,29 @@ picker.results.addEventListener('click', (event) => {
   }
 });
 picker.locate.addEventListener('click', () => {
-  setText(picker.status, t('picker.locating'));
+  if (navigator.geolocation === undefined) {
+    setPickerStatus('picker.locateFailed');
+    return;
+  }
+  setPickerStatus('picker.locating');
   navigator.geolocation.getCurrentPosition(
     (position) => {
+      if (app.dataset['screen'] !== 'picker') {
+        // Left the picker while locating; a late result must not jump the reader back to it.
+        return;
+      }
       const town = townFromPosition(position.coords.latitude, position.coords.longitude, towns);
       if (town === null) {
-        setText(picker.status, t('picker.locateFailed'));
+        setPickerStatus('picker.locateFailed');
       } else {
         choose(town.slug);
       }
     },
     () => {
-      setText(picker.status, t('picker.locateFailed'));
+      if (app.dataset['screen'] !== 'picker') {
+        return;
+      }
+      setPickerStatus('picker.locateFailed');
     },
     { maximumAge: 600_000, timeout: 15_000 },
   );
@@ -141,14 +192,15 @@ card.makeMine.addEventListener('click', () => {
 });
 need(document, '#btn-ranking').addEventListener('click', () => {
   void (async () => {
-    showScreen(app, 'loading');
+    goTo('loading');
     const summary = await fetchJson('/data/national.json', isNationalSummary);
     if (summary === null) {
-      showScreen(app, 'error');
+      goTo('error');
       return;
     }
+    lastSummary = summary;
     renderRanking(ranking, summary, getLang());
-    showScreen(app, 'ranking');
+    goTo('ranking');
   })();
 });
 need(document, '#btn-ranking-back').addEventListener('click', () => {
@@ -163,8 +215,13 @@ langButton.addEventListener('click', () => {
   setLang(otherLang());
   storage.set(STORAGE_KEYS.lang, getLang());
   paintStatic();
-  if (current !== null && app.dataset['screen'] === 'card') {
-    void openTown(current.slug, current.shared);
+  setPickerStatus(pickerStatusKey);
+  const screen = app.dataset['screen'];
+  if (screen === 'card' && lastCard !== null) {
+    renderCard(card, cardModel(lastCard, getLang()));
+    paintStaleNotice(lastCard.updatedAt);
+  } else if (screen === 'ranking' && lastSummary !== null) {
+    renderRanking(ranking, lastSummary, getLang());
   }
 });
 
