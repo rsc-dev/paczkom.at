@@ -30,7 +30,7 @@ const card: CardNodes = cardNodes(document);
 const ranking = rankingNodes(document);
 const langButton = need<HTMLButtonElement>(document, '#btn-lang');
 const staleNotice = need<HTMLElement>(document, '#notice-stale');
-const route = parseRoute(location.pathname, location.search);
+let route = parseRoute(location.pathname, location.search);
 const requests = createRequestToken();
 
 type PickerStatusKey = 'picker.locating' | 'picker.locateFailed' | null;
@@ -117,8 +117,11 @@ async function share(text: string | null): Promise<void> {
 
 function choose(slug: string): void {
   storage.set(STORAGE_KEYS.town, slug);
-  // A shared link (/krakow/) must not win over this choice on a later retry or reload.
+  // A shared link (/krakow/) must not win over this choice on a later retry or
+  // reload: reload re-parses the (now root) location, but a retry re-runs
+  // boot() against this same in-memory route, so its slug must be cleared too.
   history.replaceState(null, '', '/');
+  route = { ...route, slug: null };
   void openTown(slug, false);
 }
 

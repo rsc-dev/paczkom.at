@@ -10,7 +10,7 @@ test('first visit: search without diacritics, pick, and the town is remembered',
   await page.locator('[data-slug="lodz"]').click();
   await expect(app(page)).toHaveAttribute('data-screen', 'card');
   await expect(page.locator('#card-town')).toHaveText('Łódź');
-  await expect(page.locator('#card-level-of')).toHaveText(/^[1-6]\/6$|^$/);
+  await expect(page.locator('#card-level-of')).toHaveText(/^[1-6]\/6$/);
   await expect(page.locator('#notice-stale')).toBeHidden();
 
   await page.reload();
@@ -86,6 +86,23 @@ test('an old game link says the game is gone and still works', async ({ page }) 
   await open(page, '/?week=k3j9x');
   await expect(page.locator('#notice-retired')).toBeVisible();
   await expect(app(page)).toHaveAttribute('data-screen', 'picker');
+});
+
+test('choosing a new town after a shared link survives a failed retry', async ({ page }) => {
+  await open(page, '/gdansk');
+  await expect(page.locator('#card-town')).toHaveText('Gdańsk');
+
+  await page.locator('#btn-change').click();
+  await page.locator('#picker-input').fill('krak');
+  await page.route('**/data/towns/krakow.json', (route) => route.fulfill({ status: 503 }));
+  await page.locator('[data-slug="krakow"]').click();
+  await expect(app(page)).toHaveAttribute('data-screen', 'error');
+
+  // The retry must re-open the town just chosen, not fall back to the
+  // earlier shared link, whose slug the boot-time route object still held.
+  await page.unroute('**/data/towns/krakow.json');
+  await page.locator('#btn-retry').click();
+  await expect(page.locator('#card-town')).toHaveText('Kraków');
 });
 
 test('sharing falls back to copyable text without share or clipboard', async ({ page }) => {
