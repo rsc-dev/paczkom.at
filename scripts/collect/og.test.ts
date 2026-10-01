@@ -17,7 +17,7 @@ describe('renderTownOg', () => {
 });
 
 describe('level colours', () => {
-  it.todo('match the theme tokens the page uses', () => {
+  it('match the theme tokens the page uses', () => {
     const css = readFileSync('src/theme/tokens.css', 'utf8');
     for (const level of [1, 2, 3, 4, 5, 6] as const) {
       expect(css).toContain(`--level-${String(level)}: ${OG_LEVEL_FILL[level]};`);

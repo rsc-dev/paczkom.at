@@ -89,21 +89,15 @@ describe('static assets', () => {
 describe('index.html', () => {
   const html = read('index.html');
 
-  it('is the only page, and carries the four screens', () => {
-    for (const id of ['screen-title', 'screen-howto', 'screen-game', 'screen-result']) {
+  it('is the only page, and carries the five screens', () => {
+    for (const id of ['screen-loading', 'screen-error', 'screen-picker', 'screen-card', 'screen-ranking']) {
       expect(html).toContain(`id="${id}"`);
     }
   });
 
-  it('has the scenery slot in front of the wall', () => {
-    expect(html.indexOf('class="scenery"')).toBeGreaterThan(0);
-    expect(html.indexOf('class="scenery"')).toBeLessThan(html.indexOf('id="stage"'));
-  });
-
-  it('links the manifest, the favicon and the theme', () => {
+  it('links the manifest and the favicon', () => {
     expect(html).toContain('rel="manifest"');
     expect(html).toContain('/favicon.svg');
-    expect(html).toContain('data-theme="signage"');
   });
 });
 

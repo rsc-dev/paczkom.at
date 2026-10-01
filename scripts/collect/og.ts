@@ -9,6 +9,8 @@ import type { Level } from '../../src/core/levels.js';
 import type { TownCard } from '../../src/core/publish.js';
 import { levelName } from '../../src/i18n/index.js';
 
+export { formatWhen } from '../../src/ui/format.js';
+
 /** Same values as --level-N / --level-ink-N in src/theme/tokens.css (tested). */
 export const OG_LEVEL_FILL: Readonly<Record<Level, string>> = {
   1: '#57b108', 2: '#b0dd10', 3: '#ffd911', 4: '#e58100', 5: '#e50000', 6: '#990000',
@@ -56,13 +58,6 @@ function measuredWidth(text: string, fontSize: number): number {
 export function titleFontSize(name: string): number {
   const width = measuredWidth(name, TITLE_FONT_SIZE);
   return width <= CONTENT_WIDTH ? TITLE_FONT_SIZE : Math.max(1, Math.floor((TITLE_FONT_SIZE * CONTENT_WIDTH) / width));
-}
-
-export function formatWhen(ms: number, lang: 'pl' | 'en'): string {
-  const locale = lang === 'pl' ? 'pl-PL' : 'en-GB';
-  const date = new Intl.DateTimeFormat(locale, { timeZone: 'Europe/Warsaw', day: 'numeric', month: 'short' }).format(ms);
-  const time = new Intl.DateTimeFormat(locale, { timeZone: 'Europe/Warsaw', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms);
-  return `${date.replace('.', '')}, ${time}`;
 }
 
 export function renderTownOg(card: TownCard, when: string): Buffer {
