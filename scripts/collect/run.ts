@@ -18,19 +18,32 @@ export interface Sources {
   readonly failures: string[];
 }
 
+/** Injectable so tests can simulate a live fetch without a network call. */
+interface Fetchers {
+  readonly fetchGios: () => Promise<{ stations: GiosStation[]; indexes: GiosIndex[] }>;
+  readonly fetchSensorCommunity: () => Promise<CitizenReading[]>;
+}
+
 const readFixture = (dir: string, name: string): unknown => {
   const path = join(dir, name);
   return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as unknown) : null;
 };
 
 /**
- * A source "failed" when we could not read it at all — the fetch threw, or in
- * fixtures mode the file is missing — not when it legitimately parsed to zero
- * items. Parsers never throw (see sources.ts); a structurally-empty but
- * present response is real data for a quiet hour, and `MIN_TOWNS_WITH_DATA`
- * is what decides whether that hour is publishable.
+ * In fixtures mode, a source "failed" when its fixture file is missing — not
+ * when it legitimately parsed to zero items — because `--fixtures` is a fixed
+ * snapshot and an empty-but-present file is a deliberately recorded case (see
+ * run.test.ts). In live mode there is no such file to check for presence, so
+ * a fetch that resolves without throwing but yields nothing (e.g. GIOŚ with
+ * every per-station index call failing, or Sensor.Community replying `[]`) is
+ * itself the signal: the source gave nothing, and --check-live and the exit-1
+ * "both sources failed" guard both depend on that. Either way,
+ * `MIN_TOWNS_WITH_DATA` remains the real safety net for low-but-nonzero data.
  */
-export async function loadSources(mode: { fixtures?: string }): Promise<Sources> {
+export async function loadSources(
+  mode: { fixtures?: string },
+  fetchers: Fetchers = { fetchGios, fetchSensorCommunity },
+): Promise<Sources> {
   const failures: string[] = [];
   let stations: GiosStation[] = [];
   let indexes: GiosIndex[] = [];
@@ -47,7 +60,10 @@ export async function loadSources(mode: { fixtures?: string }): Promise<Sources>
         failures.push('gios');
       }
     } else {
-      ({ stations, indexes } = await fetchGios());
+      ({ stations, indexes } = await fetchers.fetchGios());
+      if (indexes.length === 0) {
+        failures.push('gios');
+      }
     }
   } catch (error) {
     process.stderr.write(`gios: ${String(error)}\n`);
@@ -62,7 +78,10 @@ export async function loadSources(mode: { fixtures?: string }): Promise<Sources>
         failures.push('sensor-community');
       }
     } else {
-      citizen = await fetchSensorCommunity();
+      citizen = await fetchers.fetchSensorCommunity();
+      if (citizen.length === 0) {
+        failures.push('sensor-community');
+      }
     }
   } catch (error) {
     process.stderr.write(`sensor-community: ${String(error)}\n`);

@@ -2,7 +2,7 @@
 import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { EMPTY_HISTORY, parseHistory } from '../../src/core/history.js';
 import { buildOutputs } from '../../src/core/outputs.js';
 import { isNationalSummary, isTownCard, isTownIndex } from '../../src/core/publish.js';
@@ -15,6 +15,13 @@ const SHELL = '<title>x</title><meta property="og:title" content="" /><meta prop
 // The fixtures were recorded at this instant (Task 10); grading against it
 // yields real levels instead of "too old" for almost everything.
 const NOW_MS = Date.parse('2026-10-01T17:12:00Z');
+
+const citizenReading = (sensorId: number) => ({
+  sensorId, lat: 50.06, lon: 19.94, indoor: false, at: Date.now(), pm25: 5, pm10: 8, humidity: null,
+});
+
+/** Silences stderr for a test and returns the spy so the warning text can be asserted. */
+const spyOnStderr = () => vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
 describe('loadSources from fixtures', () => {
   it('loads both sources with no failures', async () => {
@@ -32,25 +39,81 @@ describe('loadSources from fixtures', () => {
   });
 });
 
-describe('readHistory', () => {
-  it('returns empty history when the file is missing', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'hist-'));
-    expect(readHistory(join(dir, 'missing.json'))).toEqual(EMPTY_HISTORY);
+describe('loadSources in live mode (injected fetchers)', () => {
+  it('flags both sources when they resolve without throwing but yield nothing', async () => {
+    const stderr = spyOnStderr();
+    const sources = await loadSources(
+      {},
+      {
+        fetchGios: () => Promise.resolve({ stations: [], indexes: [] }),
+        fetchSensorCommunity: () => Promise.resolve([]),
+      },
+    );
+    expect(sources.failures).toEqual(['gios', 'sensor-community']);
+    stderr.mockRestore();
   });
 
-  it('returns empty history for truncated JSON instead of crashing', () => {
+  it('flags only the source that throws, not a healthy one', async () => {
+    const stderr = spyOnStderr();
+    const sources = await loadSources(
+      {},
+      {
+        fetchGios: () => Promise.reject(new Error('network down')),
+        fetchSensorCommunity: () => Promise.resolve([citizenReading(1)]),
+      },
+    );
+    expect(sources.failures).toEqual(['gios']);
+    expect(stderr).toHaveBeenCalledWith(expect.stringContaining('gios: Error: network down'));
+    stderr.mockRestore();
+  });
+
+  it('reports no failures when both sources return data', async () => {
+    const stderr = spyOnStderr();
+    const sources = await loadSources(
+      {},
+      {
+        fetchGios: () =>
+          Promise.resolve({
+            stations: [{ stationId: 1, lat: 50.06, lon: 19.94 }],
+            indexes: [{ stationId: 1, level: 2, at: Date.now() }],
+          }),
+        fetchSensorCommunity: () => Promise.resolve([citizenReading(1)]),
+      },
+    );
+    expect(sources.failures).toEqual([]);
+    stderr.mockRestore();
+  });
+});
+
+describe('readHistory', () => {
+  it('returns empty history and warns when the file is missing', () => {
+    const stderr = spyOnStderr();
+    const dir = mkdtempSync(join(tmpdir(), 'hist-'));
+    const path = join(dir, 'missing.json');
+    expect(readHistory(path)).toEqual(EMPTY_HISTORY);
+    expect(stderr).toHaveBeenCalledWith(expect.stringContaining(`${path} not found`));
+    stderr.mockRestore();
+  });
+
+  it('returns empty history and warns for truncated JSON instead of crashing', () => {
+    const stderr = spyOnStderr();
     const dir = mkdtempSync(join(tmpdir(), 'hist-'));
     const path = join(dir, 'h.json');
     writeFileSync(path, '{"version":1,"entries":[');
     expect(readHistory(path)).toEqual(EMPTY_HISTORY);
+    expect(stderr).toHaveBeenCalledWith(expect.stringContaining('history: SyntaxError'));
+    stderr.mockRestore();
   });
 
-  it('reads the entries of a valid history file', () => {
+  it('reads the entries of a valid history file without warning', () => {
+    const stderr = spyOnStderr();
     const dir = mkdtempSync(join(tmpdir(), 'hist-'));
     const path = join(dir, 'h.json');
     const raw = { version: 1, entries: [{ at: 1000, levels: { krakow: 2 } }] };
     writeFileSync(path, JSON.stringify(raw));
     expect(readHistory(path)).toEqual(parseHistory(raw));
+    expect(stderr).not.toHaveBeenCalled();
+    stderr.mockRestore();
   });
 });
 
