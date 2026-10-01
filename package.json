@@ -15,7 +15,8 @@
     "gen:fixtures": "tsx scripts/generate-scripted-days.ts && tsx scripts/generate-scripted-weeks.ts",
     "gen:icons": "tsx scripts/generate-icons.ts",
     "gen:towns": "tsx scripts/generate-towns.ts",
-    "record:fixtures": "tsx scripts/record-fixtures.ts"
+    "record:fixtures": "tsx scripts/record-fixtures.ts",
+    "collect": "tsx scripts/collect.ts"
   },
   "engines": {
     "node": "^20.19 || >=22.13"
