@@ -44,6 +44,13 @@ function sourceLine(card: TownCard, lang: Lang): string {
   const parts: string[] = [];
   if (card.source === 'gios') {
     parts.push(translate(lang, 'card.source.gios'));
+    if ((card.pm25 !== null || card.pm10 !== null) && card.sensorCount > 0) {
+      parts.push(
+        card.sensorCount === 1
+          ? translate(lang, 'card.source.giosPmOne')
+          : translate(lang, 'card.source.giosPm', { count: card.sensorCount }),
+      );
+    }
   } else if (card.source === 'citizen') {
     parts.push(
       card.sensorCount === 1

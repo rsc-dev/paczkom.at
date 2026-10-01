@@ -32,6 +32,8 @@ export const en: Readonly<Record<MessageKey, string>> = {
   'card.worstToday': 'Worst today: {level} at {hour}',
   'card.percentile': 'Better than {percent}% of towns in Poland',
   'card.source.gios': 'Official GIOŚ station',
+  'card.source.giosPmOne': 'PM: one citizen sensor',
+  'card.source.giosPm': 'PM: median of {count} citizen sensors',
   'card.source.citizenOne': 'One citizen sensor',
   'card.source.citizen': 'Median of {count} citizen sensors',
   'card.lowConfidence': 'low confidence',
@@ -54,5 +56,6 @@ export const en: Readonly<Record<MessageKey, string>> = {
   'ranking.back': 'Back',
 
   'game.retired': 'The game has been retired.',
-  'footer.attribution': 'Data: GIOŚ, Sensor.Community (ODbL), GeoNames (CC BY 4.0).',
+  'footer.attribution':
+    'Data: Chief Inspectorate of Environmental Protection (GIOŚ), Sensor.Community (ODbL), GeoNames (CC BY 4.0).',
 };

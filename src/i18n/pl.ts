@@ -36,6 +36,8 @@ export const pl = {
   'card.worstToday': 'Najgorzej dziś: {level} o {hour}',
   'card.percentile': 'Lepiej niż {percent}% miast w Polsce',
   'card.source.gios': 'Oficjalna stacja GIOŚ',
+  'card.source.giosPmOne': 'PM: jeden czujnik obywatelski',
+  'card.source.giosPm': 'PM: mediana {count} czujników obywatelskich',
   'card.source.citizenOne': 'Jeden czujnik obywatelski',
   'card.source.citizen': 'Mediana {count} czujników obywatelskich',
   'card.lowConfidence': 'niska pewność',
@@ -58,7 +60,8 @@ export const pl = {
   'ranking.back': 'Wróć',
 
   'game.retired': 'Gra została wyłączona.',
-  'footer.attribution': 'Dane: GIOŚ, Sensor.Community (ODbL), GeoNames (CC BY 4.0).',
+  'footer.attribution':
+    'Dane: Główny Inspektorat Ochrony Środowiska (GIOŚ), Sensor.Community (ODbL), GeoNames (CC BY 4.0).',
 } as const;
 
 export type MessageKey = keyof typeof pl;

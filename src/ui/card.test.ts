@@ -20,8 +20,12 @@ describe('cardModel', () => {
     });
   });
 
-  it('handles GIOŚ, one sensor, low confidence and no history', () => {
-    expect(cardModel({ ...CARD, source: 'gios' }, 'en').source).toBe('Official GIOŚ station · updated 17:25');
+  it('handles GIOŚ with citizen PM, one sensor, low confidence and no history', () => {
+    // CARD has pm25/pm10 and sensorCount 7: a GIOŚ town whose PM values come
+    // from the median of its citizen sensors must say so (spec §1).
+    expect(cardModel({ ...CARD, source: 'gios' }, 'en').source).toBe(
+      'Official GIOŚ station · PM: median of 7 citizen sensors · updated 17:25',
+    );
     expect(cardModel({ ...CARD, sensorCount: 1, lowConfidence: true }, 'pl').source).toBe(
       'Jeden czujnik obywatelski · niska pewność · aktualizacja 17:25',
     );
@@ -34,6 +38,33 @@ describe('cardModel', () => {
   it('says there is no data instead of guessing', () => {
     const model = cardModel({ ...CARD, level: null, pm25: null, pm10: null, source: 'none', percentileBetter: null }, 'pl');
     expect(model).toMatchObject({ noData: true, levelLabel: 'Brak danych dla tego miasta w tej godzinie.', levelOf: '', pm: null, percentile: null });
+  });
+});
+
+describe('sourceLine on GIOŚ towns measured by citizen sensors', () => {
+  it('labels the PM line as a citizen-sensor median, in both languages', () => {
+    expect(cardModel({ ...CARD, source: 'gios' }, 'pl').source).toBe(
+      'Oficjalna stacja GIOŚ · PM: mediana 7 czujników obywatelskich · aktualizacja 17:25',
+    );
+    expect(cardModel({ ...CARD, source: 'gios' }, 'en').source).toBe(
+      'Official GIOŚ station · PM: median of 7 citizen sensors · updated 17:25',
+    );
+  });
+
+  it('uses the one-sensor variant', () => {
+    expect(cardModel({ ...CARD, source: 'gios', sensorCount: 1 }, 'pl').source).toBe(
+      'Oficjalna stacja GIOŚ · PM: jeden czujnik obywatelski · aktualizacja 17:25',
+    );
+    expect(cardModel({ ...CARD, source: 'gios', sensorCount: 1 }, 'en').source).toBe(
+      'Official GIOŚ station · PM: one citizen sensor · updated 17:25',
+    );
+  });
+
+  it('says nothing extra when a GIOŚ town has no citizen PM data', () => {
+    expect(cardModel({ ...CARD, source: 'gios', pm25: null, pm10: null, sensorCount: 0 }, 'en').source).toBe(
+      'Official GIOŚ station · updated 17:25',
+    );
+    expect(cardModel({ ...CARD, source: 'gios', sensorCount: 0 }, 'en').source).toBe('Official GIOŚ station · updated 17:25');
   });
 });
 
