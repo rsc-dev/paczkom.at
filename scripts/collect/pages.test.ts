@@ -30,4 +30,10 @@ describe('townPage', () => {
   it('throws if the shell is missing a tag it must replace', () => {
     expect(() => townPage('<head></head>', CARD, 'x')).toThrow(/og:title/);
   });
+
+  it('keeps $-patterns in the name literal (not interpreted as a replace() pattern)', () => {
+    const page = townPage(SHELL, { ...CARD, name: 'Foo $& $1 Bar' }, '1 paź, 17:00');
+    expect(page).toContain('<title>Foo $&amp; $1 Bar · paczkom.at</title>');
+    expect(page).toContain('<meta property="og:title" content="Foo $&amp; $1 Bar: Dostateczny (4/6)" />');
+  });
 });

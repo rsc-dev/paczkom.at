@@ -33,6 +33,35 @@ const escape = (text: string): string =>
 
 const decimal = (value: number): string => String(value).replace('.', ',');
 
+const CONTENT_WIDTH = 1040;
+const TITLE_FONT_SIZE = 88;
+
+/**
+ * The actual rendered width of `text` set in Inter Bold at `fontSize`,
+ * measured by rendering it in isolation and reading resvg's bounding box — a
+ * character-count estimate is unreliable across scripts and letter-casing (an
+ * all-caps run is far wider per character than a mixed-case one).
+ */
+function measuredWidth(text: string, fontSize: number): number {
+  const probe = `<svg xmlns="http://www.w3.org/2000/svg" width="8000" height="200">
+  <text x="0" y="150" font-family="Inter" font-weight="700" font-size="${String(fontSize)}">${escape(text)}</text>
+</svg>`;
+  const resvg = new Resvg(probe, { font: { fontFiles: FONTS, loadSystemFonts: false, defaultFontFamily: 'Inter' } });
+  return resvg.getBBox()?.width ?? 0;
+}
+
+/**
+ * The town-name font size: 88 by default, shrunk so long names (e.g.
+ * "Ostrowiec Świętokrzyski") still fit the 1040px content width (x 80..1120)
+ * instead of running past the orange block below. TrueType advance widths
+ * scale linearly with font size, so one measurement at the default size gives
+ * the exact size that fits — no character-count heuristic involved.
+ */
+export function titleFontSize(name: string): number {
+  const width = measuredWidth(name, TITLE_FONT_SIZE);
+  return width <= CONTENT_WIDTH ? TITLE_FONT_SIZE : Math.max(1, Math.floor((TITLE_FONT_SIZE * CONTENT_WIDTH) / width));
+}
+
 export function formatWhen(ms: number, lang: 'pl' | 'en'): string {
   const locale = lang === 'pl' ? 'pl-PL' : 'en-GB';
   const date = new Intl.DateTimeFormat(locale, { timeZone: 'Europe/Warsaw', day: 'numeric', month: 'short' }).format(ms);
@@ -47,7 +76,7 @@ export function renderTownOg(card: TownCard, when: string): Buffer {
   const pm = card.pm25 === null ? '' : `PM2,5: ${decimal(card.pm25)} µg/m³`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <rect width="1200" height="630" fill="${PAPER}"/>
-  <text x="80" y="140" font-family="Inter" font-weight="700" font-size="88" fill="${INK}">${escape(card.name)}</text>
+  <text x="80" y="140" font-family="Inter" font-weight="700" font-size="${String(titleFontSize(card.name))}" fill="${INK}">${escape(card.name)}</text>
   <rect x="80" y="200" width="1040" height="220" rx="24" fill="${fill}"/>
   <text x="120" y="335" font-family="Inter" font-weight="700" font-size="84" fill="${ink}">${escape(label)}</text>
   <text x="80" y="500" font-family="Inter" font-weight="400" font-size="44" fill="${INK}">${escape(pm)}</text>

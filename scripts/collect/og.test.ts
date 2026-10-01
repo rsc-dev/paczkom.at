@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CARD } from '../../src/core/testing.js';
-import { OG_LEVEL_FILL, OG_LEVEL_INK, formatWhen, renderTownOg } from './og.js';
+import { OG_LEVEL_FILL, OG_LEVEL_INK, formatWhen, renderTownOg, titleFontSize } from './og.js';
 
 describe('renderTownOg', () => {
   it('draws a 1200×630 PNG', () => {
@@ -31,5 +31,15 @@ describe('formatWhen', () => {
     const ms = Date.parse('2026-10-01T15:25:00Z');
     expect(formatWhen(ms, 'pl')).toBe('1 paź, 17:25');
     expect(formatWhen(ms, 'en')).toBe('1 Oct, 17:25');
+  });
+});
+
+describe('titleFontSize', () => {
+  it('keeps the default size for a short name', () => {
+    expect(titleFontSize('Kraków')).toBe(88);
+  });
+
+  it('shrinks below the default for a long (40-character) name', () => {
+    expect(titleFontSize('A'.repeat(40))).toBeLessThan(88);
   });
 });

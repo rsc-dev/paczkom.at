@@ -15,7 +15,7 @@ function replaceMeta(html: string, property: string, content: string): string {
   if (!pattern.test(html)) {
     throw new Error(`index.html has no ${property} tag to replace`);
   }
-  return html.replace(pattern, `<meta property="${property}" content="${escape(content)}" />`);
+  return html.replace(pattern, () => `<meta property="${property}" content="${escape(content)}" />`);
 }
 
 export function townPage(shell: string, card: TownCard, when: string): string {
@@ -23,7 +23,7 @@ export function townPage(shell: string, card: TownCard, when: string): string {
   const title =
     card.level === null ? `${card.name}: Brak danych` : `${card.name}: ${PL_LEVEL[card.level]} (${String(card.level)}/6)`;
   const description = card.pm25 === null ? when : `PM2,5: ${String(card.pm25).replace('.', ',')} µg/m³ · ${when}`;
-  let html = shell.replace(/<title>[^<]*<\/title>/, `<title>${escape(card.name)} · paczkom.at</title>`);
+  let html = shell.replace(/<title>[^<]*<\/title>/, () => `<title>${escape(card.name)} · paczkom.at</title>`);
   html = replaceMeta(html, 'og:title', title);
   html = replaceMeta(html, 'og:description', description);
   html = replaceMeta(html, 'og:url', url);
