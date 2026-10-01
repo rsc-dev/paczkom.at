@@ -23,15 +23,19 @@ function byPm(direction: 1 | -1) {
 }
 
 export function buildNational(cards: readonly TownCard[], updatedAt: string): NationalSummary {
-  const ranked: RankedTown[] = cards.flatMap((c) =>
-    c.level === null ? [] : [{ slug: c.slug, name: c.name, level: c.level, pm25: c.pm25 }],
-  );
+  const toRanked = (c: TownCard): RankedTown[] =>
+    c.level === null ? [] : [{ slug: c.slug, name: c.name, level: c.level, pm25: c.pm25 }];
+  const ranked: RankedTown[] = cards.flatMap(toRanked);
+  // A faulty reading shows up as low confidence, not as a grade to be proud
+  // (or ashamed) of: it still counts towards the national picture, but it
+  // must not top the best or worst list.
+  const eligible: RankedTown[] = cards.filter((c) => !c.lowConfidence).flatMap(toRanked);
   const byName = (a: RankedTown, b: RankedTown): number => a.name.localeCompare(b.name, 'pl');
 
-  const best = [...ranked]
+  const best = [...eligible]
     .sort((a, b) => a.level - b.level || byPm(1)(a, b) || byName(a, b))
     .slice(0, RANK_SIZE);
-  const worst = [...ranked]
+  const worst = [...eligible]
     .sort((a, b) => b.level - a.level || byPm(-1)(a, b) || byName(a, b))
     .slice(0, RANK_SIZE);
 

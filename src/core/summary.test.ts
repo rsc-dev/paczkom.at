@@ -2,9 +2,14 @@ import { describe, expect, it } from 'vitest';
 import type { TownCard } from './publish.js';
 import { buildNational, percentileBetter } from './summary.js';
 
-const card = (slug: string, level: TownCard['level'], pm25: number | null = null): TownCard => ({
+const card = (
+  slug: string,
+  level: TownCard['level'],
+  pm25: number | null = null,
+  lowConfidence = false,
+): TownCard => ({
   slug, name: slug.toUpperCase(), level, pm25, pm10: null, source: level === null ? 'none' : 'citizen',
-  sensorCount: 3, lowConfidence: false, worstToday: null, levelYesterday: null, percentileBetter: null,
+  sensorCount: 3, lowConfidence, worstToday: null, levelYesterday: null, percentileBetter: null,
   updatedAt: '2026-10-01T15:25:00.000Z',
 });
 
@@ -40,5 +45,23 @@ describe('buildNational', () => {
 
   it('has no median without data', () => {
     expect(buildNational([card('g', null)], 'x').medianLevel).toBeNull();
+  });
+});
+
+describe('buildNational excludes low confidence from best/worst only', () => {
+  const faulty = card('h', 6, 999, true); // would otherwise top the worst list
+  const cards = [card('a', 1, 5), card('b', 2, 20), faulty];
+  const national = buildNational(cards, '2026-10-01T15:25:00.000Z');
+
+  it('keeps the low-confidence town off both ranked lists', () => {
+    expect(national.best.map((t) => t.slug)).not.toContain('h');
+    expect(national.worst.map((t) => t.slug)).not.toContain('h');
+    expect(national.worst.map((t) => t.slug)).toEqual(['b', 'a']);
+  });
+
+  it('still counts it in countByLevel, medianLevel and withData', () => {
+    expect(national.countByLevel['6']).toBe(1);
+    expect(national.withData).toBe(3);
+    expect(national.medianLevel).toBe(2);
   });
 });
