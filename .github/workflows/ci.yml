@@ -37,14 +37,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Collect from fixtures
+        run: npm run collect -- --fixtures scripts/collect/fixtures --now 2026-10-01T17:12:00Z --history /tmp/history.json
+
       - name: Check what shipped
         run: |
           test -f dist/index.html
           test -f dist/manifest.webmanifest
-          test -f dist/icon-192.png
-          test -f dist/icon-512.png
-          test -f dist/favicon.svg
           test -f dist/og.png
+          test -f dist/data/index.json
+          test -f dist/data/national.json
+          test -f dist/krakow/index.html
+          test -f dist/krakow/og.png
           grep -qx 'paczkom.at' dist/CNAME
 
       - name: Install Chromium

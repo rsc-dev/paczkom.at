@@ -125,16 +125,26 @@ describe('deployment', () => {
     expect(triggers).not.toContain('branches');
   });
 
-  it('has a deploy workflow wired to GitHub Pages on main', () => {
+  it('deploys to GitHub Pages after CI on main, hourly, and on demand', () => {
     const deploy = read('.github', 'workflows', 'deploy.yml');
     expect(deploy).toContain('actions/upload-pages-artifact');
     expect(deploy).toContain('actions/deploy-pages');
     expect(deploy).toContain('branches: [main]');
+    expect(deploy).toContain("cron: '25 * * * *'");
+    expect(deploy).toContain('workflow_dispatch');
   });
 
-  it('deploys the commit CI passed, not whatever main points at', () => {
+  it('collects after building and carries the history in the cache', () => {
     const deploy = read('.github', 'workflows', 'deploy.yml');
+    expect(deploy.indexOf('npm run build')).toBeLessThan(deploy.indexOf('npm run collect'));
+    expect(deploy).toContain('actions/cache/restore');
+    expect(deploy).toContain('actions/cache/save');
     expect(deploy).toContain('github.event.workflow_run.head_sha');
+  });
+
+  it('keeps the schedule alive and checks the live sources', () => {
+    expect(read('.github', 'workflows', 'keepalive.yml')).toContain('schedule');
+    expect(read('.github', 'workflows', 'live-check.yml')).toContain('--check-live');
   });
 
   it('keeps the screenshots and the Playwright report as CI artefacts', () => {

@@ -41,6 +41,9 @@ tag `game-final`.
 
     npm ci
 
+For the end-to-end suite, also fetch the browser it drives:
+`npx playwright install --with-deps chromium`.
+
 ## Develop
 
     npm run build

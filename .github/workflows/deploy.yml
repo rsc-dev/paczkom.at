@@ -1,12 +1,16 @@
 name: Deploy
 
-# Runs only after CI has gone green on `main`, so a red build never reaches
-# the domain. Pages source must be set to "GitHub Actions" in repo settings.
+# After a green CI on main, every hour at :25 (GIOŚ publishes its index around
+# :20), and on demand. Every run builds, collects fresh data and deploys; a
+# collect that cannot grade enough towns fails the run and the last hour stays
+# live. Pages source must be "GitHub Actions".
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
+  schedule:
+    - cron: '25 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -20,13 +24,14 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      # The commit CI actually passed, not whatever `main` points at by now.
+      # After CI: the commit CI passed. Hourly and manual: main.
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha || 'main' }}
@@ -41,6 +46,21 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # The newest saved history; a miss starts fresh.
+      - uses: actions/cache/restore@v4
+        with:
+          path: .history
+          key: history-${{ github.run_id }}
+          restore-keys: history-
+
+      - name: Collect
+        run: npm run collect
+
+      - uses: actions/cache/save@v4
+        with:
+          path: .history
+          key: history-${{ github.run_id }}-${{ github.run_attempt }}
 
       - uses: actions/configure-pages@v5
 

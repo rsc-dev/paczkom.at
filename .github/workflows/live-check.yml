@@ -1,0 +1,23 @@
+name: Live sources
+
+# Fails loudly when GIOŚ or Sensor.Community stops answering or changes shape,
+# before the hourly deploy starts failing on it.
+on:
+  schedule:
+    - cron: '40 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run collect -- --check-live
