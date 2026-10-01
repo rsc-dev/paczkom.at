@@ -43,7 +43,11 @@ jobs:
       - name: Check what shipped
         run: |
           test -f dist/index.html
+          test -f dist/404.html
           test -f dist/manifest.webmanifest
+          test -f dist/icon-192.png
+          test -f dist/icon-512.png
+          test -f dist/favicon.svg
           test -f dist/og.png
           test -f dist/data/index.json
           test -f dist/data/national.json
@@ -56,15 +60,6 @@ jobs:
 
       - name: Smoke test
         run: npm run test:e2e
-
-      - name: Upload viewport screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screens
-          path: test-results/screens/
-          retention-days: 7
-          if-no-files-found: warn
 
       - name: Upload Playwright report on failure
         if: failure()

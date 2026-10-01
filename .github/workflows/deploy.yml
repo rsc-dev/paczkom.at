@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -24,17 +25,33 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      # After CI: the commit CI passed. Hourly and manual: main.
+      # Hourly and manual runs do not know which commit on main is green, and
+      # must not guess: a red build never reaches the domain, so they look up
+      # the head SHA of the latest successful CI run on main themselves.
+      - name: Resolve the latest green commit on main
+        id: green
+        if: github.event_name != 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha=$(gh run list --workflow CI --branch main --status success --limit 1 --json headSha --jq '.[0].headSha')
+          if [ -z "$sha" ]; then
+            echo "no successful CI run found for main" >&2
+            exit 1
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      # After CI: the commit CI passed. Hourly and manual: the latest green commit above.
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || 'main' }}
+          ref: ${{ github.event.workflow_run.head_sha || steps.green.outputs.sha }}
 
       - uses: actions/setup-node@v4
         with:

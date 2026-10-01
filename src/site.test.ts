@@ -142,16 +142,29 @@ describe('deployment', () => {
     expect(deploy).toContain('github.event.workflow_run.head_sha');
   });
 
+  it('only deploys a workflow_run that is a successful push from this repository', () => {
+    const deploy = read('.github', 'workflows', 'deploy.yml');
+    expect(deploy).toContain("github.event.workflow_run.conclusion == 'success'");
+    expect(deploy).toContain("github.event.workflow_run.event == 'push'");
+    expect(deploy).toContain('github.event.workflow_run.head_repository.full_name == github.repository');
+  });
+
+  it('resolves the latest green commit on main for hourly and manual runs', () => {
+    const deploy = read('.github', 'workflows', 'deploy.yml');
+    expect(deploy).toContain('actions: read');
+    expect(deploy).toContain('gh run list --workflow CI --branch main --status success');
+    expect(deploy).toContain('steps.green.outputs.sha');
+  });
+
   it('keeps the schedule alive and checks the live sources', () => {
     expect(read('.github', 'workflows', 'keepalive.yml')).toContain('schedule');
     expect(read('.github', 'workflows', 'live-check.yml')).toContain('--check-live');
   });
 
-  it('keeps the screenshots and the Playwright report as CI artefacts', () => {
+  it('keeps the Playwright report as a CI artefact on failure', () => {
     const ci = read('.github', 'workflows', 'ci.yml');
-    expect(ci).toContain('test-results/screens/');
     expect(ci).toContain('playwright-report/');
-    expect(ci).toContain('if: always()');
+    expect(ci).toContain('if: failure()');
   });
 
   it('documents setup, running and deployment in the README', () => {
