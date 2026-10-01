@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "paczkom.at — a small browser game about a parcel locker",
+  "description": "paczkom.at — hourly air quality for your town",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

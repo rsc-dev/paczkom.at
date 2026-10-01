@@ -40,6 +40,9 @@ describe('zero runtime dependencies', () => {
       'test',
       'test:e2e',
       'gen:icons',
+      'gen:towns',
+      'collect',
+      'record:fixtures',
     ]) {
       expect(Object.keys(pkg.scripts ?? {})).toContain(script);
     }
@@ -95,6 +98,10 @@ describe('index.html', () => {
     }
   });
 
+  it('credits every data source', () => {
+    expect(html).toContain('data-t="footer.attribution"');
+  });
+
   it('links the manifest and the favicon', () => {
     expect(html).toContain('rel="manifest"');
     expect(html).toContain('/favicon.svg');
@@ -143,7 +150,15 @@ describe('deployment', () => {
       expect(readme, heading).toContain(heading);
     }
     expect(readme).toContain('paczkom.at');
-    expect(readme).toContain('LAUNCH_EPOCH');
+    expect(readme).toContain('## Data and attribution');
+  });
+});
+
+describe('trade-mark discipline', () => {
+  it('never says Paczkomat in the page or the copy', () => {
+    for (const file of ['index.html', 'src/i18n/pl.ts', 'src/i18n/en.ts', 'public/manifest.webmanifest']) {
+      expect(read(file).toLowerCase(), file).not.toContain('paczkomat');
+    }
   });
 });
 
@@ -152,7 +167,7 @@ describe('link previews', () => {
   const meta = (attr: 'property' | 'name', key: string): string | undefined =>
     new RegExp(`<meta ${attr}="${key}" content="([^"]*)"`).exec(html)?.[1];
 
-  it('describe the game to anything that unfurls a link', () => {
+  it('describe the site to anything that unfurls a link', () => {
     expect(meta('property', 'og:title')).toBe('paczkom.at');
     expect(meta('property', 'og:description')).not.toBe('');
     expect(meta('property', 'og:url')).toBe('https://paczkom.at/');

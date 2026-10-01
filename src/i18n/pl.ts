@@ -1,8 +1,8 @@
 /**
  * Polish catalogue — the default language.
  *
- * Wording note: "Paczkomat" is a registered mark of a parcel-locker operator
- * and must not appear in copy; this site uses no data of theirs.
+ * Wording note: the operator's registered mark for parcel lockers must not
+ * appear in copy; this site uses no data of theirs.
  */
 export const pl = {
   'app.tagline': 'Jakość powietrza w Twoim mieście, co godzinę.',
