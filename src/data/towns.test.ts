@@ -23,6 +23,48 @@ describe('src/data/towns.json', () => {
     }
   });
 
+  it('prefers the current Polish name over a historic GeoNames alternate name', () => {
+    const names = new Set(towns.map((t) => t.name));
+    for (const name of [
+      'Piła',
+      'Śrem',
+      'Skwierzyna',
+      'Mosina',
+      'Pleszew',
+      'Pniewy',
+      'Pobiedziska',
+      'Rogoźno',
+      'Świebodzin',
+      'Wolsztyn',
+      'Zbąszyń',
+      'Wschowa',
+      'Słubice',
+      'Sulechów',
+      'Strzelce Krajeńskie',
+    ]) {
+      expect(names.has(name), name).toBe(true);
+    }
+    for (const garbled of [
+      'Pyla',
+      'Srim',
+      'Squirzina',
+      'Moßin',
+      'Pleßew',
+      'Pniewi',
+      'Powiewißko',
+      'Rogoßno',
+      'Swiboßin',
+      'Wolßtin',
+      'Zabaßin',
+      'Zchowa',
+      'Zliwice',
+      'Zulichowo',
+      'Feriedebergk',
+    ]) {
+      expect(names.has(garbled), garbled).toBe(false);
+    }
+  });
+
   it('keeps every town inside Poland', () => {
     for (const town of towns) {
       expect(town.lat).toBeGreaterThan(49);

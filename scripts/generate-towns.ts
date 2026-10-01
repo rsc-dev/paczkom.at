@@ -4,7 +4,7 @@
  *   npm run gen:towns
  */
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -60,3 +60,5 @@ const towns = selectTowns(places, polishNames, include);
 const target = fileURLToPath(new URL('../src/data/towns.json', import.meta.url));
 writeFileSync(target, `${JSON.stringify(towns, null, 1)}\n`);
 process.stdout.write(`wrote ${String(towns.length)} towns to ${target}\n`);
+
+rmSync(work, { recursive: true, force: true });
