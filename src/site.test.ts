@@ -39,7 +39,6 @@ describe('zero runtime dependencies', () => {
       'lint',
       'test',
       'test:e2e',
-      'gen:fixtures',
       'gen:icons',
     ]) {
       expect(Object.keys(pkg.scripts ?? {})).toContain(script);

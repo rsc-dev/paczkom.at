@@ -12,7 +12,6 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "gen:fixtures": "tsx scripts/generate-scripted-days.ts && tsx scripts/generate-scripted-weeks.ts",
     "gen:icons": "tsx scripts/generate-icons.ts",
     "gen:towns": "tsx scripts/generate-towns.ts",
     "record:fixtures": "tsx scripts/record-fixtures.ts",

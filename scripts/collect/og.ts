@@ -7,11 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { Resvg } from '@resvg/resvg-js';
 import type { Level } from '../../src/core/levels.js';
 import type { TownCard } from '../../src/core/publish.js';
-
-/** Temporary until Task 13 adds `levelName` to i18n; then delete this map. */
-export const PL_LEVEL: Readonly<Record<Level, string>> = {
-  1: 'Bardzo dobry', 2: 'Dobry', 3: 'Umiarkowany', 4: 'Dostateczny', 5: 'Zły', 6: 'Bardzo zły',
-};
+import { levelName } from '../../src/i18n/index.js';
 
 /** Same values as --level-N / --level-ink-N in src/theme/tokens.css (tested). */
 export const OG_LEVEL_FILL: Readonly<Record<Level, string>> = {
@@ -72,7 +68,7 @@ export function formatWhen(ms: number, lang: 'pl' | 'en'): string {
 export function renderTownOg(card: TownCard, when: string): Buffer {
   const fill = card.level === null ? NO_DATA : OG_LEVEL_FILL[card.level];
   const ink = card.level === null ? INK : OG_LEVEL_INK[card.level];
-  const label = card.level === null ? 'Brak danych' : `${PL_LEVEL[card.level]} (${String(card.level)}/6)`;
+  const label = card.level === null ? 'Brak danych' : `${levelName(card.level, 'pl')} (${String(card.level)}/6)`;
   const pm = card.pm25 === null ? '' : `PM2,5: ${decimal(card.pm25)} µg/m³`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <rect width="1200" height="630" fill="${PAPER}"/>

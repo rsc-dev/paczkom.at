@@ -79,23 +79,6 @@ describe('theme files', () => {
     expect(reduced).toContain('--motion-fast: 0ms');
   });
 
-  it('restates the whole palette under the signage theme', () => {
-    const tokens = css('tokens.css');
-    const signage = css('signage.css');
-    const colourTokens = [...tokens.matchAll(/^\s{2}(--[a-z-]+):\s*#[0-9a-f]{3,8};/gm)].map(
-      (match) => match[1] ?? '',
-    );
-    expect(colourTokens.length).toBeGreaterThan(15);
-    for (const token of colourTokens) {
-      expect(signage, token).toContain(`${token}:`);
-    }
-  });
-
-  it('keeps a scenery slot that the signage theme collapses', () => {
-    expect(css('signage.css')).toContain('.scenery');
-    expect(css('signage.css')).toContain('block-size: 0');
-  });
-
   it('bundles the Latin Extended subset so Polish renders in the same face', () => {
     const fonts = css('fonts.css');
     expect(fonts).toContain('inter-latin-ext-400-normal.woff2');

@@ -5,7 +5,7 @@
  */
 import { SHARE_URL } from '../../src/core/share.js';
 import type { TownCard } from '../../src/core/publish.js';
-import { PL_LEVEL } from './og.js';
+import { levelName } from '../../src/i18n/index.js';
 
 const escape = (text: string): string =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -21,7 +21,7 @@ function replaceMeta(html: string, property: string, content: string): string {
 export function townPage(shell: string, card: TownCard, when: string): string {
   const url = `${SHARE_URL}/${card.slug}`;
   const title =
-    card.level === null ? `${card.name}: Brak danych` : `${card.name}: ${PL_LEVEL[card.level]} (${String(card.level)}/6)`;
+    card.level === null ? `${card.name}: Brak danych` : `${card.name}: ${levelName(card.level, 'pl')} (${String(card.level)}/6)`;
   const description = card.pm25 === null ? when : `PM2,5: ${String(card.pm25).replace('.', ',')} µg/m³ · ${when}`;
   let html = shell.replace(/<title>[^<]*<\/title>/, () => `<title>${escape(card.name)} · paczkom.at</title>`);
   html = replaceMeta(html, 'og:title', title);

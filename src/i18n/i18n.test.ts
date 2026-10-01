@@ -1,15 +1,14 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { COLOURS, STICKERS } from '../core/parcel.js';
+import { LEVELS } from '../core/levels.js';
 import { en } from './en.js';
 import {
   LANGS,
-  colourName,
   detectLang,
   getLang,
-  hintLine,
   isLang,
+  levelName,
   setLang,
   t,
   translate,
@@ -72,23 +71,10 @@ describe('catalogues', () => {
     );
     expect(unused).toEqual([]);
   });
-
-  it('cover every colour, sticker and size token', () => {
-    for (const colour of COLOURS) {
-      expect(Object.keys(pl)).toContain(`colour.${colour}`);
-    }
-    for (const sticker of STICKERS) {
-      expect(Object.keys(pl)).toContain(`sticker.${sticker}`);
-    }
-    for (const size of ['A', 'B', 'C']) {
-      expect(Object.keys(pl)).toContain(`size.${size}`);
-    }
-  });
 });
 
 describe('brand wording', () => {
-  // "Paczkomat" is a registered mark; the game calls the machine an
-  // "automat paczkowy" / "parcel locker".
+  // "Paczkomat" is a registered mark; this site uses no data of theirs.
   const forbidden: RegExp[] = [
     /paczkomat/i,
     /inpost/i,
@@ -112,30 +98,25 @@ describe('brand wording', () => {
       expect(offenders).toEqual([]);
     },
   );
-
-  it('names the machine the way the trademark note requires', () => {
-    expect(pl['app.tagline']).toContain('automatu paczkowego');
-    expect(en['app.tagline']).toContain('parcel locker');
-  });
 });
 
 describe('t', () => {
   it('translates in the current language', () => {
     setLang('pl');
-    expect(t('title.play')).toBe('Dzisiaj');
+    expect(t('card.share')).toBe('Udostępnij');
     setLang('en');
-    expect(t('title.play')).toBe('Today');
+    expect(t('card.share')).toBe('Share');
   });
 
   it('interpolates parameters', () => {
     setLang('pl');
-    expect(t('hint.colour', { colour: 'czerwony' })).toContain('czerwony');
-    expect(t('title.streak', { count: 4 })).toBe('Seria: 4');
+    expect(t('card.pm25', { value: '48' })).toContain('48');
+    expect(t('ranking.count', { level: 'Dobry', count: 4 })).toBe('Dobry: 4');
   });
 
   it('leaves an unknown placeholder alone rather than printing undefined', () => {
     setLang('pl');
-    expect(t('title.streak')).toBe('Seria: {count}');
+    expect(t('ranking.count', { level: 'Dobry' })).toBe('Dobry: {count}');
   });
 
   it('falls back to the key for an unknown message', () => {
@@ -176,41 +157,11 @@ describe('language selection', () => {
   });
 });
 
-describe('hint lines', () => {
-  it('names the colour alone when there is no sticker', () => {
-    expect(hintLine('red', 'none', 'pl')).toBe('ten czerwony');
-    expect(hintLine('red', 'none', 'en')).toBe('the red one');
-  });
-
-  it('names the colour and the sticker together', () => {
-    expect(hintLine('blue', 'fragile', 'pl')).toBe('ten niebieski z napisem „Ostrożnie”');
-    expect(hintLine('blue', 'fragile', 'en')).toBe('the blue one with the fragile sticker');
-  });
-
-  it('reads naturally for every sticker, in both languages', () => {
-    expect(hintLine('red', 'arrow', 'pl')).toBe('ten czerwony ze strzałką');
-    expect(hintLine('red', 'bang', 'pl')).toBe('ten czerwony z wykrzyknikiem');
-    expect(hintLine('red', 'arrow', 'en')).toBe('the red one with the arrow sticker');
-    expect(hintLine('red', 'bang', 'en')).toBe('the red one with the exclamation mark');
-    for (const sticker of STICKERS) {
-      for (const lang of LANGS) {
-        const line = hintLine('green', sticker, lang);
-        expect(line).not.toContain('{');
-        expect(line).not.toContain('hint.');
-      }
-    }
-  });
-
-  it('has a name for every colour in both languages', () => {
-    for (const colour of COLOURS) {
-      for (const lang of LANGS) {
-        expect(colourName(colour, lang)).not.toBe(`colour.${colour}`);
-      }
-    }
-  });
-
-  it('uses the current language by default', () => {
-    setLang('en');
-    expect(hintLine('green', 'none')).toBe('the green one');
+describe('levelName', () => {
+  it('names every level in both languages', () => {
+    expect(LEVELS.map((level) => levelName(level, 'pl'))).toEqual([
+      'Bardzo dobry', 'Dobry', 'Umiarkowany', 'Dostateczny', 'Zły', 'Bardzo zły',
+    ]);
+    expect(levelName(4, 'en')).toBe('Sufficient');
   });
 });
