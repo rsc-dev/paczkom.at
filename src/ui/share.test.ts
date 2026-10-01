@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { shareText, targetsFrom } from './share.js';
 
-const TEXT = 'paczkom.at · Dzisiaj #12\n📦\n1240 pkt · 1:47\nhttps://www.paczkom.at';
+const TEXT = 'paczkom.at · Dzisiaj #12\n📦\n1240 pkt · 1:47\nhttps://paczkom.at';
 
 describe('shareText', () => {
   it('uses the share sheet when the browser will take the payload', async () => {

@@ -124,7 +124,7 @@ describe('buildWeekShareText', () => {
         'Pt ⭐ 1950',
         'So ❌',
         'Razem 7900 pkt',
-        'https://www.paczkom.at/?week=k3j9x',
+        'https://paczkom.at/?week=k3j9x',
       ].join('\n'),
     );
   });
@@ -139,7 +139,7 @@ describe('buildWeekShareText', () => {
     });
     expect(text.split('\n')).toHaveLength(9);
     expect(text.endsWith(weekUrl('k3j9x'))).toBe(true);
-    expect(text).toContain('https://www.paczkom.at/?week=k3j9x');
+    expect(text).toContain('https://paczkom.at/?week=k3j9x');
   });
 
   it('stops at the day a failed week ran out on', () => {
@@ -193,7 +193,7 @@ describe('buildShareText', () => {
     expect(
       buildShareText({ labels: PL, number: 12, grid, score: 1240, timeMs: 107_000 }),
     ).toBe(
-      ['paczkom.at · Dzisiaj #12', ...grid, '1240 pkt · 1:47', 'https://www.paczkom.at'].join('\n'),
+      ['paczkom.at · Dzisiaj #12', ...grid, '1240 pkt · 1:47', 'https://paczkom.at'].join('\n'),
     );
   });
 
