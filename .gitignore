@@ -6,6 +6,9 @@ dist/
 dist-ssr/
 *.local
 
+# Hourly collector's history cache (restored from the Actions cache in CI)
+.history/
+
 # Test output
 coverage/
 test-results/

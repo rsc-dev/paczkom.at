@@ -31,7 +31,7 @@ describe('no colour literals outside the theme', () => {
   const files = [...sourceFiles(join(root, 'src', 'core')), ...sourceFiles(join(root, 'src', 'ui'))];
 
   it('has files to scan', () => {
-    expect(files.length).toBeGreaterThan(10);
+    expect(files.length).toBeGreaterThan(5);
   });
 
   it.each(COLOUR_PATTERNS)('names no %s colour in src/core or src/ui', (_label, pattern) => {
@@ -53,47 +53,26 @@ describe('theme files', () => {
       '--bg',
       '--ink',
       '--accent',
-      '--wall-bg',
-      '--door-face',
-      '--door-cavity',
-      '--panel-bg',
-      '--parcel-red',
-      '--parcel-violet',
-      '--radius-md',
-      '--font-sans',
-      '--shadow-door',
-      '--motion',
-      '--unit',
+      '--no-data',
+      '--warn-bg',
+      '--level-1',
+      '--level-2',
+      '--level-3',
+      '--level-4',
+      '--level-5',
+      '--level-6',
+      '--level-ink-1',
+      '--level-ink-2',
+      '--level-ink-3',
+      '--level-ink-4',
+      '--level-ink-5',
+      '--level-ink-6',
+      '--radius',
       '--gap',
-      '--hit-min',
+      '--font',
     ]) {
       expect(tokens, token).toContain(`${token}:`);
     }
-  });
-
-  it('collapses motion to nothing under prefers-reduced-motion', () => {
-    const tokens = css('tokens.css');
-    expect(tokens).toContain('prefers-reduced-motion: reduce');
-    const reduced = tokens.slice(tokens.indexOf('prefers-reduced-motion'));
-    expect(reduced).toContain('--motion: 0ms');
-    expect(reduced).toContain('--motion-fast: 0ms');
-  });
-
-  it('restates the whole palette under the signage theme', () => {
-    const tokens = css('tokens.css');
-    const signage = css('signage.css');
-    const colourTokens = [...tokens.matchAll(/^\s{2}(--[a-z-]+):\s*#[0-9a-f]{3,8};/gm)].map(
-      (match) => match[1] ?? '',
-    );
-    expect(colourTokens.length).toBeGreaterThan(15);
-    for (const token of colourTokens) {
-      expect(signage, token).toContain(`${token}:`);
-    }
-  });
-
-  it('keeps a scenery slot that the signage theme collapses', () => {
-    expect(css('signage.css')).toContain('.scenery');
-    expect(css('signage.css')).toContain('block-size: 0');
   });
 
   it('bundles the Latin Extended subset so Polish renders in the same face', () => {

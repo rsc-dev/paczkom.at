@@ -38,15 +38,3 @@ export function setHidden(element: HTMLElement, hidden: boolean): void {
     element.hidden = hidden;
   }
 }
-
-export function setVar(element: HTMLElement, name: string, value: string): void {
-  if (element.style.getPropertyValue(name) !== value) {
-    element.style.setProperty(name, value);
-  }
-}
-
-/** `0`–`1` as a CSS percentage, for the meter and patience bars. */
-export function percent(fraction: number): string {
-  const clamped = Math.min(Math.max(fraction, 0), 1);
-  return `${String(Math.round(clamped * 1000) / 10)}%`;
-}

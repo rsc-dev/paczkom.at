@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="pl" data-theme="signage">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <!-- Polish, to match `lang` on the document. -->
-    <meta name="description" content="paczkom.at — dwuminutowa gra o tym, do której skrytki trafiła paczka." />
+    <meta name="description" content="Jakość powietrza w Twoim mieście, co godzinę." />
     <meta name="theme-color" content="#f2efe8" />
     <!-- Link previews. Absolute URLs: unfurlers do not resolve relative ones. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="paczkom.at" />
     <meta property="og:title" content="paczkom.at" />
-    <meta property="og:description" content="Dwuminutowa gra o tym, do której skrytki trafiła paczka. Codziennie nowy dzień, raz w tygodniu cały tydzień." />
+    <meta property="og:description" content="Jakość powietrza w Twoim mieście, co godzinę." />
     <meta property="og:url" content="https://paczkom.at/" />
     <meta property="og:image" content="https://paczkom.at/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -24,169 +24,71 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <title>paczkom.at</title>
+    <title>paczkom.at · Jakość powietrza w Twoim mieście, co godzinę.</title>
   </head>
   <body>
-    <div id="app" data-screen="title">
-      <!-- ------------------------------------------------------- title -->
-      <section class="screen" id="screen-title" aria-labelledby="title-mark">
-        <div class="title__body">
-          <h1 class="title__mark" id="title-mark">paczkom<span class="brand__dot">.</span>at</h1>
-          <p class="title__tagline" data-t="app.tagline"></p>
+    <div id="app" data-screen="loading">
+      <header class="top">
+        <a class="brand" href="/">paczkom<span class="brand__dot">.</span>at</a>
+        <button class="btn btn--ghost btn--small" id="btn-lang"></button>
+      </header>
 
-          <div class="title__actions">
-            <!-- Text is set at render time: it names the day a saved week is on. -->
-            <button class="btn btn--primary btn--week" id="btn-continue-week" hidden></button>
-            <button class="btn btn--primary" id="btn-play" data-t="title.play"></button>
-            <button class="btn btn--primary btn--week" id="btn-week" data-t="title.week"></button>
-            <button class="btn btn--ghost" id="btn-howto" data-t="title.howto"></button>
-          </div>
+      <p class="notice" id="notice-retired" data-t="game.retired" hidden></p>
+      <p class="notice notice--warn" id="notice-stale" hidden></p>
 
-          <p class="title__stats" id="title-stats"></p>
-        </div>
+      <section class="screen" id="screen-loading"><p data-t="load.loading"></p></section>
 
-        <div class="title__foot">
-          <span id="title-note"></span>
-          <span class="toggles">
-            <button class="btn btn--ghost btn--small" id="btn-lang"></button>
-            <button class="btn btn--ghost btn--small btn--mute" id="btn-mute">♪</button>
-          </span>
-        </div>
+      <section class="screen" id="screen-error">
+        <p data-t="load.failed"></p>
+        <button class="btn btn--primary" id="btn-retry" data-t="load.retry"></button>
       </section>
 
-      <!-- ------------------------------------------------------- how to -->
-      <section class="screen" id="screen-howto" aria-labelledby="howto-title">
-        <h2 class="brand" id="howto-title" data-t="howto.title"></h2>
-        <ol class="howto__steps">
-          <li class="howto__step"><span data-t="howto.step1"></span></li>
-          <li class="howto__step"><span data-t="howto.step2"></span></li>
-          <li class="howto__step"><span data-t="howto.step3"></span></li>
-          <li class="howto__step"><span data-t="howto.step4"></span></li>
-          <li class="howto__step"><span data-t="howto.step5"></span></li>
-        </ol>
-        <p class="howto__note" data-t="howto.hintNote"></p>
-        <hr class="rule" />
-        <div class="title__actions">
-          <button class="btn btn--primary" id="btn-howto-play" data-t="title.play"></button>
-          <button class="btn btn--ghost" id="btn-howto-back" data-t="howto.back"></button>
-        </div>
+      <!-- ------------------------------------------------------ picker -->
+      <section class="screen" id="screen-picker" aria-labelledby="picker-title">
+        <h1 class="screen__title" id="picker-title" data-t="picker.title"></h1>
+        <p class="tagline" data-t="app.tagline"></p>
+        <label class="visually-hidden" for="picker-input" data-t="picker.placeholder"></label>
+        <input class="picker__input" id="picker-input" type="search" autocomplete="off" spellcheck="false" />
+        <ul class="picker__results" id="picker-results"></ul>
+        <p class="picker__empty" id="picker-empty" data-t="picker.noMatch" hidden></p>
+        <button class="btn btn--ghost" id="btn-locate" data-t="picker.locate"></button>
+        <p class="picker__status" id="picker-status" role="status"></p>
       </section>
 
-      <!-- --------------------------------------------------------- game -->
-      <section class="screen" id="screen-game" aria-label="paczkom.at">
-        <header class="hud" id="hud">
-          <span class="hud__phase" id="hud-phase"></span>
-          <span class="hud__clock" id="hud-clock"></span>
-          <span class="hud__meter" id="hud-meter"></span>
-          <span class="hud__count" id="hud-count"></span>
-          <span class="hud__note" id="hud-note" hidden></span>
-          <span class="stars" id="hud-stars" hidden></span>
-          <span class="hud__score" id="hud-score"></span>
-          <span class="hud__buttons">
-            <button class="btn btn--ghost btn--small" id="btn-lang-game"></button>
-            <button class="btn btn--ghost btn--small btn--mute" id="btn-mute-game">♪</button>
-          </span>
-        </header>
-
-        <!-- Reserved for themes with a backdrop; empty and zero-height here. -->
-        <div class="scenery" aria-hidden="true"></div>
-
-        <div class="stage" id="stage">
-          <section class="panel" id="panel" aria-live="polite">
-            <span class="panel__kicker" id="panel-kicker"></span>
-            <p class="panel__code" id="panel-code"></p>
-            <span class="panel__hint" id="panel-hint" hidden>
-              <span class="swatch" id="panel-swatch"></span>
-              <span class="sticker" id="panel-sticker" data-sticker="none">
-                <span class="visually-hidden" id="panel-sticker-name"></span>
-              </span>
-              <span id="panel-hint-text"></span>
-            </span>
-            <span class="panel__wait" id="panel-wait"></span>
-          </section>
-          <!-- Door buttons are built from the wall geometry at boot. -->
+      <section class="screen" id="screen-card" aria-labelledby="card-town">
+        <h1 class="screen__title" id="card-town"></h1>
+        <div class="level" id="card-level">
+          <span class="level__label" id="card-level-label"></span>
+          <span class="level__of" id="card-level-of"></span>
         </div>
-
-        <div class="tray" id="tray"></div>
+        <p class="card__line" id="card-pm"></p>
+        <p class="card__line" id="card-trend"></p>
+        <p class="card__line" id="card-worst"></p>
+        <p class="card__line" id="card-percentile"></p>
+        <p class="card__source" id="card-source"></p>
+        <div class="actions">
+          <button class="btn btn--primary" id="btn-share" data-t="card.share"></button>
+          <button class="btn btn--ghost" id="btn-make-mine" data-t="card.makeMine" hidden></button>
+          <button class="btn btn--ghost" id="btn-change" data-t="card.change"></button>
+          <button class="btn btn--ghost" id="btn-ranking" data-t="card.ranking"></button>
+        </div>
+        <p class="card__note" id="share-note" role="status"></p>
+        <textarea class="card__fallback" id="share-fallback" readonly hidden></textarea>
       </section>
 
-      <!-- ------------------------------------------------------- result -->
-      <section class="screen" id="screen-result" aria-labelledby="result-headline">
-        <div class="result__body">
-          <span class="result__kicker" id="result-kicker"></span>
-          <h2 class="result__headline" id="result-headline"></h2>
-          <p class="result__score" id="result-score"></p>
-          <p class="result__grid" id="result-grid"></p>
-          <ul class="result__stats" id="result-stats"></ul>
-          <p class="result__note" id="result-note"></p>
-        </div>
-        <div class="result__actions">
-          <button class="btn btn--primary" id="btn-share" data-t="share.button"></button>
-          <button class="btn btn--ghost" id="btn-again" data-t="result.playAgain"></button>
-          <button class="btn btn--ghost" id="btn-home" data-t="result.home"></button>
-        </div>
-        <p class="result__note" id="share-note" aria-live="polite"></p>
-        <textarea class="share-fallback" id="share-fallback" readonly hidden></textarea>
+      <section class="screen" id="screen-ranking" aria-labelledby="ranking-title">
+        <h1 class="screen__title" id="ranking-title" data-t="ranking.title"></h1>
+        <p class="card__line" id="ranking-median"></p>
+        <h2 class="ranking__heading" data-t="ranking.best"></h2>
+        <ol class="ranking__list" id="ranking-best"></ol>
+        <h2 class="ranking__heading" data-t="ranking.worst"></h2>
+        <ol class="ranking__list" id="ranking-worst"></ol>
+        <ul class="ranking__counts" id="ranking-counts"></ul>
+        <button class="btn btn--ghost" id="btn-ranking-back" data-t="ranking.back"></button>
       </section>
 
-      <!-- --------------------------------------------------- day summary -->
-      <section class="screen" id="screen-day" aria-labelledby="day-headline">
-        <div class="result__body">
-          <span class="result__kicker" id="day-kicker"></span>
-          <h2 class="result__headline" id="day-headline"></h2>
-          <p class="result__score" id="day-score"></p>
-          <span class="stars stars--large" id="day-stars"></span>
-          <p class="result__note" id="day-lost"></p>
-          <ul class="result__stats" id="day-stats"></ul>
-        </div>
-        <div class="result__actions">
-          <button class="btn btn--primary" id="btn-next-day" data-t="week.nextDay"></button>
-        </div>
-      </section>
-
-      <!-- -------------------------------------------------- week summary -->
-      <section class="screen" id="screen-week" aria-labelledby="week-headline">
-        <div class="result__body">
-          <span class="result__kicker" id="week-kicker"></span>
-          <h2 class="result__headline" id="week-headline" data-t="week.title"></h2>
-          <p class="result__score" id="week-total"></p>
-          <span class="stars stars--large" id="week-stars"></span>
-          <p class="result__note" id="week-best"></p>
-          <table class="week-table">
-            <tbody id="week-rows"></tbody>
-          </table>
-        </div>
-        <div class="result__actions">
-          <button class="btn btn--primary" id="btn-week-share" data-t="share.button"></button>
-          <button class="btn btn--ghost" id="btn-week-retry" data-t="week.retry"></button>
-          <button class="btn btn--ghost" id="btn-week-new" data-t="week.new"></button>
-          <button class="btn btn--ghost" id="btn-week-home" data-t="result.home"></button>
-        </div>
-        <p class="result__note" id="week-share-note" aria-live="polite"></p>
-        <textarea class="share-fallback" id="week-share-fallback" readonly hidden></textarea>
-      </section>
-
-      <!-- --------------------------------------------------- reklamacja -->
-      <section class="screen" id="screen-fail" aria-labelledby="fail-headline">
-        <div class="result__body">
-          <span class="result__kicker" id="fail-kicker"></span>
-          <h2 class="result__headline" id="fail-headline" data-t="fail.title"></h2>
-          <p class="fail__lead" data-t="fail.lead"></p>
-          <p class="result__score" id="fail-total"></p>
-          <span class="result__kicker" data-t="week.incidents"></span>
-          <ul class="result__stats" id="fail-incidents"></ul>
-        </div>
-        <div class="result__actions">
-          <button class="btn btn--primary" id="btn-fail-retry" data-t="week.retry"></button>
-          <button class="btn btn--ghost" id="btn-fail-share" data-t="share.button"></button>
-          <button class="btn btn--ghost" id="btn-fail-new" data-t="week.new"></button>
-          <button class="btn btn--ghost" id="btn-fail-home" data-t="result.home"></button>
-        </div>
-        <p class="result__note" id="fail-share-note" aria-live="polite"></p>
-        <textarea class="share-fallback" id="fail-share-fallback" readonly hidden></textarea>
-      </section>
+      <footer class="foot"><small data-t="footer.attribution"></small></footer>
     </div>
-
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

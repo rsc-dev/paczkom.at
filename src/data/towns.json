@@ -1,0 +1,3390 @@
+[
+ {
+  "slug": "aleksandrow-lodzki",
+  "name": "Aleksandrów Łódzki",
+  "lat": 51.81965,
+  "lon": 19.30384,
+  "population": 20292
+ },
+ {
+  "slug": "andrychow",
+  "name": "Andrychów",
+  "lat": 49.85497,
+  "lon": 19.33834,
+  "population": 21954
+ },
+ {
+  "slug": "augustow",
+  "name": "Augustów",
+  "lat": 53.84321,
+  "lon": 22.97979,
+  "population": 29752
+ },
+ {
+  "slug": "barcin",
+  "name": "Barcin",
+  "lat": 52.86607,
+  "lon": 17.94625,
+  "population": 7682
+ },
+ {
+  "slug": "barczewo",
+  "name": "Barczewo",
+  "lat": 53.83055,
+  "lon": 20.69112,
+  "population": 7315
+ },
+ {
+  "slug": "barlinek",
+  "name": "Barlinek",
+  "lat": 52.99464,
+  "lon": 15.21864,
+  "population": 14385
+ },
+ {
+  "slug": "bedzin",
+  "name": "Będzin",
+  "lat": 50.32607,
+  "lon": 19.12565,
+  "population": 58236
+ },
+ {
+  "slug": "belchatow",
+  "name": "Bełchatów",
+  "lat": 51.36883,
+  "lon": 19.35671,
+  "population": 62896
+ },
+ {
+  "slug": "belzyce",
+  "name": "Bełżyce",
+  "lat": 51.17415,
+  "lon": 22.28027,
+  "population": 6958
+ },
+ {
+  "slug": "biala-podlaska",
+  "name": "Biała Podlaska",
+  "lat": 52.03238,
+  "lon": 23.11652,
+  "population": 57541
+ },
+ {
+  "slug": "bialobrzegi",
+  "name": "Białobrzegi",
+  "lat": 51.64695,
+  "lon": 20.95041,
+  "population": 7328
+ },
+ {
+  "slug": "bialystok",
+  "name": "Białystok",
+  "lat": 53.13333,
+  "lon": 23.16433,
+  "population": 295683
+ },
+ {
+  "slug": "bielsk-podlaski",
+  "name": "Bielsk Podlaski",
+  "lat": 52.76512,
+  "lon": 23.18647,
+  "population": 26493
+ },
+ {
+  "slug": "bielsko-biala",
+  "name": "Bielsko-Biała",
+  "lat": 49.82245,
+  "lon": 19.04686,
+  "population": 176515
+ },
+ {
+  "slug": "bierun",
+  "name": "Bieruń",
+  "lat": 50.09,
+  "lon": 19.09291,
+  "population": 19659
+ },
+ {
+  "slug": "bierutow",
+  "name": "Bierutów",
+  "lat": 51.12443,
+  "lon": 17.54607,
+  "population": 5065
+ },
+ {
+  "slug": "bilgoraj",
+  "name": "Biłgoraj",
+  "lat": 50.54114,
+  "lon": 22.72204,
+  "population": 26987
+ },
+ {
+  "slug": "biskupiec",
+  "name": "Biskupiec",
+  "lat": 53.86467,
+  "lon": 20.95692,
+  "population": 10340
+ },
+ {
+  "slug": "blachownia",
+  "name": "Blachownia",
+  "lat": 50.78015,
+  "lon": 18.96389,
+  "population": 9891
+ },
+ {
+  "slug": "blonie",
+  "name": "Błonie",
+  "lat": 52.19849,
+  "lon": 20.61709,
+  "population": 12195
+ },
+ {
+  "slug": "bochnia",
+  "name": "Bochnia",
+  "lat": 49.96905,
+  "lon": 20.43028,
+  "population": 29184
+ },
+ {
+  "slug": "boguchwala",
+  "name": "Boguchwała",
+  "lat": 49.98473,
+  "lon": 21.94528,
+  "population": 5823
+ },
+ {
+  "slug": "boguszow-gorce",
+  "name": "Boguszów-Gorce",
+  "lat": 50.75514,
+  "lon": 16.20494,
+  "population": 16726
+ },
+ {
+  "slug": "boleslawiec",
+  "name": "Bolesławiec",
+  "lat": 51.26418,
+  "lon": 15.5697,
+  "population": 40682
+ },
+ {
+  "slug": "bolkow",
+  "name": "Bolków",
+  "lat": 50.92203,
+  "lon": 16.10111,
+  "population": 5304
+ },
+ {
+  "slug": "braniewo",
+  "name": "Braniewo",
+  "lat": 54.37971,
+  "lon": 19.81959,
+  "population": 18356
+ },
+ {
+  "slug": "brenna",
+  "name": "Brenna",
+  "lat": 49.72576,
+  "lon": 18.90249,
+  "population": 5859
+ },
+ {
+  "slug": "brwinow",
+  "name": "Brwinów",
+  "lat": 52.14269,
+  "lon": 20.71697,
+  "population": 12315
+ },
+ {
+  "slug": "brzeg",
+  "name": "Brzeg",
+  "lat": 50.86079,
+  "lon": 17.4674,
+  "population": 38259
+ },
+ {
+  "slug": "brzesko",
+  "name": "Brzesko",
+  "lat": 49.96911,
+  "lon": 20.60606,
+  "population": 16866
+ },
+ {
+  "slug": "brzeziny",
+  "name": "Brzeziny",
+  "lat": 51.80023,
+  "lon": 19.75144,
+  "population": 12289
+ },
+ {
+  "slug": "brzozow",
+  "name": "Brzozów",
+  "lat": 49.69501,
+  "lon": 22.01926,
+  "population": 7836
+ },
+ {
+  "slug": "buk",
+  "name": "Buk",
+  "lat": 52.35532,
+  "lon": 16.51958,
+  "population": 6102
+ },
+ {
+  "slug": "busko-zdroj",
+  "name": "Busko-Zdrój",
+  "lat": 50.47078,
+  "lon": 20.71884,
+  "population": 17095
+ },
+ {
+  "slug": "bychawa",
+  "name": "Bychawa",
+  "lat": 51.01608,
+  "lon": 22.53296,
+  "population": 5297
+ },
+ {
+  "slug": "bydgoszcz",
+  "name": "Bydgoszcz",
+  "lat": 53.1235,
+  "lon": 18.00762,
+  "population": 330038
+ },
+ {
+  "slug": "bytom",
+  "name": "Bytom",
+  "lat": 50.34802,
+  "lon": 18.93282,
+  "population": 189186
+ },
+ {
+  "slug": "bytow",
+  "name": "Bytów",
+  "lat": 54.17057,
+  "lon": 17.49187,
+  "population": 16724
+ },
+ {
+  "slug": "chelm-slaski",
+  "name": "Chełm Śląski",
+  "lat": 50.10825,
+  "lon": 19.19552,
+  "population": 5646
+ },
+ {
+  "slug": "chelmek",
+  "name": "Chełmek",
+  "lat": 50.10163,
+  "lon": 19.24801,
+  "population": 9059
+ },
+ {
+  "slug": "chelmza",
+  "name": "Chełmża",
+  "lat": 53.18463,
+  "lon": 18.60466,
+  "population": 15403
+ },
+ {
+  "slug": "chodziez",
+  "name": "Chodzież",
+  "lat": 52.99505,
+  "lon": 16.9198,
+  "population": 19776
+ },
+ {
+  "slug": "chojna",
+  "name": "Chojna",
+  "lat": 52.96389,
+  "lon": 14.42797,
+  "population": 7398
+ },
+ {
+  "slug": "chojnow",
+  "name": "Chojnów",
+  "lat": 51.27373,
+  "lon": 15.93661,
+  "population": 14209
+ },
+ {
+  "slug": "choroszcz",
+  "name": "Choroszcz",
+  "lat": 53.14332,
+  "lon": 22.98889,
+  "population": 5449
+ },
+ {
+  "slug": "chorzow",
+  "name": "Chorzów",
+  "lat": 50.30582,
+  "lon": 18.9742,
+  "population": 113430
+ },
+ {
+  "slug": "choszczno",
+  "name": "Choszczno",
+  "lat": 53.16905,
+  "lon": 15.42054,
+  "population": 15733
+ },
+ {
+  "slug": "ciechanow",
+  "name": "Ciechanów",
+  "lat": 52.88141,
+  "lon": 20.61996,
+  "population": 46438
+ },
+ {
+  "slug": "ciechocinek",
+  "name": "Ciechocinek",
+  "lat": 52.87908,
+  "lon": 18.79505,
+  "population": 10832
+ },
+ {
+  "slug": "cieszyn",
+  "name": "Cieszyn",
+  "lat": 49.75133,
+  "lon": 18.63213,
+  "population": 35586
+ },
+ {
+  "slug": "czarna-bialostocka",
+  "name": "Czarna Białostocka",
+  "lat": 53.30509,
+  "lon": 23.28146,
+  "population": 9592
+ },
+ {
+  "slug": "czarne",
+  "name": "Czarne",
+  "lat": 53.6842,
+  "lon": 16.93834,
+  "population": 6035
+ },
+ {
+  "slug": "czarnkow",
+  "name": "Czarnków",
+  "lat": 52.90214,
+  "lon": 16.56413,
+  "population": 11562
+ },
+ {
+  "slug": "czechowice-dziedzice",
+  "name": "Czechowice-Dziedzice",
+  "lat": 49.91342,
+  "lon": 19.00479,
+  "population": 34703
+ },
+ {
+  "slug": "czeladz",
+  "name": "Czeladź",
+  "lat": 50.31542,
+  "lon": 19.07824,
+  "population": 34308
+ },
+ {
+  "slug": "czempin",
+  "name": "Czempiń",
+  "lat": 52.14404,
+  "lon": 16.76408,
+  "population": 5093
+ },
+ {
+  "slug": "czerwonak",
+  "name": "Czerwonak",
+  "lat": 52.46459,
+  "lon": 16.98169,
+  "population": 5432
+ },
+ {
+  "slug": "czestochowa",
+  "name": "Częstochowa",
+  "lat": 50.79646,
+  "lon": 19.12409,
+  "population": 248125
+ },
+ {
+  "slug": "dabrowa-bialostocka",
+  "name": "Dąbrowa Białostocka",
+  "lat": 53.65364,
+  "lon": 23.34792,
+  "population": 6044
+ },
+ {
+  "slug": "dabrowa-tarnowska",
+  "name": "Dąbrowa Tarnowska",
+  "lat": 50.17462,
+  "lon": 20.98633,
+  "population": 11291
+ },
+ {
+  "slug": "debica",
+  "name": "Dębica",
+  "lat": 50.05146,
+  "lon": 21.41141,
+  "population": 47366
+ },
+ {
+  "slug": "deblin",
+  "name": "Dęblin",
+  "lat": 51.55912,
+  "lon": 21.84829,
+  "population": 17775
+ },
+ {
+  "slug": "debno",
+  "name": "Dębno",
+  "lat": 52.73901,
+  "lon": 14.698,
+  "population": 13804
+ },
+ {
+  "slug": "dobczyce",
+  "name": "Dobczyce",
+  "lat": 49.88109,
+  "lon": 20.08936,
+  "population": 6171
+ },
+ {
+  "slug": "drezdenko",
+  "name": "Drezdenko",
+  "lat": 52.83831,
+  "lon": 15.83079,
+  "population": 10541
+ },
+ {
+  "slug": "dynow",
+  "name": "Dynów",
+  "lat": 49.81506,
+  "lon": 22.23388,
+  "population": 6065
+ },
+ {
+  "slug": "dzialdowo",
+  "name": "Działdowo",
+  "lat": 53.23958,
+  "lon": 20.17004,
+  "population": 21127
+ },
+ {
+  "slug": "dzierzoniow",
+  "name": "Dzierżoniów",
+  "lat": 50.7282,
+  "lon": 16.65141,
+  "population": 34168
+ },
+ {
+  "slug": "elblag",
+  "name": "Elbląg",
+  "lat": 54.1522,
+  "lon": 19.40884,
+  "population": 127558
+ },
+ {
+  "slug": "elk",
+  "name": "Ełk",
+  "lat": 53.82824,
+  "lon": 22.36469,
+  "population": 55769
+ },
+ {
+  "slug": "garwolin",
+  "name": "Garwolin",
+  "lat": 51.89747,
+  "lon": 21.61466,
+  "population": 15912
+ },
+ {
+  "slug": "gdansk",
+  "name": "Gdańsk",
+  "lat": 54.35227,
+  "lon": 18.64912,
+  "population": 487371
+ },
+ {
+  "slug": "gizycko",
+  "name": "Giżycko",
+  "lat": 54.03811,
+  "lon": 21.76441,
+  "population": 29972
+ },
+ {
+  "slug": "gliwice",
+  "name": "Gliwice",
+  "lat": 50.29761,
+  "lon": 18.67658,
+  "population": 198835
+ },
+ {
+  "slug": "glogow-malopolski",
+  "name": "Głogów Małopolski",
+  "lat": 50.15122,
+  "lon": 21.96287,
+  "population": 5451
+ },
+ {
+  "slug": "glogowek",
+  "name": "Głogówek",
+  "lat": 50.35355,
+  "lon": 17.86405,
+  "population": 5755
+ },
+ {
+  "slug": "glowno",
+  "name": "Głowno",
+  "lat": 51.96463,
+  "lon": 19.71565,
+  "population": 15103
+ },
+ {
+  "slug": "glubczyce",
+  "name": "Głubczyce",
+  "lat": 50.20086,
+  "lon": 17.82858,
+  "population": 13697
+ },
+ {
+  "slug": "glucholazy",
+  "name": "Głuchołazy",
+  "lat": 50.31505,
+  "lon": 17.38355,
+  "population": 15120
+ },
+ {
+  "slug": "gniewkowo",
+  "name": "Gniewkowo",
+  "lat": 52.89461,
+  "lon": 18.40785,
+  "population": 7224
+ },
+ {
+  "slug": "gniezno",
+  "name": "Gniezno",
+  "lat": 52.53481,
+  "lon": 17.58259,
+  "population": 70269
+ },
+ {
+  "slug": "goczalkowice-zdroj",
+  "name": "Goczałkowice Zdrój",
+  "lat": 49.94454,
+  "lon": 18.96927,
+  "population": 6321
+ },
+ {
+  "slug": "gogolin",
+  "name": "Gogolin",
+  "lat": 50.49222,
+  "lon": 18.01994,
+  "population": 6077
+ },
+ {
+  "slug": "goleniow",
+  "name": "Goleniów",
+  "lat": 53.56392,
+  "lon": 14.82854,
+  "population": 22505
+ },
+ {
+  "slug": "golub-dobrzyn",
+  "name": "Golub-Dobrzyń",
+  "lat": 53.11087,
+  "lon": 19.05381,
+  "population": 12937
+ },
+ {
+  "slug": "gora-kalwaria",
+  "name": "Góra Kalwaria",
+  "lat": 51.97653,
+  "lon": 21.21537,
+  "population": 10777
+ },
+ {
+  "slug": "gorzow-wielkopolski",
+  "name": "Gorzów Wielkopolski",
+  "lat": 52.73371,
+  "lon": 15.22505,
+  "population": 114567
+ },
+ {
+  "slug": "gorzyce",
+  "name": "Gorzyce",
+  "lat": 50.6672,
+  "lon": 21.84013,
+  "population": 8009
+ },
+ {
+  "slug": "gostyn",
+  "name": "Gostyń",
+  "lat": 51.88247,
+  "lon": 17.01225,
+  "population": 20771
+ },
+ {
+  "slug": "gostynin",
+  "name": "Gostynin",
+  "lat": 52.42938,
+  "lon": 19.46194,
+  "population": 18976
+ },
+ {
+  "slug": "grajewo",
+  "name": "Grajewo",
+  "lat": 53.64728,
+  "lon": 22.45537,
+  "population": 22803
+ },
+ {
+  "slug": "grodkow",
+  "name": "Grodków",
+  "lat": 50.69836,
+  "lon": 17.38449,
+  "population": 8654
+ },
+ {
+  "slug": "grodzisk-mazowiecki",
+  "name": "Grodzisk Mazowiecki",
+  "lat": 52.10387,
+  "lon": 20.6337,
+  "population": 26684
+ },
+ {
+  "slug": "grodzisk-wielkopolski",
+  "name": "Grodzisk Wielkopolski",
+  "lat": 52.22762,
+  "lon": 16.36534,
+  "population": 13826
+ },
+ {
+  "slug": "grojec",
+  "name": "Grójec",
+  "lat": 51.86252,
+  "lon": 20.86757,
+  "population": 14880
+ },
+ {
+  "slug": "gryfice",
+  "name": "Gryfice",
+  "lat": 53.9165,
+  "lon": 15.20027,
+  "population": 16720
+ },
+ {
+  "slug": "gryfino",
+  "name": "Gryfino",
+  "lat": 53.25243,
+  "lon": 14.48831,
+  "population": 21270
+ },
+ {
+  "slug": "gryfow-slaski",
+  "name": "Gryfów Śląski",
+  "lat": 51.03081,
+  "lon": 15.42017,
+  "population": 6890
+ },
+ {
+  "slug": "gubin",
+  "name": "Gubin",
+  "lat": 51.94956,
+  "lon": 14.72837,
+  "population": 16629
+ },
+ {
+  "slug": "hajnowka",
+  "name": "Hajnówka",
+  "lat": 52.74328,
+  "lon": 23.58122,
+  "population": 22157
+ },
+ {
+  "slug": "hrubieszow",
+  "name": "Hrubieszów",
+  "lat": 50.80502,
+  "lon": 23.89251,
+  "population": 18605
+ },
+ {
+  "slug": "ilza",
+  "name": "Iłża",
+  "lat": 51.16313,
+  "lon": 21.23979,
+  "population": 5121
+ },
+ {
+  "slug": "imielin",
+  "name": "Imielin",
+  "lat": 50.14534,
+  "lon": 19.18599,
+  "population": 8057
+ },
+ {
+  "slug": "inowroclaw",
+  "name": "Inowrocław",
+  "lat": 52.79886,
+  "lon": 18.26387,
+  "population": 77597
+ },
+ {
+  "slug": "jablonna",
+  "name": "Jabłonna",
+  "lat": 52.37885,
+  "lon": 20.91745,
+  "population": 6552
+ },
+ {
+  "slug": "janikowo",
+  "name": "Janikowo",
+  "lat": 52.75328,
+  "lon": 18.11328,
+  "population": 9169
+ },
+ {
+  "slug": "janow-lubelski",
+  "name": "Janów Lubelski",
+  "lat": 50.70695,
+  "lon": 22.41039,
+  "population": 11811
+ },
+ {
+  "slug": "janowiec-wielkopolski",
+  "name": "Janowiec Wielkopolski",
+  "lat": 52.75583,
+  "lon": 17.48981,
+  "population": 5110
+ },
+ {
+  "slug": "jaslo",
+  "name": "Jasło",
+  "lat": 49.74506,
+  "lon": 21.47252,
+  "population": 37851
+ },
+ {
+  "slug": "jastrowie",
+  "name": "Jastrowie",
+  "lat": 53.42048,
+  "lon": 16.81756,
+  "population": 8452
+ },
+ {
+  "slug": "jastrzebie-zdroj",
+  "name": "Jastrzębie-Zdrój",
+  "lat": 49.95542,
+  "lon": 18.57479,
+  "population": 95813
+ },
+ {
+  "slug": "jawor",
+  "name": "Jawor",
+  "lat": 51.05132,
+  "lon": 16.19347,
+  "population": 23865
+ },
+ {
+  "slug": "jaworzno",
+  "name": "Jaworzno",
+  "lat": 50.20528,
+  "lon": 19.27498,
+  "population": 96541
+ },
+ {
+  "slug": "jedlicze",
+  "name": "Jedlicze",
+  "lat": 49.71749,
+  "lon": 21.64886,
+  "population": 5629
+ },
+ {
+  "slug": "jedlina-zdroj",
+  "name": "Jedlina-Zdrój",
+  "lat": 50.72005,
+  "lon": 16.34645,
+  "population": 5062
+ },
+ {
+  "slug": "jedrzejow",
+  "name": "Jędrzejów",
+  "lat": 50.63945,
+  "lon": 20.30454,
+  "population": 16792
+ },
+ {
+  "slug": "jezowe",
+  "name": "Jeżowe",
+  "lat": 50.37486,
+  "lon": 22.12749,
+  "population": 5358
+ },
+ {
+  "slug": "jordanow",
+  "name": "Jordanów",
+  "lat": 49.64935,
+  "lon": 19.82981,
+  "population": 5194
+ },
+ {
+  "slug": "jozefow",
+  "name": "Józefów",
+  "lat": 52.13707,
+  "lon": 21.23589,
+  "population": 17910
+ },
+ {
+  "slug": "kalety",
+  "name": "Kalety",
+  "lat": 50.5627,
+  "lon": 18.8926,
+  "population": 8670
+ },
+ {
+  "slug": "kalisz",
+  "name": "Kalisz",
+  "lat": 51.76109,
+  "lon": 18.09102,
+  "population": 108759
+ },
+ {
+  "slug": "kamien-pomorski",
+  "name": "Kamień Pomorski",
+  "lat": 53.96849,
+  "lon": 14.77262,
+  "population": 9036
+ },
+ {
+  "slug": "kamienna-gora",
+  "name": "Kamienna Góra",
+  "lat": 50.78314,
+  "lon": 16.03037,
+  "population": 21743
+ },
+ {
+  "slug": "karczew",
+  "name": "Karczew",
+  "lat": 52.07655,
+  "lon": 21.24962,
+  "population": 10319
+ },
+ {
+  "slug": "katowice",
+  "name": "Katowice",
+  "lat": 50.2597,
+  "lon": 19.02173,
+  "population": 286960
+ },
+ {
+  "slug": "katy-wroclawskie",
+  "name": "Kąty Wrocławskie",
+  "lat": 51.03098,
+  "lon": 16.76767,
+  "population": 5418
+ },
+ {
+  "slug": "kazimierza-wielka",
+  "name": "Kazimierza Wielka",
+  "lat": 50.26564,
+  "lon": 20.49358,
+  "population": 5696
+ },
+ {
+  "slug": "kedzierzyn-kozle",
+  "name": "Kędzierzyn-Koźle",
+  "lat": 50.34984,
+  "lon": 18.22606,
+  "population": 65636
+ },
+ {
+  "slug": "kepno",
+  "name": "Kępno",
+  "lat": 51.2784,
+  "lon": 17.98908,
+  "population": 14813
+ },
+ {
+  "slug": "kety",
+  "name": "Kęty",
+  "lat": 49.88214,
+  "lon": 19.22333,
+  "population": 19249
+ },
+ {
+  "slug": "kielce",
+  "name": "Kielce",
+  "lat": 50.87033,
+  "lon": 20.62752,
+  "population": 192468
+ },
+ {
+  "slug": "kietrz",
+  "name": "Kietrz",
+  "lat": 50.08042,
+  "lon": 18.00432,
+  "population": 6306
+ },
+ {
+  "slug": "klodawa",
+  "name": "Kłodawa",
+  "lat": 52.25447,
+  "lon": 18.91352,
+  "population": 6714
+ },
+ {
+  "slug": "kluczbork",
+  "name": "Kluczbork",
+  "lat": 50.97281,
+  "lon": 18.21816,
+  "population": 25978
+ },
+ {
+  "slug": "knurow",
+  "name": "Knurów",
+  "lat": 50.21971,
+  "lon": 18.65067,
+  "population": 39744
+ },
+ {
+  "slug": "kobylka",
+  "name": "Kobyłka",
+  "lat": 52.33953,
+  "lon": 21.19589,
+  "population": 17659
+ },
+ {
+  "slug": "kolbuszowa",
+  "name": "Kolbuszowa",
+  "lat": 50.2441,
+  "lon": 21.7761,
+  "population": 10442
+ },
+ {
+  "slug": "kolo",
+  "name": "Koło",
+  "lat": 52.20024,
+  "lon": 18.63865,
+  "population": 23493
+ },
+ {
+  "slug": "kolobrzeg",
+  "name": "Kołobrzeg",
+  "lat": 54.17565,
+  "lon": 15.58342,
+  "population": 44377
+ },
+ {
+  "slug": "koluszki",
+  "name": "Koluszki",
+  "lat": 51.73872,
+  "lon": 19.81994,
+  "population": 13343
+ },
+ {
+  "slug": "komorniki",
+  "name": "Komorniki",
+  "lat": 52.3387,
+  "lon": 16.81063,
+  "population": 5144
+ },
+ {
+  "slug": "konskie",
+  "name": "Końskie",
+  "lat": 51.19166,
+  "lon": 20.40607,
+  "population": 20756
+ },
+ {
+  "slug": "konstancin-jeziorna",
+  "name": "Konstancin-Jeziorna",
+  "lat": 52.0938,
+  "lon": 21.11761,
+  "population": 16548
+ },
+ {
+  "slug": "korczyna",
+  "name": "Korczyna",
+  "lat": 49.71555,
+  "lon": 21.80941,
+  "population": 6100
+ },
+ {
+  "slug": "kornik",
+  "name": "Kórnik",
+  "lat": 52.24772,
+  "lon": 17.08949,
+  "population": 7206
+ },
+ {
+  "slug": "koscian",
+  "name": "Kościan",
+  "lat": 52.08829,
+  "lon": 16.64866,
+  "population": 24096
+ },
+ {
+  "slug": "kostrzyn",
+  "name": "Kostrzyn",
+  "lat": 52.39847,
+  "lon": 17.22811,
+  "population": 8965
+ },
+ {
+  "slug": "koszalin",
+  "name": "Koszalin",
+  "lat": 54.19438,
+  "lon": 16.17222,
+  "population": 107450
+ },
+ {
+  "slug": "kozuchow",
+  "name": "Kożuchów",
+  "lat": 51.74558,
+  "lon": 15.59492,
+  "population": 9679
+ },
+ {
+  "slug": "krakow",
+  "name": "Kraków",
+  "lat": 50.06143,
+  "lon": 19.93658,
+  "population": 816614
+ },
+ {
+  "slug": "krapkowice",
+  "name": "Krapkowice",
+  "lat": 50.47515,
+  "lon": 17.96539,
+  "population": 18275
+ },
+ {
+  "slug": "krasnik",
+  "name": "Kraśnik",
+  "lat": 50.9236,
+  "lon": 22.22706,
+  "population": 35834
+ },
+ {
+  "slug": "krasnystaw",
+  "name": "Krasnystaw",
+  "lat": 50.98464,
+  "lon": 23.1742,
+  "population": 19532
+ },
+ {
+  "slug": "krosno",
+  "name": "Krosno",
+  "lat": 49.68866,
+  "lon": 21.77058,
+  "population": 47784
+ },
+ {
+  "slug": "krosno-odrzanskie",
+  "name": "Krosno Odrzańskie",
+  "lat": 52.05492,
+  "lon": 15.09882,
+  "population": 12178
+ },
+ {
+  "slug": "krotoszyn",
+  "name": "Krotoszyn",
+  "lat": 51.69868,
+  "lon": 17.43738,
+  "population": 29231
+ },
+ {
+  "slug": "kruszwica",
+  "name": "Kruszwica",
+  "lat": 52.67562,
+  "lon": 18.33131,
+  "population": 9494
+ },
+ {
+  "slug": "krzemieniewo",
+  "name": "Krzemieniewo",
+  "lat": 51.85905,
+  "lon": 16.83354,
+  "population": 5000
+ },
+ {
+  "slug": "krzeszowice",
+  "name": "Krzeszowice",
+  "lat": 50.14248,
+  "lon": 19.63223,
+  "population": 9978
+ },
+ {
+  "slug": "krzyz-wielkopolski",
+  "name": "Krzyż Wielkopolski",
+  "lat": 52.88097,
+  "lon": 16.01116,
+  "population": 6300
+ },
+ {
+  "slug": "ksawerow",
+  "name": "Ksawerów",
+  "lat": 51.68288,
+  "lon": 19.4028,
+  "population": 6269
+ },
+ {
+  "slug": "kudowa-zdroj",
+  "name": "Kudowa-Zdrój",
+  "lat": 50.44297,
+  "lon": 16.24397,
+  "population": 10176
+ },
+ {
+  "slug": "kutno",
+  "name": "Kutno",
+  "lat": 52.23064,
+  "lon": 19.36409,
+  "population": 48323
+ },
+ {
+  "slug": "kuznia-raciborska",
+  "name": "Kuźnia Raciborska",
+  "lat": 50.20058,
+  "lon": 18.31146,
+  "population": 5472
+ },
+ {
+  "slug": "kwidzyn",
+  "name": "Kwidzyn",
+  "lat": 53.72495,
+  "lon": 18.93114,
+  "population": 37601
+ },
+ {
+  "slug": "ladek-zdroj",
+  "name": "Lądek-Zdrój",
+  "lat": 50.34371,
+  "lon": 16.87946,
+  "population": 6140
+ },
+ {
+  "slug": "lancut",
+  "name": "Łańcut",
+  "lat": 50.06871,
+  "lon": 22.22912,
+  "population": 18266
+ },
+ {
+  "slug": "lapy",
+  "name": "Łapy",
+  "lat": 52.9911,
+  "lon": 22.88422,
+  "population": 16434
+ },
+ {
+  "slug": "lask",
+  "name": "Łask",
+  "lat": 51.59056,
+  "lon": 19.13278,
+  "population": 18577
+ },
+ {
+  "slug": "laziska-gorne",
+  "name": "Łaziska Górne",
+  "lat": 50.14952,
+  "lon": 18.84215,
+  "population": 21983
+ },
+ {
+  "slug": "lebork",
+  "name": "Lębork",
+  "lat": 54.53921,
+  "lon": 17.75012,
+  "population": 35161
+ },
+ {
+  "slug": "leczna",
+  "name": "Łęczna",
+  "lat": 51.30121,
+  "lon": 22.88135,
+  "population": 21719
+ },
+ {
+  "slug": "leczyca",
+  "name": "Łęczyca",
+  "lat": 52.05959,
+  "lon": 19.19972,
+  "population": 15528
+ },
+ {
+  "slug": "ledziny",
+  "name": "Lędziny",
+  "lat": 50.14264,
+  "lon": 19.13149,
+  "population": 16305
+ },
+ {
+  "slug": "legionowo",
+  "name": "Legionowo",
+  "lat": 52.40149,
+  "lon": 20.92664,
+  "population": 50786
+ },
+ {
+  "slug": "legnica",
+  "name": "Legnica",
+  "lat": 51.21006,
+  "lon": 16.1619,
+  "population": 106033
+ },
+ {
+  "slug": "lesko",
+  "name": "Lesko",
+  "lat": 49.4701,
+  "lon": 22.33042,
+  "population": 5700
+ },
+ {
+  "slug": "leszczyny",
+  "name": "Leszczyny",
+  "lat": 50.15007,
+  "lon": 18.67762,
+  "population": 28740
+ },
+ {
+  "slug": "leszno",
+  "name": "Leszno",
+  "lat": 51.84034,
+  "lon": 16.57494,
+  "population": 63565
+ },
+ {
+  "slug": "lewin-brzeski",
+  "name": "Lewin Brzeski",
+  "lat": 50.7487,
+  "lon": 17.61688,
+  "population": 6000
+ },
+ {
+  "slug": "lezajsk",
+  "name": "Leżajsk",
+  "lat": 50.26257,
+  "lon": 22.41932,
+  "population": 13958
+ },
+ {
+  "slug": "libiaz",
+  "name": "Libiąż",
+  "lat": 50.10396,
+  "lon": 19.31568,
+  "population": 17834
+ },
+ {
+  "slug": "lidzbark",
+  "name": "Lidzbark",
+  "lat": 53.26283,
+  "lon": 19.82663,
+  "population": 8177
+ },
+ {
+  "slug": "lidzbark-warminski",
+  "name": "Lidzbark Warmiński",
+  "lat": 54.12588,
+  "lon": 20.57954,
+  "population": 16540
+ },
+ {
+  "slug": "lipno",
+  "name": "Lipno",
+  "lat": 52.84436,
+  "lon": 19.17852,
+  "population": 14821
+ },
+ {
+  "slug": "lipsko",
+  "name": "Lipsko",
+  "lat": 51.15954,
+  "lon": 21.64933,
+  "population": 5723
+ },
+ {
+  "slug": "lochow",
+  "name": "Łochów",
+  "lat": 52.53076,
+  "lon": 21.68158,
+  "population": 6486
+ },
+ {
+  "slug": "lodygowice",
+  "name": "Łodygowice",
+  "lat": 49.72992,
+  "lon": 19.13939,
+  "population": 6925
+ },
+ {
+  "slug": "lodz",
+  "name": "Łódź",
+  "lat": 51.77058,
+  "lon": 19.47395,
+  "population": 639890
+ },
+ {
+  "slug": "lomianki",
+  "name": "Łomianki",
+  "lat": 52.33413,
+  "lon": 20.88602,
+  "population": 15315
+ },
+ {
+  "slug": "lowicz",
+  "name": "Łowicz",
+  "lat": 52.10714,
+  "lon": 19.94525,
+  "population": 29809
+ },
+ {
+  "slug": "lubaczow",
+  "name": "Lubaczów",
+  "lat": 50.157,
+  "lon": 23.12339,
+  "population": 12595
+ },
+ {
+  "slug": "luban",
+  "name": "Lubań",
+  "lat": 51.12014,
+  "lon": 15.28768,
+  "population": 22245
+ },
+ {
+  "slug": "lubartow",
+  "name": "Lubartów",
+  "lat": 51.46026,
+  "lon": 22.60952,
+  "population": 22839
+ },
+ {
+  "slug": "lubawa",
+  "name": "Lubawa",
+  "lat": 53.50428,
+  "lon": 19.74966,
+  "population": 9302
+ },
+ {
+  "slug": "lubin",
+  "name": "Lubin",
+  "lat": 51.40089,
+  "lon": 16.20149,
+  "population": 77532
+ },
+ {
+  "slug": "lublin",
+  "name": "Lublin",
+  "lat": 51.25058,
+  "lon": 22.57009,
+  "population": 336339
+ },
+ {
+  "slug": "lubon",
+  "name": "Luboń",
+  "lat": 52.34705,
+  "lon": 16.89267,
+  "population": 26431
+ },
+ {
+  "slug": "lubsko",
+  "name": "Lubsko",
+  "lat": 51.78467,
+  "lon": 14.97196,
+  "population": 14994
+ },
+ {
+  "slug": "ludwin",
+  "name": "Ludwin",
+  "lat": 51.34605,
+  "lon": 22.90581,
+  "population": 5041
+ },
+ {
+  "slug": "lukow",
+  "name": "Łuków",
+  "lat": 51.929,
+  "lon": 22.37956,
+  "population": 30465
+ },
+ {
+  "slug": "makow-mazowiecki",
+  "name": "Maków Mazowiecki",
+  "lat": 52.86493,
+  "lon": 21.10053,
+  "population": 9978
+ },
+ {
+  "slug": "makow-podhalanski",
+  "name": "Maków Podhalański",
+  "lat": 49.73008,
+  "lon": 19.67711,
+  "population": 5746
+ },
+ {
+  "slug": "marki",
+  "name": "Marki",
+  "lat": 52.32065,
+  "lon": 21.10474,
+  "population": 23177
+ },
+ {
+  "slug": "marklowice",
+  "name": "Markłowice",
+  "lat": 50.01695,
+  "lon": 18.52098,
+  "population": 5173
+ },
+ {
+  "slug": "miastko",
+  "name": "Miastko",
+  "lat": 54.00283,
+  "lon": 16.98263,
+  "population": 10954
+ },
+ {
+  "slug": "miechow",
+  "name": "Miechów",
+  "lat": 50.35648,
+  "lon": 20.02788,
+  "population": 11735
+ },
+ {
+  "slug": "miedzychod",
+  "name": "Międzychód",
+  "lat": 52.59882,
+  "lon": 15.89696,
+  "population": 10994
+ },
+ {
+  "slug": "miedzyrzec-podlaski",
+  "name": "Międzyrzec Podlaski",
+  "lat": 51.9864,
+  "lon": 22.78248,
+  "population": 17158
+ },
+ {
+  "slug": "miedzyrzecz",
+  "name": "Międzyrzecz",
+  "lat": 52.44461,
+  "lon": 15.57801,
+  "population": 18669
+ },
+ {
+  "slug": "miedzyzdroje",
+  "name": "Międzyzdroje",
+  "lat": 53.92921,
+  "lon": 14.45097,
+  "population": 5502
+ },
+ {
+  "slug": "mikolow",
+  "name": "Mikołów",
+  "lat": 50.17103,
+  "lon": 18.9041,
+  "population": 38821
+ },
+ {
+  "slug": "milanowek",
+  "name": "Milanówek",
+  "lat": 52.11879,
+  "lon": 20.67155,
+  "population": 15784
+ },
+ {
+  "slug": "minsk-mazowiecki",
+  "name": "Mińsk Mazowiecki",
+  "lat": 52.17935,
+  "lon": 21.57251,
+  "population": 37027
+ },
+ {
+  "slug": "mogilno",
+  "name": "Mogilno",
+  "lat": 52.65806,
+  "lon": 17.95578,
+  "population": 12465
+ },
+ {
+  "slug": "monki",
+  "name": "Mońki",
+  "lat": 53.40496,
+  "lon": 22.79791,
+  "population": 10577
+ },
+ {
+  "slug": "morag",
+  "name": "Morąg",
+  "lat": 53.91711,
+  "lon": 19.92602,
+  "population": 14745
+ },
+ {
+  "slug": "mosina",
+  "name": "Mosina",
+  "lat": 52.24543,
+  "lon": 16.84709,
+  "population": 12318
+ },
+ {
+  "slug": "mragowo",
+  "name": "Mrągowo",
+  "lat": 53.86437,
+  "lon": 21.30507,
+  "population": 21965
+ },
+ {
+  "slug": "mszana-dolna",
+  "name": "Mszana Dolna",
+  "lat": 49.67432,
+  "lon": 20.07992,
+  "population": 7500
+ },
+ {
+  "slug": "mszczonow",
+  "name": "Mszczonów",
+  "lat": 51.97415,
+  "lon": 20.52083,
+  "population": 6267
+ },
+ {
+  "slug": "murowana-goslina",
+  "name": "Murowana Goślina",
+  "lat": 52.57463,
+  "lon": 17.00933,
+  "population": 9989
+ },
+ {
+  "slug": "myslenice",
+  "name": "Myślenice",
+  "lat": 49.83383,
+  "lon": 19.9383,
+  "population": 17686
+ },
+ {
+  "slug": "mysliborz",
+  "name": "Myślibórz",
+  "lat": 52.92382,
+  "lon": 14.86785,
+  "population": 12092
+ },
+ {
+  "slug": "myszkow",
+  "name": "Myszków",
+  "lat": 50.5752,
+  "lon": 19.32461,
+  "population": 33273
+ },
+ {
+  "slug": "nadarzyn",
+  "name": "Nadarzyn",
+  "lat": 52.09438,
+  "lon": 20.80776,
+  "population": 9881
+ },
+ {
+  "slug": "naklo-nad-notecia",
+  "name": "Nakło nad Notecią",
+  "lat": 53.14214,
+  "lon": 17.60181,
+  "population": 19565
+ },
+ {
+  "slug": "namyslow",
+  "name": "Namysłów",
+  "lat": 51.07592,
+  "lon": 17.72284,
+  "population": 16376
+ },
+ {
+  "slug": "nasielsk",
+  "name": "Nasielsk",
+  "lat": 52.58887,
+  "lon": 20.80553,
+  "population": 7445
+ },
+ {
+  "slug": "niepolomice",
+  "name": "Niepołomice",
+  "lat": 50.04066,
+  "lon": 20.22257,
+  "population": 9384
+ },
+ {
+  "slug": "nisko",
+  "name": "Nisko",
+  "lat": 50.51987,
+  "lon": 22.13968,
+  "population": 15573
+ },
+ {
+  "slug": "nowa-deba",
+  "name": "Nowa Dęba",
+  "lat": 50.42974,
+  "lon": 21.75078,
+  "population": 11489
+ },
+ {
+  "slug": "nowa-sarzyna",
+  "name": "Nowa Sarzyna",
+  "lat": 50.32086,
+  "lon": 22.34456,
+  "population": 6255
+ },
+ {
+  "slug": "nowa-sol",
+  "name": "Nowa Sól",
+  "lat": 51.80333,
+  "lon": 15.71702,
+  "population": 40354
+ },
+ {
+  "slug": "nowogard",
+  "name": "Nowogard",
+  "lat": 53.67437,
+  "lon": 15.1163,
+  "population": 16703
+ },
+ {
+  "slug": "nowogrod-bobrzanski",
+  "name": "Nowogród Bobrzański",
+  "lat": 51.79856,
+  "lon": 15.2352,
+  "population": 5114
+ },
+ {
+  "slug": "nowy-dwor-gdanski",
+  "name": "Nowy Dwór Gdański",
+  "lat": 54.21305,
+  "lon": 19.11771,
+  "population": 9822
+ },
+ {
+  "slug": "nowy-dwor-mazowiecki",
+  "name": "Nowy Dwór Mazowiecki",
+  "lat": 52.43022,
+  "lon": 20.71652,
+  "population": 27633
+ },
+ {
+  "slug": "nowy-sacz",
+  "name": "Nowy Sącz",
+  "lat": 49.62177,
+  "lon": 20.69705,
+  "population": 84376
+ },
+ {
+  "slug": "nowy-targ",
+  "name": "Nowy Targ",
+  "lat": 49.47783,
+  "lon": 20.03228,
+  "population": 33763
+ },
+ {
+  "slug": "nowy-tomysl",
+  "name": "Nowy Tomyśl",
+  "lat": 52.3195,
+  "lon": 16.12844,
+  "population": 15179
+ },
+ {
+  "slug": "nysa",
+  "name": "Nysa",
+  "lat": 50.47379,
+  "lon": 17.33437,
+  "population": 47283
+ },
+ {
+  "slug": "oborniki",
+  "name": "Oborniki",
+  "lat": 52.64739,
+  "lon": 16.81406,
+  "population": 17915
+ },
+ {
+  "slug": "olecko",
+  "name": "Olecko",
+  "lat": 54.03374,
+  "lon": 22.50704,
+  "population": 15923
+ },
+ {
+  "slug": "olesno",
+  "name": "Olesno",
+  "lat": 50.87698,
+  "lon": 18.42094,
+  "population": 10236
+ },
+ {
+  "slug": "oleszyce",
+  "name": "Oleszyce",
+  "lat": 50.1675,
+  "lon": 23.03481,
+  "population": 5193
+ },
+ {
+  "slug": "olkusz",
+  "name": "Olkusz",
+  "lat": 50.2813,
+  "lon": 19.56503,
+  "population": 37744
+ },
+ {
+  "slug": "olsztyn",
+  "name": "Olsztyn",
+  "lat": 53.78376,
+  "lon": 20.49272,
+  "population": 169793
+ },
+ {
+  "slug": "olsztynek",
+  "name": "Olsztynek",
+  "lat": 53.58374,
+  "lon": 20.28471,
+  "population": 7591
+ },
+ {
+  "slug": "opalenica",
+  "name": "Opalenica",
+  "lat": 52.30887,
+  "lon": 16.41278,
+  "population": 8991
+ },
+ {
+  "slug": "opatow",
+  "name": "Opatów",
+  "lat": 50.80058,
+  "lon": 21.42538,
+  "population": 6799
+ },
+ {
+  "slug": "opoczno",
+  "name": "Opoczno",
+  "lat": 51.37569,
+  "lon": 20.27827,
+  "population": 22592
+ },
+ {
+  "slug": "opole",
+  "name": "Opole",
+  "lat": 50.67119,
+  "lon": 17.92604,
+  "population": 127676
+ },
+ {
+  "slug": "opole-lubelskie",
+  "name": "Opole Lubelskie",
+  "lat": 51.14775,
+  "lon": 21.96897,
+  "population": 8780
+ },
+ {
+  "slug": "orneta",
+  "name": "Orneta",
+  "lat": 54.11483,
+  "lon": 20.13328,
+  "population": 9412
+ },
+ {
+  "slug": "ornontowice",
+  "name": "Ornontowice",
+  "lat": 50.19377,
+  "lon": 18.75435,
+  "population": 5291
+ },
+ {
+  "slug": "orzesze",
+  "name": "Orzesze",
+  "lat": 50.15595,
+  "lon": 18.77923,
+  "population": 18438
+ },
+ {
+  "slug": "orzysz",
+  "name": "Orzysz",
+  "lat": 53.80967,
+  "lon": 21.94811,
+  "population": 5998
+ },
+ {
+  "slug": "osiek",
+  "name": "Osiek",
+  "lat": 49.95067,
+  "lon": 19.26444,
+  "population": 8000
+ },
+ {
+  "slug": "ostroda",
+  "name": "Ostróda",
+  "lat": 53.69671,
+  "lon": 19.96486,
+  "population": 33524
+ },
+ {
+  "slug": "ostroleka",
+  "name": "Ostrołęka",
+  "lat": 53.08621,
+  "lon": 21.57566,
+  "population": 53740
+ },
+ {
+  "slug": "ostrow-wielkopolski",
+  "name": "Ostrów Wielkopolski",
+  "lat": 51.65501,
+  "lon": 17.80686,
+  "population": 72898
+ },
+ {
+  "slug": "ostrowiec-swietokrzyski",
+  "name": "Ostrowiec Świętokrzyski",
+  "lat": 50.92936,
+  "lon": 21.38525,
+  "population": 73989
+ },
+ {
+  "slug": "ostrzeszow",
+  "name": "Ostrzeszów",
+  "lat": 51.4264,
+  "lon": 17.93355,
+  "population": 14446
+ },
+ {
+  "slug": "otmuchow",
+  "name": "Otmuchów",
+  "lat": 50.46627,
+  "lon": 17.17348,
+  "population": 5181
+ },
+ {
+  "slug": "otwock",
+  "name": "Otwock",
+  "lat": 52.10577,
+  "lon": 21.26129,
+  "population": 43388
+ },
+ {
+  "slug": "ozarow-mazowiecki",
+  "name": "Ożarów Mazowiecki",
+  "lat": 52.21039,
+  "lon": 20.79716,
+  "population": 8237
+ },
+ {
+  "slug": "ozorkow",
+  "name": "Ozorków",
+  "lat": 51.96336,
+  "lon": 19.29139,
+  "population": 20608
+ },
+ {
+  "slug": "pabianice",
+  "name": "Pabianice",
+  "lat": 51.66446,
+  "lon": 19.35473,
+  "population": 70542
+ },
+ {
+  "slug": "paczkow",
+  "name": "Paczków",
+  "lat": 50.46395,
+  "lon": 17.00658,
+  "population": 8081
+ },
+ {
+  "slug": "pajeczno",
+  "name": "Pajęczno",
+  "lat": 51.14449,
+  "lon": 18.99612,
+  "population": 6731
+ },
+ {
+  "slug": "pakosc",
+  "name": "Pakość",
+  "lat": 52.80178,
+  "lon": 18.0853,
+  "population": 5762
+ },
+ {
+  "slug": "parczew",
+  "name": "Parczew",
+  "lat": 51.64021,
+  "lon": 22.90057,
+  "population": 10249
+ },
+ {
+  "slug": "paslek",
+  "name": "Pasłęk",
+  "lat": 54.0616,
+  "lon": 19.65932,
+  "population": 12267
+ },
+ {
+  "slug": "piaseczno",
+  "name": "Piaseczno",
+  "lat": 52.0814,
+  "lon": 21.02397,
+  "population": 36278
+ },
+ {
+  "slug": "piastow",
+  "name": "Piastów",
+  "lat": 52.18435,
+  "lon": 20.83952,
+  "population": 23290
+ },
+ {
+  "slug": "piechowice",
+  "name": "Piechowice",
+  "lat": 50.84963,
+  "lon": 15.59887,
+  "population": 6496
+ },
+ {
+  "slug": "piekary-slaskie",
+  "name": "Piekary Śląskie",
+  "lat": 50.38017,
+  "lon": 18.92653,
+  "population": 59757
+ },
+ {
+  "slug": "piensk",
+  "name": "Pieńsk",
+  "lat": 51.249,
+  "lon": 15.04685,
+  "population": 5813
+ },
+ {
+  "slug": "pieszyce",
+  "name": "Pieszyce",
+  "lat": 50.71287,
+  "lon": 16.58232,
+  "population": 9406
+ },
+ {
+  "slug": "pila",
+  "name": "Piła",
+  "lat": 53.15145,
+  "lon": 16.73782,
+  "population": 75532
+ },
+ {
+  "slug": "pilawa-gorna",
+  "name": "Piława Górna",
+  "lat": 50.68357,
+  "lon": 16.74359,
+  "population": 6736
+ },
+ {
+  "slug": "pinczow",
+  "name": "Pińczów",
+  "lat": 50.52052,
+  "lon": 20.52649,
+  "population": 11806
+ },
+ {
+  "slug": "pionki",
+  "name": "Pionki",
+  "lat": 51.47604,
+  "lon": 21.44995,
+  "population": 19966
+ },
+ {
+  "slug": "piotrkow-kujawski",
+  "name": "Piotrków Kujawski",
+  "lat": 52.55111,
+  "lon": 18.49905,
+  "population": 5030
+ },
+ {
+  "slug": "piotrkow-trybunalski",
+  "name": "Piotrków Trybunalski",
+  "lat": 51.40547,
+  "lon": 19.70321,
+  "population": 80128
+ },
+ {
+  "slug": "pisz",
+  "name": "Pisz",
+  "lat": 53.62744,
+  "lon": 21.81253,
+  "population": 19232
+ },
+ {
+  "slug": "pleszew",
+  "name": "Pleszew",
+  "lat": 51.89636,
+  "lon": 17.78549,
+  "population": 17640
+ },
+ {
+  "slug": "plock",
+  "name": "Płock",
+  "lat": 52.54682,
+  "lon": 19.70638,
+  "population": 127474
+ },
+ {
+  "slug": "plonsk",
+  "name": "Płońsk",
+  "lat": 52.62348,
+  "lon": 20.37552,
+  "population": 22217
+ },
+ {
+  "slug": "pniewy",
+  "name": "Pniewy",
+  "lat": 52.50943,
+  "lon": 16.25668,
+  "population": 7738
+ },
+ {
+  "slug": "pobiedziska",
+  "name": "Pobiedziska",
+  "lat": 52.47753,
+  "lon": 17.28767,
+  "population": 8677
+ },
+ {
+  "slug": "poddebice",
+  "name": "Poddębice",
+  "lat": 51.89344,
+  "lon": 18.9573,
+  "population": 7840
+ },
+ {
+  "slug": "polanica-zdroj",
+  "name": "Polanica-Zdrój",
+  "lat": 50.40373,
+  "lon": 16.51271,
+  "population": 6966
+ },
+ {
+  "slug": "polaniec",
+  "name": "Połaniec",
+  "lat": 50.43324,
+  "lon": 21.2812,
+  "population": 8158
+ },
+ {
+  "slug": "police",
+  "name": "Police",
+  "lat": 53.55214,
+  "lon": 14.57182,
+  "population": 34350
+ },
+ {
+  "slug": "polkowice",
+  "name": "Polkowice",
+  "lat": 51.50391,
+  "lon": 16.07261,
+  "population": 21565
+ },
+ {
+  "slug": "poniatowa",
+  "name": "Poniatowa",
+  "lat": 51.17983,
+  "lon": 22.13093,
+  "population": 10056
+ },
+ {
+  "slug": "poznan",
+  "name": "Poznań",
+  "lat": 52.40692,
+  "lon": 16.92993,
+  "population": 536151
+ },
+ {
+  "slug": "prabuty",
+  "name": "Prabuty",
+  "lat": 53.755,
+  "lon": 19.20547,
+  "population": 8488
+ },
+ {
+  "slug": "praszka",
+  "name": "Praszka",
+  "lat": 51.05375,
+  "lon": 18.45317,
+  "population": 8150
+ },
+ {
+  "slug": "proszowice",
+  "name": "Proszowice",
+  "lat": 50.19275,
+  "lon": 20.28909,
+  "population": 6146
+ },
+ {
+  "slug": "prudnik",
+  "name": "Prudnik",
+  "lat": 50.32124,
+  "lon": 17.57461,
+  "population": 23343
+ },
+ {
+  "slug": "pruszcz-gdanski",
+  "name": "Pruszcz Gdański",
+  "lat": 54.26217,
+  "lon": 18.63625,
+  "population": 23618
+ },
+ {
+  "slug": "pruszkow",
+  "name": "Pruszków",
+  "lat": 52.17072,
+  "lon": 20.81214,
+  "population": 55371
+ },
+ {
+  "slug": "przasnysz",
+  "name": "Przasnysz",
+  "lat": 53.01907,
+  "lon": 20.88029,
+  "population": 16718
+ },
+ {
+  "slug": "przemysl",
+  "name": "Przemyśl",
+  "lat": 49.78498,
+  "lon": 22.76728,
+  "population": 67013
+ },
+ {
+  "slug": "przeworsk",
+  "name": "Przeworsk",
+  "lat": 50.05912,
+  "lon": 22.49408,
+  "population": 15805
+ },
+ {
+  "slug": "przysucha",
+  "name": "Przysucha",
+  "lat": 51.35858,
+  "lon": 20.62889,
+  "population": 6188
+ },
+ {
+  "slug": "pszczyna",
+  "name": "Pszczyna",
+  "lat": 49.98037,
+  "lon": 18.95382,
+  "population": 25288
+ },
+ {
+  "slug": "pszow",
+  "name": "Pszów",
+  "lat": 50.03994,
+  "lon": 18.39472,
+  "population": 14028
+ },
+ {
+  "slug": "puck",
+  "name": "Puck",
+  "lat": 54.7179,
+  "lon": 18.40841,
+  "population": 11415
+ },
+ {
+  "slug": "pulawy",
+  "name": "Puławy",
+  "lat": 51.41655,
+  "lon": 21.96939,
+  "population": 49759
+ },
+ {
+  "slug": "pultusk",
+  "name": "Pułtusk",
+  "lat": 52.7025,
+  "lon": 21.08276,
+  "population": 19039
+ },
+ {
+  "slug": "puszczykowo",
+  "name": "Puszczykowo",
+  "lat": 52.2857,
+  "lon": 16.84925,
+  "population": 9143
+ },
+ {
+  "slug": "pyrzyce",
+  "name": "Pyrzyce",
+  "lat": 53.1462,
+  "lon": 14.89257,
+  "population": 12893
+ },
+ {
+  "slug": "pyskowice",
+  "name": "Pyskowice",
+  "lat": 50.4,
+  "lon": 18.63333,
+  "population": 19018
+ },
+ {
+  "slug": "rabka",
+  "name": "Rabka",
+  "lat": 49.60889,
+  "lon": 19.96654,
+  "population": 13071
+ },
+ {
+  "slug": "raciborz",
+  "name": "Racibórz",
+  "lat": 50.09195,
+  "lon": 18.21928,
+  "population": 58464
+ },
+ {
+  "slug": "radlin",
+  "name": "Radlin",
+  "lat": 50.0502,
+  "lon": 18.47626,
+  "population": 17479
+ },
+ {
+  "slug": "radom",
+  "name": "Radom",
+  "lat": 51.40253,
+  "lon": 21.14714,
+  "population": 226794
+ },
+ {
+  "slug": "radziejow",
+  "name": "Radziejów",
+  "lat": 52.62481,
+  "lon": 18.52771,
+  "population": 5759
+ },
+ {
+  "slug": "radzymin",
+  "name": "Radzymin",
+  "lat": 52.41592,
+  "lon": 21.18415,
+  "population": 8818
+ },
+ {
+  "slug": "radzyn-podlaski",
+  "name": "Radzyń Podlaski",
+  "lat": 51.78333,
+  "lon": 22.61667,
+  "population": 16071
+ },
+ {
+  "slug": "rakszawa",
+  "name": "Rakszawa",
+  "lat": 50.16051,
+  "lon": 22.23907,
+  "population": 6894
+ },
+ {
+  "slug": "rawa-mazowiecka",
+  "name": "Rawa Mazowiecka",
+  "lat": 51.76437,
+  "lon": 20.25493,
+  "population": 17770
+ },
+ {
+  "slug": "rawicz",
+  "name": "Rawicz",
+  "lat": 51.60946,
+  "lon": 16.85852,
+  "population": 21380
+ },
+ {
+  "slug": "reda",
+  "name": "Reda",
+  "lat": 54.60528,
+  "lon": 18.34717,
+  "population": 18116
+ },
+ {
+  "slug": "rogozno",
+  "name": "Rogoźno",
+  "lat": 52.75226,
+  "lon": 16.99049,
+  "population": 10859
+ },
+ {
+  "slug": "ropczyce",
+  "name": "Ropczyce",
+  "lat": 50.05229,
+  "lon": 21.60891,
+  "population": 15279
+ },
+ {
+  "slug": "rudnik-nad-sanem",
+  "name": "Rudnik nad Sanem",
+  "lat": 50.44152,
+  "lon": 22.24856,
+  "population": 6770
+ },
+ {
+  "slug": "rumia",
+  "name": "Rumia",
+  "lat": 54.57092,
+  "lon": 18.38802,
+  "population": 44791
+ },
+ {
+  "slug": "rybnik",
+  "name": "Rybnik",
+  "lat": 50.09713,
+  "lon": 18.54179,
+  "population": 142510
+ },
+ {
+  "slug": "rydultowy",
+  "name": "Rydułtowy",
+  "lat": 50.05857,
+  "lon": 18.41703,
+  "population": 21887
+ },
+ {
+  "slug": "ryki",
+  "name": "Ryki",
+  "lat": 51.62574,
+  "lon": 21.93274,
+  "population": 9619
+ },
+ {
+  "slug": "rypin",
+  "name": "Rypin",
+  "lat": 53.06603,
+  "lon": 19.40941,
+  "population": 16589
+ },
+ {
+  "slug": "rzepin",
+  "name": "Rzepin",
+  "lat": 52.3464,
+  "lon": 14.83227,
+  "population": 6488
+ },
+ {
+  "slug": "rzeszow",
+  "name": "Rzeszów",
+  "lat": 50.04132,
+  "lon": 21.99901,
+  "population": 198317
+ },
+ {
+  "slug": "sandomierz",
+  "name": "Sandomierz",
+  "lat": 50.68265,
+  "lon": 21.74898,
+  "population": 25087
+ },
+ {
+  "slug": "sanok",
+  "name": "Sanok",
+  "lat": 49.55573,
+  "lon": 22.2056,
+  "population": 39684
+ },
+ {
+  "slug": "sedziszow",
+  "name": "Sędziszów",
+  "lat": 50.5659,
+  "lon": 20.05563,
+  "population": 6771
+ },
+ {
+  "slug": "sedziszow-malopolski",
+  "name": "Sędziszów Małopolski",
+  "lat": 50.07069,
+  "lon": 21.70062,
+  "population": 7096
+ },
+ {
+  "slug": "sejny",
+  "name": "Sejny",
+  "lat": 54.10802,
+  "lon": 23.34698,
+  "population": 5872
+ },
+ {
+  "slug": "sepolno-krajenskie",
+  "name": "Sępólno Krajeńskie",
+  "lat": 53.45198,
+  "lon": 17.53169,
+  "population": 9223
+ },
+ {
+  "slug": "sianow",
+  "name": "Sianów",
+  "lat": 54.22646,
+  "lon": 16.29127,
+  "population": 6606
+ },
+ {
+  "slug": "siemianowice-slaskie",
+  "name": "Siemianowice Śląskie",
+  "lat": 50.32738,
+  "lon": 19.02901,
+  "population": 73121
+ },
+ {
+  "slug": "siemiatycze",
+  "name": "Siemiatycze",
+  "lat": 52.42719,
+  "lon": 22.86231,
+  "population": 15421
+ },
+ {
+  "slug": "sieradz",
+  "name": "Sieradz",
+  "lat": 51.59584,
+  "lon": 18.73023,
+  "population": 44436
+ },
+ {
+  "slug": "sierakow",
+  "name": "Sieraków",
+  "lat": 52.65134,
+  "lon": 16.08047,
+  "population": 6090
+ },
+ {
+  "slug": "sierpc",
+  "name": "Sierpc",
+  "lat": 52.8568,
+  "lon": 19.66913,
+  "population": 18866
+ },
+ {
+  "slug": "siewierz",
+  "name": "Siewierz",
+  "lat": 50.46657,
+  "lon": 19.23028,
+  "population": 5417
+ },
+ {
+  "slug": "skarzysko-kamienna",
+  "name": "Skarżysko-Kamienna",
+  "lat": 51.11311,
+  "lon": 20.87162,
+  "population": 49410
+ },
+ {
+  "slug": "skawina",
+  "name": "Skawina",
+  "lat": 49.97524,
+  "lon": 19.82869,
+  "population": 23647
+ },
+ {
+  "slug": "skierniewice",
+  "name": "Skierniewice",
+  "lat": 51.95485,
+  "lon": 20.15837,
+  "population": 49042
+ },
+ {
+  "slug": "skoczow",
+  "name": "Skoczów",
+  "lat": 49.80089,
+  "lon": 18.7877,
+  "population": 14810
+ },
+ {
+  "slug": "skwierzyna",
+  "name": "Skwierzyna",
+  "lat": 52.59914,
+  "lon": 15.50652,
+  "population": 10051
+ },
+ {
+  "slug": "slawkow",
+  "name": "Sławków",
+  "lat": 50.29943,
+  "lon": 19.38967,
+  "population": 6901
+ },
+ {
+  "slug": "slawno",
+  "name": "Sławno",
+  "lat": 54.36276,
+  "lon": 16.67888,
+  "population": 13415
+ },
+ {
+  "slug": "slubice",
+  "name": "Słubice",
+  "lat": 52.35088,
+  "lon": 14.56065,
+  "population": 17567
+ },
+ {
+  "slug": "slupca",
+  "name": "Słupca",
+  "lat": 52.28733,
+  "lon": 17.87192,
+  "population": 14476
+ },
+ {
+  "slug": "slupsk",
+  "name": "Słupsk",
+  "lat": 54.46405,
+  "lon": 17.02872,
+  "population": 98608
+ },
+ {
+  "slug": "smigiel",
+  "name": "Śmigiel",
+  "lat": 52.01339,
+  "lon": 16.52704,
+  "population": 5531
+ },
+ {
+  "slug": "sobotka",
+  "name": "Sobótka",
+  "lat": 50.89992,
+  "lon": 16.74441,
+  "population": 6906
+ },
+ {
+  "slug": "sochaczew",
+  "name": "Sochaczew",
+  "lat": 52.22944,
+  "lon": 20.23838,
+  "population": 38267
+ },
+ {
+  "slug": "sokolka",
+  "name": "Sokółka",
+  "lat": 53.40715,
+  "lon": 23.50228,
+  "population": 19079
+ },
+ {
+  "slug": "sokolow-podlaski",
+  "name": "Sokołów Podlaski",
+  "lat": 52.40677,
+  "lon": 22.25307,
+  "population": 18241
+ },
+ {
+  "slug": "srem",
+  "name": "Śrem",
+  "lat": 52.08868,
+  "lon": 17.01508,
+  "population": 30404
+ },
+ {
+  "slug": "sroda-slaska",
+  "name": "Środa Śląska",
+  "lat": 51.16406,
+  "lon": 16.59508,
+  "population": 8912
+ },
+ {
+  "slug": "sroda-wielkopolska",
+  "name": "Środa Wielkopolska",
+  "lat": 52.22843,
+  "lon": 17.27617,
+  "population": 21757
+ },
+ {
+  "slug": "stalowa-wola",
+  "name": "Stalowa Wola",
+  "lat": 50.58286,
+  "lon": 22.05334,
+  "population": 66495
+ },
+ {
+  "slug": "staporkow",
+  "name": "Stąporków",
+  "lat": 51.13762,
+  "lon": 20.57173,
+  "population": 5946
+ },
+ {
+  "slug": "starachowice",
+  "name": "Starachowice",
+  "lat": 51.0374,
+  "lon": 21.07126,
+  "population": 53739
+ },
+ {
+  "slug": "stargard",
+  "name": "Stargard",
+  "lat": 53.33672,
+  "lon": 15.0499,
+  "population": 71224
+ },
+ {
+  "slug": "staszow",
+  "name": "Staszów",
+  "lat": 50.56307,
+  "lon": 21.16593,
+  "population": 16137
+ },
+ {
+  "slug": "stryszawa",
+  "name": "Stryszawa",
+  "lat": 49.71327,
+  "lon": 19.52185,
+  "population": 5266
+ },
+ {
+  "slug": "strzalkowo",
+  "name": "Strzałkowo",
+  "lat": 52.30701,
+  "lon": 17.81811,
+  "population": 5140
+ },
+ {
+  "slug": "strzelce-krajenskie",
+  "name": "Strzelce Krajeńskie",
+  "lat": 52.87726,
+  "lon": 15.52978,
+  "population": 9978
+ },
+ {
+  "slug": "strzelce-opolskie",
+  "name": "Strzelce Opolskie",
+  "lat": 50.5107,
+  "lon": 18.30056,
+  "population": 20241
+ },
+ {
+  "slug": "strzelno",
+  "name": "Strzelno",
+  "lat": 52.62789,
+  "lon": 18.17246,
+  "population": 5951
+ },
+ {
+  "slug": "strzyzow",
+  "name": "Strzyżów",
+  "lat": 49.87074,
+  "lon": 21.79413,
+  "population": 8739
+ },
+ {
+  "slug": "sucha",
+  "name": "Sucha",
+  "lat": 49.74188,
+  "lon": 19.59429,
+  "population": 9801
+ },
+ {
+  "slug": "suchedniow",
+  "name": "Suchedniów",
+  "lat": 51.04776,
+  "lon": 20.82922,
+  "population": 9184
+ },
+ {
+  "slug": "sulechow",
+  "name": "Sulechów",
+  "lat": 52.08362,
+  "lon": 15.62513,
+  "population": 18055
+ },
+ {
+  "slug": "sulecin",
+  "name": "Sulęcin",
+  "lat": 52.44429,
+  "lon": 15.11676,
+  "population": 10090
+ },
+ {
+  "slug": "sulejow",
+  "name": "Sulejów",
+  "lat": 51.35436,
+  "lon": 19.88538,
+  "population": 6332
+ },
+ {
+  "slug": "sulejowek",
+  "name": "Sulejówek",
+  "lat": 52.25221,
+  "lon": 21.26902,
+  "population": 18414
+ },
+ {
+  "slug": "sulkowice",
+  "name": "Sułkowice",
+  "lat": 49.84053,
+  "lon": 19.80097,
+  "population": 6362
+ },
+ {
+  "slug": "susz",
+  "name": "Susz",
+  "lat": 53.71743,
+  "lon": 19.33645,
+  "population": 5593
+ },
+ {
+  "slug": "suwalki",
+  "name": "Suwałki",
+  "lat": 54.11175,
+  "lon": 22.93087,
+  "population": 69222
+ },
+ {
+  "slug": "swarzedz",
+  "name": "Swarzędz",
+  "lat": 52.41289,
+  "lon": 17.08503,
+  "population": 29010
+ },
+ {
+  "slug": "swidnica",
+  "name": "Świdnica",
+  "lat": 50.84378,
+  "lon": 16.48859,
+  "population": 60351
+ },
+ {
+  "slug": "swiebodzice",
+  "name": "Świebodzice",
+  "lat": 50.85974,
+  "lon": 16.31966,
+  "population": 23228
+ },
+ {
+  "slug": "swiebodzin",
+  "name": "Świebodzin",
+  "lat": 52.24751,
+  "lon": 15.53355,
+  "population": 21757
+ },
+ {
+  "slug": "swietochlowice",
+  "name": "Świętochłowice",
+  "lat": 50.29636,
+  "lon": 18.91726,
+  "population": 55600
+ },
+ {
+  "slug": "swinoujscie",
+  "name": "Świnoujście",
+  "lat": 53.91053,
+  "lon": 14.24712,
+  "population": 40919
+ },
+ {
+  "slug": "szamotuly",
+  "name": "Szamotuły",
+  "lat": 52.61201,
+  "lon": 16.57794,
+  "population": 18588
+ },
+ {
+  "slug": "szczebrzeszyn",
+  "name": "Szczebrzeszyn",
+  "lat": 50.69499,
+  "lon": 22.97954,
+  "population": 5255
+ },
+ {
+  "slug": "szczecin",
+  "name": "Szczecin",
+  "lat": 53.42894,
+  "lon": 14.55302,
+  "population": 395513
+ },
+ {
+  "slug": "szczecinek",
+  "name": "Szczecinek",
+  "lat": 53.70791,
+  "lon": 16.69937,
+  "population": 38496
+ },
+ {
+  "slug": "szczyrk",
+  "name": "Szczyrk",
+  "lat": 49.71724,
+  "lon": 19.03183,
+  "population": 5860
+ },
+ {
+  "slug": "szczytno",
+  "name": "Szczytno",
+  "lat": 53.56259,
+  "lon": 20.98747,
+  "population": 26044
+ },
+ {
+  "slug": "sztum",
+  "name": "Sztum",
+  "lat": 53.92077,
+  "lon": 19.03072,
+  "population": 9766
+ },
+ {
+  "slug": "szubin",
+  "name": "Szubin",
+  "lat": 53.00967,
+  "lon": 17.74,
+  "population": 9206
+ },
+ {
+  "slug": "szydlowiec",
+  "name": "Szydłowiec",
+  "lat": 51.22823,
+  "lon": 20.86106,
+  "population": 12128
+ },
+ {
+  "slug": "tarnobrzeg",
+  "name": "Tarnobrzeg",
+  "lat": 50.57304,
+  "lon": 21.67937,
+  "population": 50459
+ },
+ {
+  "slug": "tarnow",
+  "name": "Tarnów",
+  "lat": 50.01381,
+  "lon": 20.98698,
+  "population": 117799
+ },
+ {
+  "slug": "tarnowskie-gory",
+  "name": "Tarnowskie Góry",
+  "lat": 50.44548,
+  "lon": 18.86147,
+  "population": 60938
+ },
+ {
+  "slug": "tczew",
+  "name": "Tczew",
+  "lat": 54.09242,
+  "lon": 18.77787,
+  "population": 60133
+ },
+ {
+  "slug": "terespol",
+  "name": "Terespol",
+  "lat": 52.0755,
+  "lon": 23.61614,
+  "population": 6000
+ },
+ {
+  "slug": "tluszcz",
+  "name": "Tłuszcz",
+  "lat": 52.43058,
+  "lon": 21.43561,
+  "population": 7482
+ },
+ {
+  "slug": "tomaszow-lubelski",
+  "name": "Tomaszów Lubelski",
+  "lat": 50.44767,
+  "lon": 23.41616,
+  "population": 20261
+ },
+ {
+  "slug": "tomaszow-mazowiecki",
+  "name": "Tomaszów Mazowiecki",
+  "lat": 51.53131,
+  "lon": 20.00855,
+  "population": 67197
+ },
+ {
+  "slug": "trzcianka",
+  "name": "Trzcianka",
+  "lat": 53.04063,
+  "lon": 16.45629,
+  "population": 16914
+ },
+ {
+  "slug": "trzebiatow",
+  "name": "Trzebiatów",
+  "lat": 54.06147,
+  "lon": 15.26475,
+  "population": 10322
+ },
+ {
+  "slug": "trzebinia",
+  "name": "Trzebinia",
+  "lat": 50.15931,
+  "lon": 19.46966,
+  "population": 18828
+ },
+ {
+  "slug": "trzemeszno",
+  "name": "Trzemeszno",
+  "lat": 52.56139,
+  "lon": 17.82311,
+  "population": 7840
+ },
+ {
+  "slug": "tuchola",
+  "name": "Tuchola",
+  "lat": 53.58792,
+  "lon": 17.85905,
+  "population": 13686
+ },
+ {
+  "slug": "tuchow",
+  "name": "Tuchów",
+  "lat": 49.89485,
+  "lon": 21.05407,
+  "population": 6680
+ },
+ {
+  "slug": "turek",
+  "name": "Turek",
+  "lat": 52.01548,
+  "lon": 18.50055,
+  "population": 29533
+ },
+ {
+  "slug": "tuszyn",
+  "name": "Tuszyn",
+  "lat": 51.60949,
+  "lon": 19.53009,
+  "population": 7124
+ },
+ {
+  "slug": "tychy",
+  "name": "Tychy",
+  "lat": 50.13717,
+  "lon": 18.96641,
+  "population": 130000
+ },
+ {
+  "slug": "ustka",
+  "name": "Ustka",
+  "lat": 54.58048,
+  "lon": 16.86194,
+  "population": 16250
+ },
+ {
+  "slug": "ustron",
+  "name": "Ustroń",
+  "lat": 49.72153,
+  "lon": 18.80198,
+  "population": 15637
+ },
+ {
+  "slug": "ustrzyki-dolne",
+  "name": "Ustrzyki Dolne",
+  "lat": 49.4304,
+  "lon": 22.59381,
+  "population": 9610
+ },
+ {
+  "slug": "wabrzezno",
+  "name": "Wąbrzeźno",
+  "lat": 53.27989,
+  "lon": 18.94773,
+  "population": 13911
+ },
+ {
+  "slug": "wadowice",
+  "name": "Wadowice",
+  "lat": 49.88335,
+  "lon": 19.49292,
+  "population": 19238
+ },
+ {
+  "slug": "walbrzych",
+  "name": "Wałbrzych",
+  "lat": 50.77141,
+  "lon": 16.28432,
+  "population": 127431
+ },
+ {
+  "slug": "walcz",
+  "name": "Wałcz",
+  "lat": 53.27787,
+  "lon": 16.47122,
+  "population": 25971
+ },
+ {
+  "slug": "warka",
+  "name": "Warka",
+  "lat": 51.7843,
+  "lon": 21.19091,
+  "population": 11048
+ },
+ {
+  "slug": "warszawa",
+  "name": "Warszawa",
+  "lat": 52.22977,
+  "lon": 21.01178,
+  "population": 1702139
+ },
+ {
+  "slug": "wasilkow",
+  "name": "Wasilków",
+  "lat": 53.19909,
+  "lon": 23.20776,
+  "population": 9440
+ },
+ {
+  "slug": "wegorzewo",
+  "name": "Węgorzewo",
+  "lat": 54.21567,
+  "lon": 21.7372,
+  "population": 11864
+ },
+ {
+  "slug": "wegrow",
+  "name": "Węgrów",
+  "lat": 52.39954,
+  "lon": 22.01634,
+  "population": 12512
+ },
+ {
+  "slug": "wejherowo",
+  "name": "Wejherowo",
+  "lat": 54.60568,
+  "lon": 18.23559,
+  "population": 46820
+ },
+ {
+  "slug": "wiecbork",
+  "name": "Więcbork",
+  "lat": 53.35384,
+  "lon": 17.49064,
+  "population": 5953
+ },
+ {
+  "slug": "wielen",
+  "name": "Wieleń",
+  "lat": 52.89461,
+  "lon": 16.17136,
+  "population": 6067
+ },
+ {
+  "slug": "wieliczka",
+  "name": "Wieliczka",
+  "lat": 49.98738,
+  "lon": 20.06473,
+  "population": 18677
+ },
+ {
+  "slug": "wieruszow",
+  "name": "Wieruszów",
+  "lat": 51.29488,
+  "lon": 18.15547,
+  "population": 8692
+ },
+ {
+  "slug": "wisla",
+  "name": "Wisła",
+  "lat": 49.65629,
+  "lon": 18.8591,
+  "population": 11379
+ },
+ {
+  "slug": "witkowo",
+  "name": "Witkowo",
+  "lat": 52.43964,
+  "lon": 17.77264,
+  "population": 7825
+ },
+ {
+  "slug": "witnica",
+  "name": "Witnica",
+  "lat": 52.67318,
+  "lon": 14.89765,
+  "population": 6821
+ },
+ {
+  "slug": "wladyslawowo",
+  "name": "Władysławowo",
+  "lat": 54.79086,
+  "lon": 18.4009,
+  "population": 14889
+ },
+ {
+  "slug": "wloclawek",
+  "name": "Włocławek",
+  "lat": 52.64817,
+  "lon": 19.0678,
+  "population": 120339
+ },
+ {
+  "slug": "wlodawa",
+  "name": "Włodawa",
+  "lat": 51.55,
+  "lon": 23.55,
+  "population": 13142
+ },
+ {
+  "slug": "wloszczowa",
+  "name": "Włoszczowa",
+  "lat": 50.85256,
+  "lon": 19.96593,
+  "population": 10661
+ },
+ {
+  "slug": "wodzislaw-slaski",
+  "name": "Wodzisław Śląski",
+  "lat": 50.00377,
+  "lon": 18.47205,
+  "population": 49521
+ },
+ {
+  "slug": "wolbrom",
+  "name": "Wolbrom",
+  "lat": 50.37957,
+  "lon": 19.75831,
+  "population": 9146
+ },
+ {
+  "slug": "wolczyn",
+  "name": "Wołczyn",
+  "lat": 51.01845,
+  "lon": 18.04994,
+  "population": 6221
+ },
+ {
+  "slug": "wolin",
+  "name": "Wolin",
+  "lat": 53.84214,
+  "lon": 14.61465,
+  "population": 12438
+ },
+ {
+  "slug": "wolomin",
+  "name": "Wołomin",
+  "lat": 52.34006,
+  "lon": 21.24207,
+  "population": 36592
+ },
+ {
+  "slug": "wolsztyn",
+  "name": "Wolsztyn",
+  "lat": 52.11552,
+  "lon": 16.11712,
+  "population": 13689
+ },
+ {
+  "slug": "wroclaw",
+  "name": "Wrocław",
+  "lat": 51.10286,
+  "lon": 17.03006,
+  "population": 672545
+ },
+ {
+  "slug": "wronki",
+  "name": "Wronki",
+  "lat": 52.71051,
+  "lon": 16.38044,
+  "population": 11462
+ },
+ {
+  "slug": "wrzesnia",
+  "name": "Września",
+  "lat": 52.32512,
+  "lon": 17.56519,
+  "population": 28703
+ },
+ {
+  "slug": "wschowa",
+  "name": "Wschowa",
+  "lat": 51.80705,
+  "lon": 16.31663,
+  "population": 14458
+ },
+ {
+  "slug": "wyrzysk",
+  "name": "Wyrzysk",
+  "lat": 53.153,
+  "lon": 17.26802,
+  "population": 5263
+ },
+ {
+  "slug": "zabki",
+  "name": "Ząbki",
+  "lat": 52.29271,
+  "lon": 21.10539,
+  "population": 23473
+ },
+ {
+  "slug": "zabrze",
+  "name": "Zabrze",
+  "lat": 50.32492,
+  "lon": 18.78576,
+  "population": 192177
+ },
+ {
+  "slug": "zagorz",
+  "name": "Zagórz",
+  "lat": 49.51457,
+  "lon": 22.26706,
+  "population": 5129
+ },
+ {
+  "slug": "zamosc",
+  "name": "Zamość",
+  "lat": 50.72314,
+  "lon": 23.25196,
+  "population": 66034
+ },
+ {
+  "slug": "zary",
+  "name": "Żary",
+  "lat": 51.64205,
+  "lon": 15.13727,
+  "population": 38779
+ },
+ {
+  "slug": "zawadzkie",
+  "name": "Zawadzkie",
+  "lat": 50.60503,
+  "lon": 18.48467,
+  "population": 8439
+ },
+ {
+  "slug": "zawiercie",
+  "name": "Zawiercie",
+  "lat": 50.48766,
+  "lon": 19.41679,
+  "population": 53159
+ },
+ {
+  "slug": "zawoja",
+  "name": "Zawoja",
+  "lat": 49.64396,
+  "lon": 19.54227,
+  "population": 6200
+ },
+ {
+  "slug": "zbaszyn",
+  "name": "Zbąszyń",
+  "lat": 52.2509,
+  "lon": 15.9252,
+  "population": 7185
+ },
+ {
+  "slug": "zbaszynek",
+  "name": "Zbąszynek",
+  "lat": 52.24315,
+  "lon": 15.81654,
+  "population": 5073
+ },
+ {
+  "slug": "zdunska-wola",
+  "name": "Zduńska Wola",
+  "lat": 51.59915,
+  "lon": 18.93974,
+  "population": 44515
+ },
+ {
+  "slug": "zdzieszowice",
+  "name": "Zdzieszowice",
+  "lat": 50.42482,
+  "lon": 18.12349,
+  "population": 13401
+ },
+ {
+  "slug": "zelow",
+  "name": "Zelów",
+  "lat": 51.46452,
+  "lon": 19.21972,
+  "population": 8003
+ },
+ {
+  "slug": "zgierz",
+  "name": "Zgierz",
+  "lat": 51.85561,
+  "lon": 19.40623,
+  "population": 58036
+ },
+ {
+  "slug": "zgorzelec",
+  "name": "Zgorzelec",
+  "lat": 51.14942,
+  "lon": 15.00835,
+  "population": 33247
+ },
+ {
+  "slug": "ziebice",
+  "name": "Ziębice",
+  "lat": 50.60122,
+  "lon": 17.04065,
+  "population": 9328
+ },
+ {
+  "slug": "zielona-gora",
+  "name": "Zielona Góra",
+  "lat": 51.93548,
+  "lon": 15.50643,
+  "population": 118433
+ },
+ {
+  "slug": "zielonka",
+  "name": "Zielonka",
+  "lat": 52.30376,
+  "lon": 21.16018,
+  "population": 17518
+ },
+ {
+  "slug": "zlocieniec",
+  "name": "Złocieniec",
+  "lat": 53.53286,
+  "lon": 16.01132,
+  "population": 13337
+ },
+ {
+  "slug": "zlotow",
+  "name": "Złotów",
+  "lat": 53.36346,
+  "lon": 17.04082,
+  "population": 18395
+ },
+ {
+  "slug": "znin",
+  "name": "Żnin",
+  "lat": 52.84958,
+  "lon": 17.71992,
+  "population": 14008
+ },
+ {
+  "slug": "zolynia",
+  "name": "Żołynia",
+  "lat": 50.162,
+  "lon": 22.30825,
+  "population": 5145
+ },
+ {
+  "slug": "zory",
+  "name": "Żory",
+  "lat": 50.04523,
+  "lon": 18.70062,
+  "population": 63174
+ },
+ {
+  "slug": "zuromin",
+  "name": "Żuromin",
+  "lat": 53.06611,
+  "lon": 19.90894,
+  "population": 9019
+ },
+ {
+  "slug": "zwolen",
+  "name": "Zwoleń",
+  "lat": 51.35542,
+  "lon": 21.58768,
+  "population": 8048
+ },
+ {
+  "slug": "zychlin",
+  "name": "Żychlin",
+  "lat": 52.24404,
+  "lon": 19.62613,
+  "population": 9009
+ },
+ {
+  "slug": "zyrardow",
+  "name": "Żyrardów",
+  "lat": 52.0488,
+  "lon": 20.44599,
+  "population": 41179
+ },
+ {
+  "slug": "zywiec",
+  "name": "Żywiec",
+  "lat": 49.68529,
+  "lon": 19.19243,
+  "population": 32132
+ }
+]

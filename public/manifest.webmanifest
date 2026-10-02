@@ -1,7 +1,7 @@
 {
   "name": "paczkom.at",
   "short_name": "paczkom.at",
-  "description": "A two-minute game about remembering which box the parcel went into.",
+  "description": "Jakość powietrza w Twoim mieście, co godzinę.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -14,6 +14,10 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
+    // The app's default language follows the browser locale; the suite expects
+    // the Polish default unless a test switches it, which only a Polish locale
+    // gives on every host (CI runners default to en-US).
+    locale: 'pl-PL',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

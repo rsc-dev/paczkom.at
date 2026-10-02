@@ -3,9 +3,9 @@
  *
  * The catalogues are flat `Record<Key, string>` maps and `t` interpolates
  * `{param}` placeholders. Language is chosen once at boot and can be switched
- * live; game state is language-independent, so switching only re-renders.
+ * live. State is language-independent, so switching only re-renders.
  */
-import type { Colour, Sticker } from '../core/parcel.js';
+import type { Level } from '../core/levels.js';
 import { en } from './en.js';
 import { pl } from './pl.js';
 import type { MessageKey } from './pl.js';
@@ -76,27 +76,6 @@ export function t(key: MessageKey, params?: Params): string {
   return translate(currentLang, key, params);
 }
 
-export function colourName(colour: Colour, lang: Lang = currentLang): string {
-  return translate(lang, `colour.${colour}`);
-}
-
-export function stickerName(sticker: Sticker, lang: Lang = currentLang): string {
-  return translate(lang, `sticker.${sticker}`);
-}
-
-/**
- * The hint line shown at hint level 1, built from the parcel's identity.
- *
- * The sticker half is a whole phrase per sticker rather than a name slotted
- * into one template: Polish needs a different preposition for each sticker.
- */
-export function hintLine(colour: Colour, sticker: Sticker, lang: Lang = currentLang): string {
-  const colourText = colourName(colour, lang);
-  if (sticker === 'none') {
-    return translate(lang, 'hint.colour', { colour: colourText });
-  }
-  return translate(lang, 'hint.colourSticker', {
-    colour: colourText,
-    sticker: translate(lang, `hint.sticker.${sticker}`),
-  });
+export function levelName(level: Level, lang: Lang = currentLang): string {
+  return translate(lang, `level.${String(level)}` as MessageKey);
 }

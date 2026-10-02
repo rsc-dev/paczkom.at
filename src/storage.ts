@@ -3,8 +3,8 @@
  *
  * `localStorage` is best-effort: private-mode browsers throw on access, on
  * write, or both. Every value written this session is also kept in memory, so
- * a browser that refuses to store anything still gets a fully playable game —
- * it just forgets the streak when the tab closes.
+ * a browser that refuses to store anything still works — it just forgets the
+ * town when the tab closes.
  */
 
 export const STORAGE_PREFIX = 'pk:v1:';
@@ -108,15 +108,8 @@ export function createStorage(backend: StorageBackend | null = defaultBackend())
 /** The instance the app uses. */
 export const storage: Storage = createStorage();
 
-/** Keys the game persists (design D12, plus the Week change's best run). */
+/** Keys the site persists: the language choice and the reader's own town. */
 export const STORAGE_KEYS = {
   lang: 'lang',
-  theme: 'theme',
-  mute: 'mute',
-  daily: 'daily',
-  best: 'best',
-  /** Highest total from a *completed* week. */
-  weekBest: 'week:best',
-  /** The Week run in progress, saved between days; absent once it is over. */
-  weekRun: 'week:run',
+  town: 'town',
 } as const;

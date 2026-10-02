@@ -36,17 +36,17 @@ describe('createStorage', () => {
     const storage = createStorage(backend);
     storage.set('lang', 'en');
     storage.set('mute', true);
-    storage.set('daily', { '2026-09-14': { practices: 1 } });
+    storage.set('prefs', { '2026-09-14': { visits: 1 } });
 
     expect(storage.get<string>('lang')).toBe('en');
     expect(storage.get<boolean>('mute')).toBe(true);
-    expect(storage.get<Record<string, unknown>>('daily')).toEqual({
-      '2026-09-14': { practices: 1 },
+    expect(storage.get<Record<string, unknown>>('prefs')).toEqual({
+      '2026-09-14': { visits: 1 },
     });
     expect([...backend.data.keys()]).toEqual([
       `${STORAGE_PREFIX}lang`,
       `${STORAGE_PREFIX}mute`,
-      `${STORAGE_PREFIX}daily`,
+      `${STORAGE_PREFIX}prefs`,
     ]);
   });
 
@@ -61,8 +61,8 @@ describe('createStorage', () => {
   });
 
   it('treats a corrupt value as absent', () => {
-    const storage = createStorage(memoryBackend({ [`${STORAGE_PREFIX}daily`]: '{not json' }));
-    expect(storage.get('daily')).toBeUndefined();
+    const storage = createStorage(memoryBackend({ [`${STORAGE_PREFIX}prefs`]: '{not json' }));
+    expect(storage.get('prefs')).toBeUndefined();
   });
 
   it('removes a key', () => {

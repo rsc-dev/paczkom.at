@@ -5,7 +5,7 @@
  */
 
 /**
- * `dismissed` means the player closed the share sheet: they made a choice, and
+ * `dismissed` means the reader closed the share sheet: they made a choice, and
  * the right response is to do nothing rather than to quietly copy instead.
  */
 export type ShareOutcome = 'shared' | 'dismissed' | 'copied' | 'manual';
@@ -42,7 +42,7 @@ function isDismissal(error: unknown): boolean {
 }
 
 /**
- * Tries each path in turn. A dismissed share sheet stops there — the player
+ * Tries each path in turn. A dismissed share sheet stops there — the reader
  * said no, and quietly copying to their clipboard instead is not what they
  * asked for. Anything else that goes wrong falls through to the next path.
  */
@@ -58,7 +58,7 @@ export async function shareText(text: string, targets: ShareTargets): Promise<Sh
         return 'dismissed';
       }
       // Refused for some other reason: fall through rather than leaving the
-      // player with no way to get the text out at all.
+      // reader with no way to get the text out at all.
     }
   }
 

@@ -39,8 +39,10 @@ describe('zero runtime dependencies', () => {
       'lint',
       'test',
       'test:e2e',
-      'gen:fixtures',
       'gen:icons',
+      'gen:towns',
+      'collect',
+      'record:fixtures',
     ]) {
       expect(Object.keys(pkg.scripts ?? {})).toContain(script);
     }
@@ -90,21 +92,19 @@ describe('static assets', () => {
 describe('index.html', () => {
   const html = read('index.html');
 
-  it('is the only page, and carries the four screens', () => {
-    for (const id of ['screen-title', 'screen-howto', 'screen-game', 'screen-result']) {
+  it('is the only page, and carries the five screens', () => {
+    for (const id of ['screen-loading', 'screen-error', 'screen-picker', 'screen-card', 'screen-ranking']) {
       expect(html).toContain(`id="${id}"`);
     }
   });
 
-  it('has the scenery slot in front of the wall', () => {
-    expect(html.indexOf('class="scenery"')).toBeGreaterThan(0);
-    expect(html.indexOf('class="scenery"')).toBeLessThan(html.indexOf('id="stage"'));
+  it('credits every data source', () => {
+    expect(html).toContain('data-t="footer.attribution"');
   });
 
-  it('links the manifest, the favicon and the theme', () => {
+  it('links the manifest and the favicon', () => {
     expect(html).toContain('rel="manifest"');
     expect(html).toContain('/favicon.svg');
-    expect(html).toContain('data-theme="signage"');
   });
 });
 
@@ -125,23 +125,46 @@ describe('deployment', () => {
     expect(triggers).not.toContain('branches');
   });
 
-  it('has a deploy workflow wired to GitHub Pages on main', () => {
+  it('deploys to GitHub Pages after CI on main, hourly, and on demand', () => {
     const deploy = read('.github', 'workflows', 'deploy.yml');
     expect(deploy).toContain('actions/upload-pages-artifact');
     expect(deploy).toContain('actions/deploy-pages');
     expect(deploy).toContain('branches: [main]');
+    expect(deploy).toContain("cron: '25 * * * *'");
+    expect(deploy).toContain('workflow_dispatch');
   });
 
-  it('deploys the commit CI passed, not whatever main points at', () => {
+  it('collects after building and carries the history in the cache', () => {
     const deploy = read('.github', 'workflows', 'deploy.yml');
+    expect(deploy.indexOf('npm run build')).toBeLessThan(deploy.indexOf('npm run collect'));
+    expect(deploy).toContain('actions/cache/restore');
+    expect(deploy).toContain('actions/cache/save');
     expect(deploy).toContain('github.event.workflow_run.head_sha');
   });
 
-  it('keeps the screenshots and the Playwright report as CI artefacts', () => {
+  it('only deploys a workflow_run that is a successful push from this repository', () => {
+    const deploy = read('.github', 'workflows', 'deploy.yml');
+    expect(deploy).toContain("github.event.workflow_run.conclusion == 'success'");
+    expect(deploy).toContain("github.event.workflow_run.event == 'push'");
+    expect(deploy).toContain('github.event.workflow_run.head_repository.full_name == github.repository');
+  });
+
+  it('resolves the latest green commit on main for hourly and manual runs', () => {
+    const deploy = read('.github', 'workflows', 'deploy.yml');
+    expect(deploy).toContain('actions: read');
+    expect(deploy).toContain('gh run list --workflow CI --branch main --status success');
+    expect(deploy).toContain('steps.green.outputs.sha');
+  });
+
+  it('keeps the schedule alive and checks the live sources', () => {
+    expect(read('.github', 'workflows', 'keepalive.yml')).toContain('schedule');
+    expect(read('.github', 'workflows', 'live-check.yml')).toContain('--check-live');
+  });
+
+  it('keeps the Playwright report as a CI artefact on failure', () => {
     const ci = read('.github', 'workflows', 'ci.yml');
-    expect(ci).toContain('test-results/screens/');
     expect(ci).toContain('playwright-report/');
-    expect(ci).toContain('if: always()');
+    expect(ci).toContain('if: failure()');
   });
 
   it('documents setup, running and deployment in the README', () => {
@@ -150,7 +173,15 @@ describe('deployment', () => {
       expect(readme, heading).toContain(heading);
     }
     expect(readme).toContain('paczkom.at');
-    expect(readme).toContain('LAUNCH_EPOCH');
+    expect(readme).toContain('## Data and attribution');
+  });
+});
+
+describe('trade-mark discipline', () => {
+  it('never says Paczkomat in the page or the copy', () => {
+    for (const file of ['index.html', 'src/i18n/pl.ts', 'src/i18n/en.ts', 'public/manifest.webmanifest']) {
+      expect(read(file).toLowerCase(), file).not.toContain('paczkomat');
+    }
   });
 });
 
@@ -159,7 +190,7 @@ describe('link previews', () => {
   const meta = (attr: 'property' | 'name', key: string): string | undefined =>
     new RegExp(`<meta ${attr}="${key}" content="([^"]*)"`).exec(html)?.[1];
 
-  it('describe the game to anything that unfurls a link', () => {
+  it('describe the site to anything that unfurls a link', () => {
     expect(meta('property', 'og:title')).toBe('paczkom.at');
     expect(meta('property', 'og:description')).not.toBe('');
     expect(meta('property', 'og:url')).toBe('https://paczkom.at/');
