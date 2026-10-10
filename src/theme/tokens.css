@@ -1,0 +1,22 @@
+/**
+ * Every colour and size the page uses. TypeScript never names a colour: the
+ * LCD paints `[data-seg]` (ghost) and `[data-seg][data-on]` (lit), and the
+ * case is plain CSS. Everything is monochrome, in the tones of the art board.
+ */
+:root {
+  /* The owner's art board: paper, the grey plate around the screen, ink. */
+  --bg: #c8cdb6;
+  --bg-grain: rgb(35 38 31 / 9%);
+  --ink: #1f221c;
+  --plate: #a3a998;
+  --plate-hi: #b9bead;
+  --plate-lo: #7d8376;
+  --slip: #dfe2d2;
+  --lcd-bg: #b7bf9e;
+  --lcd-ink: #1c2114;
+  --lcd-print: #4d5640;
+  --lcd-ghost: 0.08;
+  --radius: 14px;
+  --gap: 16px;
+  --font: 'Inter', system-ui, sans-serif;
+}

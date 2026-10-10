@@ -1,0 +1,85 @@
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; color: var(--ink); font-family: var(--font); background-color: var(--bg);
+  /* The board's paper: a fine stipple and a faint diagonal hatch. */
+  background-image: radial-gradient(var(--bg-grain) 0.6px, transparent 0.8px),
+    repeating-linear-gradient(-45deg, var(--bg-grain) 0 1px, transparent 1px 7px);
+  background-size: 4px 4px, auto;
+}
+#app { min-height: 100dvh; display: grid; place-items: center; padding: var(--gap); }
+/* `hidden` must win over every display rule below (the slip is display: flex). */
+[hidden] { display: none !important; }
+.visually-hidden, .handheld__brand { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The case: the board's grey plate, printed in ink with a double outline. Portrait by default (phones). */
+.handheld {
+  width: min(100%, 26rem); display: flex; flex-direction: column; gap: var(--gap);
+  padding: 1.4rem; border-radius: 22px; color: var(--ink);
+  background: linear-gradient(var(--plate-hi), var(--plate) 30%, var(--plate-lo));
+  box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 7px var(--plate-hi), inset 0 0 0 8.5px var(--ink),
+    0 14px 30px rgb(30 34 26 / 30%);
+}
+.handheld__screen { padding: 0.35rem 0.4rem 0.9rem; }
+/* The title breaks a double rule, as on the board; the maker's name sits in a box below. */
+.lcd-title { display: flex; align-items: center; gap: 0.7rem; margin: 0.15rem 0.2rem 0.45rem; font: 800 1.35rem/1.6 var(--font); letter-spacing: 0.04em; }
+.lcd-title::before, .lcd-title::after { content: ''; flex: 1; height: 5px; border-block: 1.5px solid var(--ink); }
+.lcd-title--foot {
+  width: fit-content; margin: 0.6rem auto 0; padding: 0.35rem 1.1rem; justify-content: center;
+  border: 1.5px solid var(--ink); border-radius: 4px; font: 700 0.78rem/1 var(--font); letter-spacing: 0.22em;
+}
+.lcd-title--foot::before, .lcd-title--foot::after { content: none; }
+.lcd {
+  aspect-ratio: 5 / 3; border-radius: 10px; background: var(--lcd-bg); touch-action: manipulation;
+  box-shadow: 0 0 0 5px var(--ink), 0 0 0 7px var(--plate-hi), 0 0 0 8.5px var(--ink), inset 0 0 18px rgb(0 0 0 / 22%);
+}
+.lcd svg { display: block; width: 100%; height: 100%; }
+
+/* The LCD: the faint print, ghosts and lit segments. Sprites are black ink on transparency. */
+.lcd-print { fill: var(--lcd-print); stroke: var(--lcd-print); }
+.lcd-print image, .lcd-print .lcd-stroke { opacity: 0.55; }
+.lcd-text { font: 700 14px var(--font); stroke: none; }
+.lcd-label { fill: var(--lcd-print); }
+.lcd-stroke { fill: none; stroke-width: 1.4; stroke-linecap: round; }
+[data-seg] { fill: var(--lcd-ink); stroke: none; opacity: var(--lcd-ghost); }
+[data-seg][data-on] { opacity: 1; }
+[data-seg] .lcd-stroke { fill: none; stroke: var(--lcd-ink); }
+[data-seg] .lcd-thick { stroke-width: 5; }
+[data-seg] .lcd-crate { stroke-width: 2.4; stroke-linejoin: round; }
+
+/* Controls: plate-coloured keys outlined in ink. */
+.handheld__controls { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--gap); }
+.pad { display: flex; flex-direction: column; gap: 1rem; }
+.pad--left, .pad--right { align-self: center; }
+.pad--middle { align-items: center; gap: 0.5rem; }
+.round {
+  width: 4.25rem; height: 4.25rem; border-radius: 50%; border: 0; cursor: pointer; touch-action: manipulation;
+  background: var(--plate-hi); box-shadow: inset 0 0 0 2px var(--ink), inset 0 -5px 0 var(--plate-lo), 0 2px 0 var(--ink);
+}
+.round__glyph { font: 700 1.4rem var(--font); color: var(--ink); pointer-events: none; }
+.pill, .tiny__btn { border: 0; border-radius: 999px; cursor: pointer; background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.pill { min-width: 5.5rem; padding: 0.45rem 0.8rem; font: 700 0.8rem var(--font); letter-spacing: 0.06em; }
+.round:active, .pill:active, .tiny__btn:active { background: var(--plate-lo); }
+.round:focus-visible, .pill:focus-visible, .tiny__btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.tiny { display: flex; gap: 0.5rem; }
+.tiny__btn { padding: 0.25rem 0.6rem; font: 0.75rem var(--font); }
+.tiny__btn[aria-pressed='false'] { opacity: 0.5; }
+
+/* The slip after a shift. */
+.slip { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.9rem; border-radius: 8px; background: var(--slip); color: var(--ink); border: 1.5px solid var(--ink); }
+.slip__text, .slip__record, .slip__note { margin: 0; }
+.slip__record { font-weight: 700; text-decoration: underline; }
+.slip__fallback { font: inherit; min-height: 6rem; }
+.help { margin: 0; font-size: 0.8rem; text-align: center; opacity: 0.8; }
+
+/* Landscape: the classic horizontal handheld, buttons at the sides. */
+@media (orientation: landscape) and (min-width: 640px) {
+  .handheld { width: min(100%, 52rem); display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: 'brand brand brand' 'left screen right' 'mid mid mid' 'slip slip slip' 'help help help'; }
+  .handheld__brand { grid-area: brand; }
+  .handheld__screen { grid-area: screen; }
+  .handheld__controls { display: contents; }
+  .pad--left { grid-area: left; }
+  .pad--right { grid-area: right; }
+  .pad--middle { grid-area: mid; flex-direction: row; justify-content: center; }
+  .slip { grid-area: slip; }
+  .help { grid-area: help; }
+}

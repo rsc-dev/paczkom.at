@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Polish, to match `lang` on the document. -->
+    <meta name="description" content="Łap rzucane paczki i noś je do automatu. Gra w stylu konsolek LCD." />
+    <meta name="theme-color" content="#c8cdb6" />
+    <!-- Link previews. Absolute URLs: unfurlers do not resolve relative ones. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="paczkom.at" />
+    <meta property="og:title" content="paczkom.at" />
+    <meta property="og:description" content="Łap rzucane paczki i noś je do automatu. Gra w stylu konsolek LCD." />
+    <meta property="og:url" content="https://paczkom.at/" />
+    <meta property="og:image" content="https://paczkom.at/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Konsolka LCD z kurierem łapiącym paczki" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:locale:alternate" content="en_GB" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <title>paczkom.at · gra w paczki</title>
+  </head>
+  <body>
+    <div id="app" data-state="clock">
+      <main class="handheld" aria-labelledby="brand">
+        <h1 class="handheld__brand" id="brand">paczkom.at</h1>
+        <div class="handheld__screen">
+          <p class="lcd-title" aria-hidden="true">PACZKOM.AT</p>
+          <div class="lcd" id="lcd"></div>
+          <p class="lcd-title lcd-title--foot" aria-hidden="true">ELEKTRONIKA PACZKOM.AT</p>
+        </div>
+        <div class="handheld__controls">
+          <div class="pad pad--left">
+            <button class="round" type="button" data-move="-1" data-t-label="btn.left"><span class="round__glyph" aria-hidden="true">←</span></button>
+          </div>
+          <div class="pad pad--middle">
+            <button class="pill" type="button" data-start="A" data-t="btn.gameA"></button>
+            <button class="pill" type="button" data-start="B" data-t="btn.gameB"></button>
+            <button class="pill" type="button" data-clock data-t="btn.clock"></button>
+            <div class="tiny">
+              <button class="tiny__btn" type="button" id="btn-sound" data-t-label="btn.sound" aria-pressed="true">♪</button>
+              <button class="tiny__btn" type="button" id="btn-lang"></button>
+            </div>
+          </div>
+          <div class="pad pad--right">
+            <button class="round" type="button" data-move="1" data-t-label="btn.right"><span class="round__glyph" aria-hidden="true">→</span></button>
+          </div>
+        </div>
+        <section class="slip" id="slip" hidden>
+          <p class="slip__text" id="slip-text"></p>
+          <p class="slip__record" id="slip-record" data-t="slip.newRecord" hidden></p>
+          <button class="pill" type="button" id="btn-share" data-t="slip.share"></button>
+          <p class="slip__note" id="share-note" role="status"></p>
+          <textarea class="slip__fallback" id="share-fallback" readonly hidden></textarea>
+        </section>
+        <p class="help" data-t="help.keys"></p>
+        <p class="visually-hidden" id="live" aria-live="polite"></p>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

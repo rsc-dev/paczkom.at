@@ -1,0 +1,27 @@
+import type { MessageKey } from './pl.js';
+
+export const en: Readonly<Record<MessageKey, string>> = {
+  'meta.tagline': 'Catch thrown parcels and carry them to the locker. An LCD-handheld game.',
+  'lang.toggle': 'PL',
+  'btn.left': 'Left',
+  'btn.right': 'Right',
+  'unit.one': 'pt',
+  'unit.many': 'pts',
+  'live.hearts': 'Hearts: {count}',
+  'btn.gameA': 'GAME A',
+  'btn.gameB': 'GAME B',
+  'btn.clock': 'TIME',
+  'btn.sound': 'Sound',
+  'lcd.game': 'GAME',
+  'lcd.label': 'Game screen',
+  'slip.over': 'End of shift: {points} {unit} · record: {record}',
+  'slip.newRecord': 'New record!',
+  'slip.share': 'Share',
+  'slip.shared': 'Shared.',
+  'slip.copied': 'Copied to the clipboard.',
+  'slip.manual': 'Copy the text below.',
+  'share.game': 'Game {mode}',
+  'live.score': 'Points: {score}',
+  'live.over': 'End of shift.',
+  'help.keys': 'Keys: A/D or ←/→ — left and right, numpad 1–5. The locker is at the far right. Space: game A, B: game B.',
+};
